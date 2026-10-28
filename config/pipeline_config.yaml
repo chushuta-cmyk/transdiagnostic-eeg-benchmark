@@ -1,0 +1,47 @@
+# Transdiagnostic EEG Benchmark Pipeline Configuration
+dataset:
+  target_montage: "standard_1020_19ch"
+  channels_19:
+    - "Fp1"
+    - "Fp2"
+    - "F3"
+    - "F4"
+    - "C3"
+    - "C4"
+    - "P3"
+    - "P4"
+    - "O1"
+    - "O2"
+    - "F7"
+    - "F8"
+    - "T7"
+    - "T8"
+    - "P7"
+    - "P8"
+    - "Fz"
+    - "Cz"
+    - "Pz"
+
+spectral:
+  bands:
+    delta: [0.5, 4.0]
+    theta: [4.0, 8.0]
+    alpha: [8.0, 13.0]
+    beta: [13.0, 30.0]
+  fooof:
+    freq_range: [1.0, 40.0]
+    alpha_bump_exclude: [7.0, 14.0]
+
+graph:
+  algorithm: "MST_plus_Proportional"
+  proportional_sparsity: 0.20
+  connectivity_metric: "PLI"
+
+model:
+  architecture: "NormativeGCN"
+  hidden_dim: 32
+  dropout: 0.3
+  learning_rate: 0.005
+  weight_decay: 0.0001
+  batch_size: 8
+  epochs: 30

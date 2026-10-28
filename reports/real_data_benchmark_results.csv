@@ -1,0 +1,4 @@
+Analysis / Paradigm,Sample N,Balanced Accuracy,ROC-AUC,95% Bootstrap CI,Permutation p-value,Statistical Significance
+Study 1 LOSO (Sleep Debt: ds004902),40 sessions (20 pairs),65.0%,0.593,"[0.409, 0.768]",0.1698,n.s.
+Study 2 LOSO (Clinical MDD: MPHCE),"58 subjects (28 HC, 30 MDD)",77.6%,0.889,"[0.795, 0.963]",0.0010,p < 0.001 (***)
+Zero-Shot Normative |Z| Transfer (S1 -> S2),58 test subjects,70.7%,0.731,"[0.585, 0.864]",0.0030,p < 0.01 (**)

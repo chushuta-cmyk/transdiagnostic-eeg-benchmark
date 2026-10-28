@@ -1,0 +1,14 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Large raw datasets (already safely kept in external folders)
+data/raw/
+
+# Temporary checkpoints
+*.tmp
