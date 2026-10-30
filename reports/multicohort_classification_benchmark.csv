@@ -8,5 +8,5 @@ Sleep_ds004902_SingleSess,Within-Cohort 5-Fold GroupCV (Subject-Independent),142
 Cavanagh_MDD -> Mumtaz_MDD,Zero-Shot Cross-Cohort Transfer,58,30,28,0.8103448275862069,0.8107142857142857,0.8321428571428572,0.7060879190385831,0.9346140269139303,Zero-shot cross-hardware generalization
 Mumtaz_MDD -> Cavanagh_MDD,Zero-Shot Cross-Cohort Transfer,119,44,75,0.6302521008403361,0.5046969696969698,0.46545454545454545,0.3528791380746977,0.5814658210007045,Asymmetric severe-to-mild transfer
 Sleep_Deprivation -> UCSD_Parkinson,Zero-Shot Cross-Cohort Transfer,46,30,16,0.6304347826086957,0.6875,0.8020833333333334,0.6626227938727938,0.928921568627451,Shared low-frequency slowing dynamics
-Sleep_Deprivation -> Mumtaz_MDD,Zero-Shot Cross-Cohort Transfer,58,30,28,0.43103448275862066,0.4226190476190476,0.2773809523809524,0.1361896383186706,0.4219103535353535,Inverted AUC (0.270 -> 0.730 effective) proves theta dissociation
+Sleep_Deprivation -> Mumtaz_MDD,Zero-Shot Cross-Cohort Transfer,58,30,28,0.43103448275862066,0.4226190476190476,0.2773809523809524,0.1361896383186706,0.4219103535353535,Inverted AUC (0.277 -> 0.723 effective) proves theta dissociation
 Cavanagh_MDD -> UCSD_Parkinson,Zero-Shot Cross-Cohort Transfer,46,30,16,0.41304347826086957,0.375,0.27083333333333337,0.12100840336134452,0.44608031674208154,Inverted AUC (0.271 -> 0.729 effective) confirms theta polarity axis

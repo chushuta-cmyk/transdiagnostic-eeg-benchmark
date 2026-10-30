@@ -5,7 +5,7 @@ publication-ready Word .docx manuscript.
 Features:
   - Complete elimination of raw LaTeX code, math markup, and garbled symbols.
   - Full Unicode conversion of Greek letters, mathematical operators, superscripts, and subscripts.
-  - Clean table rendering with alternating row fills and proper cell margins.
+  - Journal-standard APA/IEEE Three-Line Tables (top border, header bottom border, table bottom border, zero vertical borders).
   - High-resolution (300 DPI) embedded figures with formatted captions.
   - Professional typography adhering to medical and neuroscience journal standards.
 """
@@ -61,9 +61,7 @@ SUPERSCRIPTS = {
     '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴',
     '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹',
     '+': '⁺', '-': '⁻', '=': '⁼', '(': '⁽', ')': '⁾',
-    'n': 'ⁿ', 'i': 'ⁱ', 'a': 'ᵃ', 'b': 'ᵇ', 'c': 'ᶜ',
-    'k': 'ᵏ', 'm': 'ᵐ', 'r': 'ʳ', 't': 'ᵗ', 'x': 'ˣ',
-    '*': '*', '†': '†',
+    'n': 'ⁿ', 'i': 'ⁱ', '*': '*', 'T': 'ᵀ', '–': '⁻'
 }
 
 SUBSCRIPTS = {
@@ -93,17 +91,41 @@ def set_cell_shading(cell, color_hex):
     cell._tc.get_or_add_tcPr().append(shading_elm)
 
 
+def set_three_line_borders(table):
+    """Applies strict APA/IEEE three-line table borders with zero vertical lines."""
+    tblPr = table._tbl.tblPr
+    tblBorders = parse_xml(
+        f'<w:tblBorders {nsdecls("w")}>'
+        f'  <w:top w:val="single" w:sz="12" w:space="0" w:color="1A365D"/>'
+        f'  <w:left w:val="none"/>'
+        f'  <w:bottom w:val="single" w:sz="12" w:space="0" w:color="1A365D"/>'
+        f'  <w:right w:val="none"/>'
+        f'  <w:insideH w:val="none"/>'
+        f'  <w:insideV w:val="none"/>'
+        f'</w:tblBorders>'
+    )
+    tblPr.append(tblBorders)
+
+    # Add a thin bottom border to the header row (row 0)
+    for cell in table.rows[0].cells:
+        tcPr = cell._tc.get_or_add_tcPr()
+        tcBorders = parse_xml(
+            f'<w:tcBorders {nsdecls("w")}>'
+            f'  <w:bottom w:val="single" w:sz="6" w:space="0" w:color="2D3748"/>'
+            f'</w:tcBorders>'
+        )
+        tcPr.append(tcBorders)
+
+
 def clean_latex(text: str) -> str:
     """Translates common math/LaTeX tokens into clean, elegant Unicode text."""
     if not text:
         return ""
     s = text
 
-    # Standard symbols
     for macro, sym in GREEK_AND_SYMBOLS.items():
         s = s.replace(macro, sym)
 
-    # Special accents and wrappers
     s = re.sub(r'\\hat\{y\}', 'ŷ', s)
     s = re.sub(r'\\hat\{P\}', 'P̂', s)
     s = re.sub(r'\\tilde\{D\}', 'D̃', s)
@@ -116,21 +138,18 @@ def clean_latex(text: str) -> str:
     s = re.sub(r'\\boldsymbol\{([^}]+)\}', r'\1', s)
     s = re.sub(r'\\text\{([^}]+)\}', r'\1', s)
 
-    # Superscripts
     def sub_sup(m):
         content = m.group(1)
         return "".join(SUPERSCRIPTS.get(c, c) for c in content)
     s = re.sub(r'\^\{([^}]+)\}', sub_sup, s)
     s = re.sub(r'\^([0-9a-zA-Z\*\+\-†])', lambda m: SUPERSCRIPTS.get(m.group(1), m.group(1)), s)
 
-    # Subscripts
     def sub_sub(m):
         content = m.group(1)
         return "".join(SUBSCRIPTS.get(c, c) for c in content)
     s = re.sub(r'_\{([^}]+)\}', sub_sub, s)
     s = re.sub(r'_([0-9a-zA-Z\*\+\-])', lambda m: SUBSCRIPTS.get(m.group(1), m.group(1)), s)
 
-    # Strip math delimiters
     s = re.sub(r'\$([^$]+)\$', r'\1', s)
     s = s.replace('$', '')
     s = s.replace('{', '').replace('}', '')
@@ -139,18 +158,76 @@ def clean_latex(text: str) -> str:
     return s
 
 
+def add_formatted_text(p, text):
+    parts = re.split(r'(\*\*[^*]+\*\*|\*[^*]+\*)', text)
+    for part in parts:
+        if part.startswith('**') and part.endswith('**'):
+            run = p.add_run(part[2:-2])
+            run.bold = True
+        elif part.startswith('*') and part.endswith('*'):
+            run = p.add_run(part[1:-1])
+            run.italic = True
+        else:
+            p.add_run(part)
+
+
+def render_markdown_table(doc, table_lines):
+    clean_rows = []
+    for line in table_lines:
+        cells = [c.strip() for c in line.split('|')[1:-1]]
+        if all(re.match(r'^:?-+:?$', c) for c in cells):
+            continue
+        clean_rows.append(cells)
+
+    if not clean_rows:
+        return
+
+    n_cols = max(len(r) for r in clean_rows)
+    table = doc.add_table(rows=len(clean_rows), cols=n_cols)
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+
+    set_three_line_borders(table)
+
+    for r_idx, row in enumerate(clean_rows):
+        is_header = (r_idx == 0)
+        for c_idx in range(n_cols):
+            cell = table.cell(r_idx, c_idx)
+            val = row[c_idx] if c_idx < len(row) else ""
+            val = val.replace('<br>', '\n')
+            val = clean_latex(val)
+
+            p = cell.paragraphs[0]
+            p.text = ""
+            p.paragraph_format.line_spacing = 1.05
+            p.paragraph_format.space_after = Pt(2)
+
+            add_formatted_text(p, val)
+
+            set_cell_margins(cell, top=80, bottom=80, left=100, right=100)
+            if is_header:
+                for run in p.runs:
+                    run.font.bold = True
+                    run.font.size = Pt(9.5)
+                set_cell_shading(cell, "EDF2F7")
+            else:
+                for run in p.runs:
+                    run.font.size = Pt(8.5)
+                if r_idx % 2 == 1:
+                    set_cell_shading(cell, "F7FAFC")
+
+    doc.add_paragraph().paragraph_format.space_after = Pt(6)
+
+
 def build_docx():
     print(f"📄 Building Clean Word Document from {MD_PATH.name}...")
     doc = docx.Document()
 
-    # Page Margins (1.0 inch all around)
     for section in doc.sections:
         section.top_margin = Inches(1.0)
         section.bottom_margin = Inches(1.0)
         section.left_margin = Inches(1.0)
         section.right_margin = Inches(1.0)
 
-    # Normal Style
     normal_style = doc.styles['Normal']
     normal_style.font.name = 'Times New Roman'
     normal_style.font.size = Pt(11)
@@ -182,7 +259,6 @@ def build_docx():
             i += 1
             continue
 
-        # Skip horizontal rules
         if line == '---':
             i += 1
             continue
@@ -247,7 +323,7 @@ def build_docx():
                 p_img.add_run().add_picture(str(fig1_path), width=Inches(6.4))
                 p_cap = doc.add_paragraph()
                 p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                run_cap = p_cap.add_run("Figure 1. Multi-Cohort Biophysical Effect Sizes Across Pathologies (Forest plots of Cohen's d with 95% Confidence Intervals; * indicates Benjamini-Hochberg FDR q < 0.05).")
+                run_cap = p_cap.add_run("Figure 1. Multi-Cohort Biophysical Effect Sizes Across Pathologies (Forest plots of Cohen's d / dz with 95% Confidence Intervals; * indicates Benjamini-Hochberg FDR q < 0.05, ** q < 0.01 across 20 focal hypothesis tests).")
                 run_cap.font.size = Pt(9.5)
                 run_cap.font.italic = True
                 p_cap.paragraph_format.space_after = Pt(10)
@@ -262,10 +338,10 @@ def build_docx():
                 doc.add_paragraph().paragraph_format.space_before = Pt(6)
                 p_img = doc.add_paragraph()
                 p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                p_img.add_run().add_picture(str(fig2_path), width=Inches(6.2))
+                p_img.add_run().add_picture(str(fig2_path), width=Inches(6.4))
                 p_cap = doc.add_paragraph()
                 p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                run_cap = p_cap.add_run("Figure 2. NormativeGCN Classification Benchmarks: Within-Cohort Cross-Validation vs. Zero-Shot Cross-Cohort Model Transfer (ROC-AUC with 95% Bootstrap Confidence Intervals).")
+                run_cap = p_cap.add_run("Figure 2. Classification Benchmarks: Fold-Nested NormativeGCN vs. Flat Logistic Regression Baseline (Within-Cohort Cross-Validation vs. Zero-Shot Cross-Cohort Model Transfer; * indicates Inverted ROC-AUC due to reversed physiological polarity).")
                 run_cap.font.size = Pt(9.5)
                 run_cap.font.italic = True
                 p_cap.paragraph_format.space_after = Pt(10)
@@ -282,64 +358,6 @@ def build_docx():
 
     doc.save(OUTPUT_DOCX)
     print(f"✓ Successfully generated clean publication Word manuscript: {OUTPUT_DOCX}")
-
-
-def add_formatted_text(p, text):
-    parts = re.split(r'(\*\*[^*]+\*\*|\*[^*]+\*)', text)
-    for part in parts:
-        if part.startswith('**') and part.endswith('**'):
-            run = p.add_run(part[2:-2])
-            run.bold = True
-        elif part.startswith('*') and part.endswith('*'):
-            run = p.add_run(part[1:-1])
-            run.italic = True
-        else:
-            p.add_run(part)
-
-
-def render_markdown_table(doc, table_lines):
-    clean_rows = []
-    for line in table_lines:
-        cells = [c.strip() for c in line.split('|')[1:-1]]
-        if all(re.match(r'^:?-+:?$', c) for c in cells):
-            continue
-        clean_rows.append(cells)
-
-    if not clean_rows:
-        return
-
-    n_cols = max(len(r) for r in clean_rows)
-    table = doc.add_table(rows=len(clean_rows), cols=n_cols)
-    table.alignment = WD_TABLE_ALIGNMENT.CENTER
-
-    for r_idx, row in enumerate(clean_rows):
-        is_header = (r_idx == 0)
-        for c_idx in range(n_cols):
-            cell = table.cell(r_idx, c_idx)
-            val = row[c_idx] if c_idx < len(row) else ""
-            val = val.replace('<br>', '\n')
-            val = clean_latex(val)
-
-            p = cell.paragraphs[0]
-            p.text = ""
-            p.paragraph_format.line_spacing = 1.0
-            p.paragraph_format.space_after = Pt(2)
-
-            add_formatted_text(p, val)
-
-            set_cell_margins(cell, top=70, bottom=70, left=90, right=90)
-            if is_header:
-                for run in p.runs:
-                    run.font.bold = True
-                    run.font.size = Pt(9.5)
-                set_cell_shading(cell, "EBF3FA")
-            else:
-                for run in p.runs:
-                    run.font.size = Pt(9)
-                if r_idx % 2 == 1:
-                    set_cell_shading(cell, "F9FAFC")
-
-    doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
 
 if __name__ == "__main__":
