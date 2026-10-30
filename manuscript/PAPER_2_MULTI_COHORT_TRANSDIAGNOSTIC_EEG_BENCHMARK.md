@@ -1,8 +1,11 @@
 # A Universal 19-Channel Normative Graph Architecture Resolves Shared and Divergent Electrophysiological Signatures Across Acute Sleep Debt, Major Depression, and Parkinson's Disease
 
-**Author**: Chushu Tan¹,²  
-¹ School of Sociology, China University of Political Science and Law, Beijing, China  
-² Department of Psychology, University at Buffalo, The State University of New York, Buffalo, NY, USA  
+**Chushu Tan**^{1,2,*}
+
+^{1} School of Sociology, China University of Political Science and Law, Beijing 102249, China  
+^{2} Department of Psychology, University at Buffalo (UB), The State University of New York, New York, NY 12246, USA  
+
+^{*} Corresponding author: Chushu Tan, Guangzhou, Guangdong 510006, China. Email: chushuta@gmail.com. Tel: +86 18008428969. ORCID: 0009-0007-3093-0160  
 
 ---
 
