@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 """
-Compiles PAPER_2_MULTI_COHORT_TRANSDIAGNOSTIC_EEG_BENCHMARK.md into a publication-ready Word .docx.
-Includes professional formatting, clean tables, and embedded 300-DPI publication figures.
+Compiles PAPER_2_MULTI_COHORT_TRANSDIAGNOSTIC_EEG_BENCHMARK.md into a professional,
+publication-ready Word .docx manuscript.
+Features:
+  - Complete elimination of raw LaTeX code, math markup, and garbled symbols.
+  - Full Unicode conversion of Greek letters, mathematical operators, superscripts, and subscripts.
+  - Clean table rendering with alternating row fills and proper cell margins.
+  - High-resolution (300 DPI) embedded figures with formatted captions.
+  - Professional typography adhering to medical and neuroscience journal standards.
 """
 
 import re
@@ -18,8 +24,60 @@ MD_PATH = BENCHMARK_ROOT / "manuscript" / "PAPER_2_MULTI_COHORT_TRANSDIAGNOSTIC_
 REPORTS_DIR = BENCHMARK_ROOT / "reports"
 OUTPUT_DOCX = BENCHMARK_ROOT / "manuscript" / "PAPER_2_MULTI_COHORT_TRANSDIAGNOSTIC_EEG_BENCHMARK.docx"
 
+GREEK_AND_SYMBOLS = {
+    r'\Delta': 'Δ',
+    r'\beta': 'β',
+    r'\alpha': 'α',
+    r'\theta': 'θ',
+    r'\delta': 'δ',
+    r'\chi': 'χ',
+    r'\Omega': 'Ω',
+    r'\omega': 'ω',
+    r'\rho': 'ρ',
+    r'\sigma': 'σ',
+    r'\mu': 'μ',
+    r'\lambda': 'λ',
+    r'\nabla': '∇',
+    r'\times': '×',
+    r'\le': '≤',
+    r'\leq': '≤',
+    r'\ge': '≥',
+    r'\geq': '≥',
+    r'\pm': '±',
+    r'\approx': '≈',
+    r'\neq': '≠',
+    r'\propto': '∝',
+    r'\to': '→',
+    r'\sim': '~',
+    r'\mu\text{V}': 'µV',
+    r'\text{--}': '–',
+    r'\text{-}': '-',
+    r'\quad': ' ',
+    r'\dagger': '†',
+    r'\Sigma': 'Σ',
+}
 
-def set_cell_margins(cell, top=100, bottom=100, left=150, right=150):
+SUPERSCRIPTS = {
+    '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴',
+    '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹',
+    '+': '⁺', '-': '⁻', '=': '⁼', '(': '⁽', ')': '⁾',
+    'n': 'ⁿ', 'i': 'ⁱ', 'a': 'ᵃ', 'b': 'ᵇ', 'c': 'ᶜ',
+    'k': 'ᵏ', 'm': 'ᵐ', 'r': 'ʳ', 't': 'ᵗ', 'x': 'ˣ',
+    '*': '*', '†': '†',
+}
+
+SUBSCRIPTS = {
+    '0': '₀', '1': '₁', '2': '₂', '3': '₃', '4': '₄',
+    '5': '₅', '6': '₆', '7': '₇', '8': '₈', '9': '₉',
+    '+': '₊', '-': '₋', '=': '₌', '(': '₍', ')': '₎',
+    'a': 'ₐ', 'e': 'ₑ', 'o': 'ₒ', 'x': 'ₓ', 'h': 'ₕ',
+    'i': 'ᵢ', 'j': 'ⱼ', 'k': 'ₖ', 'l': 'ₗ', 'm': 'ₘ',
+    'n': 'ₙ', 'p': 'ₚ', 's': 'ₛ', 't': 'ₜ', 'u': 'ᵤ',
+    'v': 'ᵥ', 'z': '𝓏',
+}
+
+
+def set_cell_margins(cell, top=100, bottom=100, left=140, right=140):
     tcPr = cell._tc.get_or_add_tcPr()
     tcMar = OxmlElement('w:tcMar')
     for m, val in [('top', top), ('bottom', bottom), ('left', left), ('right', right)]:
@@ -36,33 +94,68 @@ def set_cell_shading(cell, color_hex):
 
 
 def clean_latex(text: str) -> str:
-    # Basic math cleanups
-    text = text.replace(r'\text{--}', '–').replace(r'\text{-}', '-')
-    text = text.replace(r'\mu\text{V}', 'µV')
-    text = text.replace(r'\chi', 'χ').replace(r'\delta', 'δ').replace(r'\theta', 'θ').replace(r'\alpha', 'α')
-    text = text.replace(r'\Delta', 'Δ').replace(r'\pm', '±')
-    text = re.sub(r'\\text\{([^}]+)\}', r'\1', text)
-    text = re.sub(r'\$([^$]+)\$', r'\1', text)
-    return text
+    """Translates common math/LaTeX tokens into clean, elegant Unicode text."""
+    if not text:
+        return ""
+    s = text
+
+    # Standard symbols
+    for macro, sym in GREEK_AND_SYMBOLS.items():
+        s = s.replace(macro, sym)
+
+    # Special accents and wrappers
+    s = re.sub(r'\\hat\{y\}', 'ŷ', s)
+    s = re.sub(r'\\hat\{P\}', 'P̂', s)
+    s = re.sub(r'\\tilde\{D\}', 'D̃', s)
+    s = re.sub(r'\\tilde\{A\}', 'Ã', s)
+    s = re.sub(r'\\mathbf\{([^}]+)\}', r'\1', s)
+    s = re.sub(r'\\mathrm\{([^}]+)\}', r'\1', s)
+    s = re.sub(r'\\mathit\{([^}]+)\}', r'\1', s)
+    s = re.sub(r'\\mathcal\{([^}]+)\}', r'\1', s)
+    s = re.sub(r'\\mathbb\{([^}]+)\}', r'\1', s)
+    s = re.sub(r'\\boldsymbol\{([^}]+)\}', r'\1', s)
+    s = re.sub(r'\\text\{([^}]+)\}', r'\1', s)
+
+    # Superscripts
+    def sub_sup(m):
+        content = m.group(1)
+        return "".join(SUPERSCRIPTS.get(c, c) for c in content)
+    s = re.sub(r'\^\{([^}]+)\}', sub_sup, s)
+    s = re.sub(r'\^([0-9a-zA-Z\*\+\-†])', lambda m: SUPERSCRIPTS.get(m.group(1), m.group(1)), s)
+
+    # Subscripts
+    def sub_sub(m):
+        content = m.group(1)
+        return "".join(SUBSCRIPTS.get(c, c) for c in content)
+    s = re.sub(r'_\{([^}]+)\}', sub_sub, s)
+    s = re.sub(r'_([0-9a-zA-Z\*\+\-])', lambda m: SUBSCRIPTS.get(m.group(1), m.group(1)), s)
+
+    # Strip math delimiters
+    s = re.sub(r'\$([^$]+)\$', r'\1', s)
+    s = s.replace('$', '')
+    s = s.replace('{', '').replace('}', '')
+    s = s.replace(r'\,', ' ').replace(r'\;', ' ')
+    s = re.sub(r'\\[a-zA-Z]+', '', s)
+    return s
 
 
 def build_docx():
-    print(f"📄 Building Word Document from {MD_PATH.name}...")
+    print(f"📄 Building Clean Word Document from {MD_PATH.name}...")
     doc = docx.Document()
 
-    # Margins
+    # Page Margins (1.0 inch all around)
     for section in doc.sections:
         section.top_margin = Inches(1.0)
         section.bottom_margin = Inches(1.0)
         section.left_margin = Inches(1.0)
         section.right_margin = Inches(1.0)
 
-    # Styles
+    # Normal Style
     normal_style = doc.styles['Normal']
     normal_style.font.name = 'Times New Roman'
     normal_style.font.size = Pt(11)
     normal_style.font.color.rgb = RGBColor(0x22, 0x22, 0x22)
-    normal_style.paragraph_format.line_spacing = 1.3
+    normal_style.paragraph_format.line_spacing = 1.25
     normal_style.paragraph_format.space_after = Pt(6)
 
     lines = MD_PATH.read_text(encoding='utf-8').splitlines()
@@ -81,7 +174,6 @@ def build_docx():
             i += 1
             continue
         elif in_table:
-            # Render accumulated table
             render_markdown_table(doc, table_lines)
             in_table = False
             table_lines = []
@@ -100,10 +192,10 @@ def build_docx():
             p = doc.add_paragraph()
             p.alignment = WD_ALIGN_PARAGRAPH.CENTER
             run = p.add_run(clean_latex(line[2:]))
-            run.font.size = Pt(17)
+            run.font.size = Pt(16)
             run.font.bold = True
             run.font.color.rgb = RGBColor(0x11, 0x22, 0x44)
-            p.paragraph_format.space_after = Pt(12)
+            p.paragraph_format.space_after = Pt(10)
             i += 1
             continue
 
@@ -111,7 +203,7 @@ def build_docx():
         if line.startswith('## '):
             p = doc.add_paragraph()
             run = p.add_run(clean_latex(line[3:]))
-            run.font.size = Pt(14)
+            run.font.size = Pt(13)
             run.font.bold = True
             run.font.color.rgb = RGBColor(0x1a, 0x36, 0x5d)
             p.paragraph_format.space_before = Pt(14)
@@ -123,7 +215,7 @@ def build_docx():
         if line.startswith('### '):
             p = doc.add_paragraph()
             run = p.add_run(clean_latex(line[4:]))
-            run.font.size = Pt(12)
+            run.font.size = Pt(11.5)
             run.font.bold = True
             run.font.color.rgb = RGBColor(0x2d, 0x37, 0x48)
             p.paragraph_format.space_before = Pt(10)
@@ -137,6 +229,7 @@ def build_docx():
             run = p.add_run(clean_latex(line[5:]))
             run.font.size = Pt(11)
             run.font.bold = True
+            run.font.color.rgb = RGBColor(0x33, 0x33, 0x33)
             p.paragraph_format.space_before = Pt(8)
             p.paragraph_format.space_after = Pt(2)
             i += 1
@@ -146,36 +239,36 @@ def build_docx():
         if "Table 1 and Figure 1" in line:
             p = doc.add_paragraph()
             add_formatted_text(p, clean_latex(line))
-            # Insert Figure 1
             fig1_path = REPORTS_DIR / "Figure_1_Multicohort_Biophysical_Effect_Sizes.png"
             if fig1_path.exists():
                 doc.add_paragraph().paragraph_format.space_before = Pt(6)
                 p_img = doc.add_paragraph()
                 p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                p_img.add_run().add_picture(str(fig1_path), width=Inches(6.3))
+                p_img.add_run().add_picture(str(fig1_path), width=Inches(6.4))
                 p_cap = doc.add_paragraph()
                 p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                run_cap = p_cap.add_run("Figure 1. Multi-Cohort Biophysical Effect Sizes Across Pathologies (Forest Plots with 95% Confidence Intervals).")
+                run_cap = p_cap.add_run("Figure 1. Multi-Cohort Biophysical Effect Sizes Across Pathologies (Forest plots of Cohen's d with 95% Confidence Intervals; * indicates Benjamini-Hochberg FDR q < 0.05).")
                 run_cap.font.size = Pt(9.5)
                 run_cap.font.italic = True
+                p_cap.paragraph_format.space_after = Pt(10)
             i += 1
             continue
 
         if "Table 2 and Figure 2" in line:
             p = doc.add_paragraph()
             add_formatted_text(p, clean_latex(line))
-            # Insert Figure 2
             fig2_path = REPORTS_DIR / "Figure_2_Within_vs_Cross_Cohort_Performance.png"
             if fig2_path.exists():
                 doc.add_paragraph().paragraph_format.space_before = Pt(6)
                 p_img = doc.add_paragraph()
                 p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                p_img.add_run().add_picture(str(fig2_path), width=Inches(6.0))
+                p_img.add_run().add_picture(str(fig2_path), width=Inches(6.2))
                 p_cap = doc.add_paragraph()
                 p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                run_cap = p_cap.add_run("Figure 2. NormativeGCN Classification Benchmarks: Within-Cohort 5-Fold Cross-Validation vs. Zero-Shot Cross-Cohort Model Transfer (ROC-AUC with 95% Bootstrap CI).")
+                run_cap = p_cap.add_run("Figure 2. NormativeGCN Classification Benchmarks: Within-Cohort Cross-Validation vs. Zero-Shot Cross-Cohort Model Transfer (ROC-AUC with 95% Bootstrap Confidence Intervals).")
                 run_cap.font.size = Pt(9.5)
                 run_cap.font.italic = True
+                p_cap.paragraph_format.space_after = Pt(10)
             i += 1
             continue
 
@@ -188,7 +281,7 @@ def build_docx():
         render_markdown_table(doc, table_lines)
 
     doc.save(OUTPUT_DOCX)
-    print(f"✓ Successfully generated publication Word manuscript: {OUTPUT_DOCX}")
+    print(f"✓ Successfully generated clean publication Word manuscript: {OUTPUT_DOCX}")
 
 
 def add_formatted_text(p, text):
@@ -234,7 +327,7 @@ def render_markdown_table(doc, table_lines):
 
             add_formatted_text(p, val)
 
-            set_cell_margins(cell, top=80, bottom=80, left=100, right=100)
+            set_cell_margins(cell, top=70, bottom=70, left=90, right=90)
             if is_header:
                 for run in p.runs:
                     run.font.bold = True
