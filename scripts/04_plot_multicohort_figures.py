@@ -3,8 +3,7 @@
 Step 04: Publication-Quality Visualization for Multi-Cohort Transdiagnostic EEG Benchmark.
 Generates 300-DPI publication figures in reports/:
   - Figure_1_Multicohort_Biophysical_Effect_Sizes.png & .tiff (Forest plot comparing d values)
-  - Figure_2_OMST_Topology_and_Efficiency.png & .tiff (GCE and network density distributions)
-  - Figure_3_Within_vs_Cross_Cohort_Performance.png & .tiff (Within-cohort CV vs. Zero-shot transfer AUC)
+  - Figure_2_Within_vs_Cross_Cohort_Performance.png & .tiff (Within-cohort CV vs. Zero-shot transfer AUC)
 """
 
 from pathlib import Path
@@ -66,15 +65,24 @@ def plot_figure_1_forest():
             ax.errorbar(d, y_pos[i], xerr=[[xerr[0][i]], [xerr[1][i]]], fmt='o',
                         color=c, ecolor=c, elinewidth=2.2, capsize=5, capthick=2, markersize=8)
 
+            # Add significance indicator
+            p_val = sub.loc[i, 'p_value']
+            q_val = sub.loc[i, 'q_value_focal'] if 'q_value_focal' in sub.columns else np.nan
+            if pd.notnull(q_val) and q_val < 0.05:
+                star = "**" if q_val < 0.01 else "*"
+                ax.text(d, y_pos[i] + 0.22, star, ha='center', va='bottom', color=c, fontweight='bold', fontsize=12)
+            elif pd.notnull(p_val) and p_val < 0.05:
+                ax.text(d, y_pos[i] + 0.22, "†", ha='center', va='bottom', color=c, fontweight='bold', fontsize=11)
+
         ax.set_title(m_title, fontweight='bold', fontsize=11)
         ax.set_xlabel("Cohen's d [95% CI]", fontweight='bold')
         ax.grid(True, linestyle=':', alpha=0.4)
         if ax_idx == 0:
             clean_labels = [c.replace('Study ', 'S').split(' (')[0] for c in cohorts]
             ax.set_yticks(y_pos)
-            ax.set_yticklabels(clean_labels, fontweight='bold', fontsize=9.5)
+            ax.set_yticklabels(clean_labels, fontweight='bold', fontsize=10)
 
-    plt.suptitle("Multi-Cohort Biophysical Effect Sizes Across Sleep Debt, Depression, and Parkinson's Disease",
+    plt.suptitle("Multi-Cohort Biophysical Effect Sizes Across Sleep Debt, Depression, and Parkinson's Disease (* FDR q < 0.05)",
                  fontweight='bold', fontsize=13, y=1.02)
     plt.tight_layout()
     save_png_and_tiff(fig, REPORTS_DIR / "Figure_1_Multicohort_Biophysical_Effect_Sizes")
@@ -88,7 +96,7 @@ def plot_figure_2_benchmarks():
 
     df = pd.read_csv(csv_path)
 
-    fig, ax = plt.subplots(figsize=(10, 5.5))
+    fig, ax = plt.subplots(figsize=(11, 7.0))
 
     names = df['cohort'].values
     aucs = df['roc_auc'].values
@@ -101,22 +109,32 @@ def plot_figure_2_benchmarks():
 
     colors = ['#27ae60' if 'Within' in t else '#e67e22' for t in types]
 
-    bars = ax.barh(y_pos, aucs, xerr=xerr, color=colors, alpha=0.8, edgecolor='black', height=0.6,
+    bars = ax.barh(y_pos, aucs, xerr=xerr, color=colors, alpha=0.85, edgecolor='black', height=0.62,
                    capsize=4, error_kw=dict(elinewidth=1.8, ecolor='black'))
+
+    # Add numeric AUC labels next to bars
+    for i, (b, auc_val) in enumerate(zip(bars, aucs)):
+        if auc_val < 0.35:
+            # Inverted AUC
+            ax.text(auc_val + 0.03, y_pos[i], f"AUC = {auc_val:.3f} (Inv = {1.0-auc_val:.3f})",
+                    va='center', fontweight='bold', fontsize=8.5, color='#c0392b')
+        else:
+            ax.text(auc_val + 0.03, y_pos[i], f"AUC = {auc_val:.3f}",
+                    va='center', fontweight='bold', fontsize=8.5, color='#2c3e50')
 
     ax.axvline(0.5, color='red', linestyle='--', linewidth=1.2, label='Chance Baseline (AUC = 0.50)')
     ax.set_yticks(y_pos)
-    ax.set_yticklabels(names, fontweight='bold', fontsize=10)
+    ax.set_yticklabels(names, fontweight='bold', fontsize=9.5)
     ax.set_xlabel("ROC-AUC [95% Bootstrap CI]", fontweight='bold')
-    ax.set_xlim(0.15, 1.02)
-    ax.set_title("Fold-Nested NormativeGCN Classification: Within-Cohort CV vs. Cross-Cohort Transfer",
+    ax.set_xlim(0.10, 1.15)
+    ax.set_title("Fold-Nested NormativeGCN: Within-Cohort Validation vs. Zero-Shot Cross-Cohort Transfer",
                  fontweight='bold', fontsize=12)
     ax.grid(True, linestyle=':', alpha=0.4, axis='x')
 
     # Legend
     from matplotlib.patches import Patch
     legend_elements = [
-        Patch(facecolor='#27ae60', edgecolor='black', label='Within-Cohort CV (Valid Model)'),
+        Patch(facecolor='#27ae60', edgecolor='black', label='Within-Cohort CV (Leak-Free NormativeGCN)'),
         Patch(facecolor='#e67e22', edgecolor='black', label='Cross-Cohort Transfer (Zero-Shot)'),
         plt.Line2D([0], [0], color='red', linestyle='--', label='Chance Level (0.50)')
     ]

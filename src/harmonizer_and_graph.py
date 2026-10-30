@@ -80,7 +80,9 @@ class TopologicalGraphBuilder:
 
         # Iterative extraction of orthogonal MSTs
         # To maximize tree weight with minimum_spanning_tree, we invert weights: cost = 1.0 - w
-        inv_cost_available = 1.0 - w_full
+        # Add an epsilon (+ 1e-4) so that all available valid edges have cost > 0.
+        # This prevents SciPy's sparse minimum_spanning_tree from treating 0.0-cost edges (w=1.0) as empty/absent.
+        inv_cost_available = (1.0 - w_full) + 1e-4
         np.fill_diagonal(inv_cost_available, 0.0)
         available_mask = np.ones((n, n), dtype=bool)
         np.fill_diagonal(available_mask, False)
