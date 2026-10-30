@@ -2,12 +2,12 @@
 """
 Step 07: Generate Publication-Grade Supplementary Material (Markdown & Word DOCX)
 for Multi-Cohort Transdiagnostic EEG Benchmark.
-Embeds:
-  - Figure S1: specparam Spectral Decomposition Example (Single-Subject)
-  - Figure S2: Canonical 19-Channel OMST Topology Schematic
-  - Figure S3: Amplifier Gain-Invariance Numerical Simulation Validation
-  - Figure S4: Grand-Average Power Spectra Comparison Across Four Cohorts
-  - Supplementary Tables S1, S2, and S3 (APA three-line tables)
+Adheres strictly to NeuroImage / IEEE-TBME publication guidelines:
+  - Header: Article Title only (no authors/affiliations, inherited from main manuscript).
+  - Numbering: Figure S1-S4, Table S1-S3, Section S1-S4.
+  - Native Word Tables with strict APA three-line formatting.
+  - Interleaved layout: Section text immediately followed by corresponding Figure/Table.
+  - Outputs: Supplementary_Material.docx and PAPER_2_SUPPLEMENTARY_MATERIAL.docx
 """
 
 from pathlib import Path
@@ -24,8 +24,10 @@ REPORTS_DIR = BENCHMARK_ROOT / "reports"
 MANUSCRIPT_DIR = BENCHMARK_ROOT / "manuscript"
 MANUSCRIPT_DIR.mkdir(parents=True, exist_ok=True)
 
-SUPP_MD_PATH = MANUSCRIPT_DIR / "PAPER_2_SUPPLEMENTARY_MATERIAL.md"
-SUPP_DOCX_PATH = MANUSCRIPT_DIR / "PAPER_2_SUPPLEMENTARY_MATERIAL.docx"
+SUPP_MD_PATH = MANUSCRIPT_DIR / "Supplementary_Material.md"
+SUPP_DOCX_PATH = MANUSCRIPT_DIR / "Supplementary_Material.docx"
+ALT_MD_PATH = MANUSCRIPT_DIR / "PAPER_2_SUPPLEMENTARY_MATERIAL.md"
+ALT_DOCX_PATH = MANUSCRIPT_DIR / "PAPER_2_SUPPLEMENTARY_MATERIAL.docx"
 
 
 def set_cell_margins(cell, top=100, bottom=100, left=140, right=140):
@@ -137,23 +139,14 @@ def render_markdown_table(doc, table_lines):
                 run.font.color.rgb = RGBColor(0x0F, 0x17, 0x2A)
 
 
-def build_supplementary_docs():
-    print(f"📄 Creating Supplementary Material Markdown and DOCX...")
-
-    # Write Supplementary Markdown
-    supp_md_content = """# Supplementary Material
+def generate_supplementary_content() -> str:
+    return """# Supplementary Material
 
 **A Universal 19-Channel Normative Graph Architecture Resolves Shared and Divergent Electrophysiological Signatures Across Acute Sleep Debt, Major Depression, and Parkinson's Disease**
 
-Chushu Tan$^{1,2,*}$
-
-$^{1}$ School of Sociology, China University of Political Science and Law, Beijing 102249, China  
-$^{2}$ Department of Psychology, University at Buffalo (UB), The State University of New York, New York, NY 12246, USA  
-*Corresponding author: Chushu Tan. Email: chushuta@gmail.com. ORCID: 0009-0007-3093-0160
-
 ---
 
-## Supplementary Section S1: Parameterized Spectral Decomposition via specparam
+## Section S1. Parameterized Spectral Decomposition via specparam
 
 To eliminate the pervasive conflation between narrowband neural oscillations and broadband 1/f background activity, resting-state electroencephalographic power spectra were decomposed using the `specparam` algorithm (formerly FOOOF). Spectral estimation was executed via Welch's modified periodogram with 2.0-second Hamming windows and 50% overlap (frequency resolution 0.25 Hz). Power spectra were parameterized in fixed aperiodic mode across 1.0–40.0 Hz according to:
 log₁₀ PSD(f) = L(f) + Σₙ aₙ exp(-(f - cₙ)² / (2wₙ²)),  where L(f) = b - χ log₁₀(f)
@@ -166,18 +159,14 @@ Here, b denotes the broadband aperiodic offset, χ denotes the aperiodic exponen
 
 ---
 
-## Supplementary Section S2: Data-Driven Connectomics via Orthogonal Minimum Spanning Trees (OMST)
+## Section S2. Data-Driven Connectomics via Orthogonal Minimum Spanning Trees (OMST)
 
 Functional brain connectivity was quantified using the Phase Lag Index (PLI) in the combined theta-alpha band (4.0–13.0 Hz) to eliminate spurious zero-lag volume conduction. To construct connected brain network topologies without subjective thresholding, we applied the Orthogonal Minimum Spanning Trees (OMST) framework. Distance metrics were computed as c_ij = (1.0 - PLI_ij) + 10⁻⁴. The primary spanning tree was extracted using Kruskal's algorithm, followed by iterative extraction of orthogonal spanning trees by setting previously selected edges to zero. Cumulative networks were evaluated by maximizing Global Cost Efficiency (GCE):
 GCE(m) = E_global(G_m) / E_global(G_full) - Cost(G_m)
 
 Across all 282 subjects and 365 recording sessions, the mean number of extracted trees was M = 1.51 ± 0.50 (density = 15.03% ± 4.99%), with strictly 0.0000% isolated nodes.
 
-![Figure S2](../reports/fig_S2_omst_topology.png)
-
-**Figure S2.** Schematic diagram of aggregated Orthogonal Minimum Spanning Tree (OMST) connectome for the standard 19‑channel 10‑20 EEG montage. Blue circles denote scalp electrode nodes. Gray edges represent functional connectivity pathways derived from phase‑lag index. Edge thickness does not encode connection strength. The OMST algorithm guarantees zero isolated nodes in all participants. Montage‑specific graph statistics are provided in the figure caption.
-
-### Supplementary Table S1: Canonical 19-Channel 10–20 Electrode Coordinates and Empirical OMST Graph Metrics
+### Table S1. Canonical 19-Channel 10–20 Electrode Coordinates and Empirical OMST Graph Metrics
 | Channel Label | Cortical Region | Projected X (2D) | Projected Y (2D) | Mean Node Degree | Mean Clustering Coeff. | Betweenness Centrality |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
 | Fp1 | Prefrontal (Left) | -0.28 | +0.78 | 3.42 ± 0.65 | 0.312 ± 0.084 | 0.082 ± 0.031 |
@@ -202,9 +191,13 @@ Across all 282 subjects and 365 recording sessions, the mean number of extracted
 
 *Note: Data are presented as Mean ± SD across all 365 recording sessions. OMST graph metrics are computed on the optimal GCE network. Isolated node rate is 0.0000% across all 19 channels.*
 
+![Figure S2](../reports/fig_S2_omst_topology.png)
+
+**Figure S2.** Schematic diagram of aggregated Orthogonal Minimum Spanning Tree (OMST) connectome for the standard 19‑channel 10‑20 EEG montage. Blue circles denote scalp electrode nodes. Gray edges represent functional connectivity pathways derived from phase‑lag index. Edge thickness does not encode connection strength. The OMST algorithm guarantees zero isolated nodes in all participants. Montage‑specific graph statistics are provided in the figure caption.
+
 ---
 
-## Supplementary Section S3: Analytical and Numerical Proof of Amplifier Gain Invariance
+## Section S3. Analytical and Numerical Proof of Amplifier Gain Invariance
 
 When raw EEG signals are recorded across different hardware systems, arbitrary amplifier gain scaling introduces a multiplicative factor k such that v'(t) = k · v(t). The resulting power spectrum scales quadratically: PSD'(f) = k² · PSD(f), corresponding to a constant vertical shift in logarithmic space: log₁₀ PSD'(f) = log₁₀ PSD(f) + 2 log₁₀ k.
 
@@ -218,7 +211,7 @@ Under linear spectral parameterization:
 
 **Figure S3.** Numerical simulation validating amplifier‑gain invariance of selected spectral features. Top panel: the aperiodic offset b varies strictly following theoretical prediction Δb = 2 log₁₀(k) as gain factor k is manipulated (red dashed line = theoretical prediction; blue circular markers = simulation extracted offset). Bottom panel: absolute numerical error for gain‑invariant features (periodic‑theta, periodic‑delta, periodic‑alpha, aperiodic exponent χ). Errors remain near machine‑precision zero (< 10⁻¹⁴) across four orders‑of‑magnitude gain variation, confirming feature invariance across amplifier gain scaling. Horizontal dashed line indicates zero error.
 
-### Supplementary Table S2: Numerical Stress Simulation of Amplifier Gain Scaling (k in [0.01, 100.0])
+### Table S2. Numerical Stress Simulation of Amplifier Gain Scaling (k in [0.01, 100.0])
 | Gain Factor (k) | Theoretical Δb (B) | Extracted Offset (b) | Periodic Theta Error | Periodic Delta Error | Periodic Alpha Error | Aperiodic Exponent Error | Hilbert PLI Matrix Error |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | 0.01 | -4.000000 | -3.350000 | 2.1 × 10⁻¹⁵ | 1.8 × 10⁻¹⁵ | 2.5 × 10⁻¹⁵ | 1.2 × 10⁻¹⁵ | 0.0 × 10⁰ |
@@ -233,7 +226,7 @@ Under linear spectral parameterization:
 
 ---
 
-## Supplementary Section S4: Grand-Average Resting-State Power Spectra Across Four Cohorts
+## Section S4. Grand-Average Resting-State Power Spectra Across Four Cohorts
 
 Figure S4 visualizes the grand-average power spectra (1.0–40.0 Hz) across the four cohorts analyzed in the transdiagnostic benchmark. The empirical spectral curves demonstrate the polarity dissociation in frontal periodic theta (elevated under sleep debt and dopaminergic stimulation; suppressed under depression), as well as characteristic alpha peak slowing in Parkinson's disease.
 
@@ -241,7 +234,7 @@ Figure S4 visualizes the grand-average power spectra (1.0–40.0 Hz) across the 
 
 **Figure S4.** Grand‑average log₁₀ power‑spectra for case and control groups across four independent cohorts. Shaded ribbons denote standard error of the mean (SEM). A: Acute total sleep‑deprivation cohort (TSD vs rested normal sleep, OpenNeuro ds004902). B: In‑patient major depressive disorder (MDD vs HC, Figshare 4244171). C: Sub‑clinical university depression cohort (Elevated vs Low BDI, OpenNeuro ds003478). D: Parkinson’s disease (ON/OFF‑medication patients vs age‑matched healthy controls, OpenNeuro ds002778).
 
-### Supplementary Table S3: Multi-Cohort Benchmark Cohort Specifications and Recording Parameters
+### Table S3. Multi-Cohort Benchmark Cohort Specifications and Recording Parameters
 | Cohort Identifier | Repository Accession | Target Pathology | Sample Size (N) | Age (Years, Mean ± SD) | Native Montage | Harmonized Montage | Sampling Rate | Primary Finding |
 | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
 | **Study 1: Sleep Debt** | OpenNeuro ds004902 | Acute Total Sleep Debt | 71 Pairs (142 Sessions) | 20.0 ± 1.4 | 64-Channel (10-20) | 19-Channel Standard | 500 Hz | Offset elevation (+0.14 B), Theta surge (dz = +0.284) |
@@ -251,9 +244,18 @@ Figure S4 visualizes the grand-average power spectra (1.0–40.0 Hz) across the 
 
 *Note: All datasets were re-referenced to common average reference (CAR), filtered across 1.0–40.0 Hz, harmonized to standard 19-channel 10-20 coordinates, and cleaned using identical automated artifact rejection protocols.*
 """
-    with open(SUPP_MD_PATH, 'w', encoding='utf-8') as f:
-        f.write(supp_md_content)
-    print(f"✓ Wrote {SUPP_MD_PATH.name}")
+
+
+def build_supplementary_docs():
+    print(f"📄 Building Supplementary Material according to journal submission standards...")
+
+    content = generate_supplementary_content()
+
+    # Save to both target markdown paths
+    for p in [SUPP_MD_PATH, ALT_MD_PATH]:
+        with open(p, 'w', encoding='utf-8') as f:
+            f.write(content)
+        print(f"✓ Saved markdown: {p.name}")
 
     # Build DOCX
     doc = docx.Document()
@@ -270,7 +272,7 @@ Figure S4 visualizes the grand-average power spectra (1.0–40.0 Hz) across the 
     normal_style.paragraph_format.line_spacing = 1.25
     normal_style.paragraph_format.space_after = Pt(6)
 
-    lines = supp_md_content.splitlines()
+    lines = content.splitlines()
     i = 0
     in_table = False
     table_buffer = []
@@ -340,7 +342,7 @@ Figure S4 visualizes the grand-average power spectra (1.0–40.0 Hz) across the 
             i += 1
             continue
 
-        # Check for image insertion
+        # Image insertion
         img_match = re.match(r'!\[([^\]]*)\]\(([^)]+)\)', line)
         if img_match:
             img_rel_path = img_match.group(2)
@@ -384,8 +386,11 @@ Figure S4 visualizes the grand-average power spectra (1.0–40.0 Hz) across the 
     if in_table:
         render_markdown_table(doc, table_buffer)
 
+    # Save to both target docx paths
     doc.save(SUPP_DOCX_PATH)
-    print(f"✓ Successfully generated {SUPP_DOCX_PATH.name}")
+    print(f"✓ Saved DOCX: {SUPP_DOCX_PATH.name}")
+    doc.save(ALT_DOCX_PATH)
+    print(f"✓ Saved DOCX: {ALT_DOCX_PATH.name}")
 
 
 if __name__ == '__main__':
