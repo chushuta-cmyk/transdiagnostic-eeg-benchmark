@@ -130,21 +130,32 @@ def plot_figure_s2(output_dir: Path = REPORTS_DIR):
         'O1':  (-0.28, -0.78), 'O2': (0.28, -0.78)
     }
 
+    # Tree 1: Exactly 18 edges connecting all 19 nodes without cycles (sum of degrees = 36)
     omst_edges_t1 = [
-        ('Fp1', 'Fp2'), ('Fp1', 'F3'), ('Fp2', 'F4'),
-        ('F3', 'Fz'), ('F4', 'Fz'), ('Fz', 'Cz'),
-        ('F7', 'F3'), ('F8', 'F4'), ('F7', 'T7'), ('F8', 'T8'),
-        ('T7', 'C3'), ('T8', 'C4'), ('C3', 'Cz'), ('C4', 'Cz'),
-        ('Cz', 'Pz'), ('Pz', 'P3'), ('Pz', 'P4'),
+        ('Fp1', 'F3'), ('Fp2', 'F4'),
+        ('F7', 'F3'), ('F8', 'F4'),
+        ('F7', 'T7'), ('F8', 'T8'),
+        ('F3', 'Fz'), ('F4', 'Fz'),
+        ('Fz', 'Cz'),
+        ('C3', 'Cz'), ('C4', 'Cz'),
+        ('Cz', 'Pz'),
+        ('Pz', 'P3'), ('Pz', 'P4'),
+        ('T7', 'P7'), ('T8', 'P8'),
         ('P3', 'O1'), ('P4', 'O2')
     ]
+    # Tree 2: Exactly 18 orthogonal edges connecting all 19 nodes without cycles (sum of degrees = 36)
     omst_edges_t2 = [
-        ('Fp1', 'F7'), ('Fp2', 'F8'),
-        ('F3', 'C3'), ('F4', 'C4'), ('C3', 'P3'), ('C4', 'P4'),
-        ('T7', 'P7'), ('T8', 'P8'), ('P7', 'P3'), ('P8', 'P4'),
-        ('P7', 'O1'), ('P8', 'O2'), ('O1', 'O2'),
-        ('P3', 'P4'), ('C3', 'C4'), ('F3', 'F4'),
-        ('Fz', 'Pz')
+        ('Fp1', 'Fp2'), ('Fp1', 'F7'), ('Fp2', 'F8'),
+        ('F3', 'C3'), ('F4', 'C4'),
+        ('T7', 'C3'), ('T8', 'C4'),
+        ('C3', 'P3'), ('C4', 'P4'),
+        ('P7', 'P3'), ('P8', 'P4'),
+        ('P7', 'O1'), ('P8', 'O2'),
+        ('O1', 'O2'),
+        ('Fz', 'Pz'),
+        ('F3', 'F4'),
+        ('C3', 'C4'),
+        ('Cz', 'O1')
     ]
 
     fig, ax = plt.subplots(figsize=(6.2, 6.2), dpi=300)
