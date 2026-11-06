@@ -12,6 +12,7 @@ Features:
   - High-resolution (300 DPI) embedded figures with formatted captions.
 """
 
+import sys
 import re
 from pathlib import Path
 import docx
@@ -22,9 +23,12 @@ from docx.oxml import OxmlElement, parse_xml
 from docx.oxml.ns import nsdecls, qn
 
 BENCHMARK_ROOT = Path(__file__).resolve().parent.parent
-MD_PATH = BENCHMARK_ROOT / "manuscript" / "PAPER_2_MULTI_COHORT_TRANSDIAGNOSTIC_EEG_BENCHMARK.md"
+DEFAULT_MD = BENCHMARK_ROOT / "manuscript" / "PAPER_2_MULTI_COHORT_TRANSDIAGNOSTIC_EEG_BENCHMARK.md"
 REPORTS_DIR = BENCHMARK_ROOT / "reports"
-OUTPUT_DOCX = BENCHMARK_ROOT / "manuscript" / "PAPER_2_MULTI_COHORT_TRANSDIAGNOSTIC_EEG_BENCHMARK.docx"
+DEFAULT_DOCX = BENCHMARK_ROOT / "manuscript" / "PAPER_2_MULTI_COHORT_TRANSDIAGNOSTIC_EEG_BENCHMARK.docx"
+
+MD_PATH = Path(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_MD
+OUTPUT_DOCX = Path(sys.argv[2]) if len(sys.argv) > 2 else DEFAULT_DOCX
 
 GREEK_AND_SYMBOLS = {
     r'\Delta': 'Δ',
@@ -372,8 +376,14 @@ def build_manuscript_docx():
             fig_num = m.group(1) if m else "1"
             if fig_num == "1":
                 fig_path = REPORTS_DIR / "Figure_1_Multicohort_Biophysical_Effect_Sizes.png"
+            elif fig_num == "2":
+                fig_path = REPORTS_DIR / "Figure_2_Tri_Center_Parkinsons_Generalization.png"
+            elif fig_num == "3":
+                fig_path = REPORTS_DIR / "Figure_3_Transdiagnostic_Transfer_and_Ablations.png"
+            elif fig_num == "4":
+                fig_path = REPORTS_DIR / "Figure_4_Clinical_Scale_Continuous_Prediction.png"
             else:
-                fig_path = REPORTS_DIR / "Figure_2_Within_vs_Cross_Cohort_Performance.png"
+                fig_path = REPORTS_DIR / f"Figure_{fig_num}.png"
 
             if fig_path.exists():
                 p_img = doc.add_paragraph()

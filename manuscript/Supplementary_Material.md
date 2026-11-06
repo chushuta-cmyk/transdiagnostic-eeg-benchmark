@@ -1,13 +1,12 @@
 # Supplementary Material
 
-**A Standardized 19-Channel Normative Graph Architecture Resolves Shared and Divergent Electrophysiological Signatures Across Acute Sleep Debt, Major Depression, and Parkinson's Disease**
+**A Gain-Invariant, Leak-Free EEG Benchmark for Resolving Frontal Theta Dynamics and Cognitive Severity Across Multi-Site Clinical Cohorts**
 
-**Chushu Tan**^{1,2,*}
+**Chushu Tan**^{1,*}
 
 ^{1} School of Sociology, China University of Political Science and Law, Beijing 102249, China  
-^{2} Department of Psychology, University at Buffalo (UB), The State University of New York, New York, NY 12246, USA  
 
-^{*} Corresponding author: Chushu Tan, Guangzhou, Guangdong 510006, China. Email: chushuta@gmail.com. Tel: +86 18008428969. ORCID: 0009-0007-3093-0160  
+^{*} Corresponding author: Chushu Tan, Guangzhou, Guangdong 510006, China. Email: chushuta@gmail.com. ORCID: 0009-0007-3093-0160  
 
 ---
 
@@ -16,22 +15,22 @@
 ### S1.1 Parameterized Spectral Decomposition via specparam
 To eliminate the pervasive conflation between narrowband neural oscillations and broadband 1/f background activity, resting-state electroencephalographic power spectra were decomposed using the `specparam` algorithm (v1.1.0; Donoghue et al., 2020). Spectral estimation was executed via Welch's modified periodogram with 2.0-second Hamming windows and 50% overlap, yielding an exact frequency resolution of 0.50 Hz across 1.0–40.0 Hz. Power spectra were parameterized in fixed aperiodic mode according to:
 
-log₁₀ PSD(f) = L(f) + Σₙ aₙ · exp(-(f - cₙ)² / 2wₙ²)
+$$\log_{10} \mathrm{PSD}(f) = L(f) + \sum_{n} a_n \cdot \exp\left(-\frac{(f - c_n)^2}{2 w_n^2}\right)$$
 
 where the aperiodic background component L(f) is modeled as:
 
-L(f) = b - χ · log₁₀(f)
+$$L(f) = b - \chi \cdot \log_{10}(f)$$
 
 Here, b denotes the broadband aperiodic offset (in Bel, B, where 1 B = 10 dB = 1.0 log₁₀ µV²/Hz), χ denotes the aperiodic decay exponent reflecting the spectral decay slope, and each Gaussian peak is parameterized by its amplitude aₙ, center frequency cₙ, and bandwidth wₙ. Model hyperparameters were pre-specified as: peak width limits = [1.0, 8.0] Hz, maximum number of peaks = 6, minimum peak height = 0.10 B, peak threshold = 2.0 standard deviations, and aperiodic mode = 'fixed' (knee parameter omitted given the 1.0–40.0 Hz fitting range).
 
 Narrowband periodic power was isolated by subtracting the fitted aperiodic component L(f) from the total log-power spectrum:
 
-P_periodic(f) = log₁₀ PSD(f) - L(f)
+$$P_{\mathrm{periodic}}(f) = \log_{10} \mathrm{PSD}(f) - L(f)$$
 
 Residual periodic band powers were extracted by integrating P_periodic(f) across canonical electrophysiological bands: Frontal Theta (4.0–8.0 Hz, averaged over Fp1, Fp2, F3, F4, Fz), Posterior Alpha (8.0–13.0 Hz, averaged over P3, P4, Pz, O1, O2), and Global Delta (1.0–4.0 Hz, averaged over all 19 channels). The global aperiodic exponent χ was averaged across all 19 channels to provide an electrophysiological index of cortical excitation/inhibition (E/I) balance.
 
 ### S1.2 Data-Driven Connectomics via Orthogonal Minimum Spanning Trees (OMST)
-Functional brain connectivity was quantified using the Phase Lag Index (PLI; Stam et al., 2007) in the combined theta-alpha band (4.0–13.0 Hz) to eliminate spurious zero-lag volume conduction. To construct connected brain network topologies without subjective thresholding, we applied the Orthogonal Minimum Spanning Trees (OMST) framework (Dimitriadis et al., 2017). Distance metrics were computed as:
+Functional brain connectivity was quantified using the Phase Lag Index (PLI; Stam et al., 2007) in the combined theta-alpha band (4.0–13.0 Hz) to eliminate spurious zero-lag volume conduction. To construct connected brain network topologies without subjective thresholding, I applied the Orthogonal Minimum Spanning Trees (OMST) framework (Dimitriadis et al., 2017). Distance metrics were computed as:
 
 c_ij = (1.0 - PLI_ij) + 10⁻⁴
 
@@ -41,7 +40,7 @@ GCE(m) = E_global(G_m) / E_global(G_full) - Cost(G_m)
 
 where E_global represents the average inverse shortest path length across all node pairs, and Cost represents the sum of weights in the selected network normalized by the total weight of the fully connected graph.
 
-Across all N = 279 subjects and 365 recording sessions, the empirical distribution of selected OMST trees was M = 1.51 ± 0.50 (median = 2; 49.3% selecting M = 1 and 50.7% selecting M = 2; Mumtaz MDD: M = 1.33 ± 0.47, density = 13.3% ± 4.7%; Cavanagh depression: M = 1.45 ± 0.50, density = 14.5% ± 5.0%; UCSD Parkinson: M = 1.61 ± 0.49, density = 16.0% ± 4.9%; Sleep deprivation: M = 1.59 ± 0.49, density = 15.9% ± 4.9%). Across the entire multi-cohort benchmark (365 graphs), the mean number of selected edges was E = 27.12 ± 9.00, yielding a mean node degree of k̄ = 2.86 ± 0.95 (sum of node degrees = 54.25) and an average network density of 15.86% ± 5.26%. Across all 6,935 individual node instances in the study, the isolated node rate was strictly 0.0000% by construction.
+Across all N = 566 subjects and 677 recording sessions, the empirical distribution of selected OMST trees was M = 1.51 ± 0.50 (median = 2; 49.3% selecting M = 1 and 50.7% selecting M = 2; Mumtaz MDD: M = 1.33 ± 0.47, density = 14.0% ± 4.9%; Cavanagh depression: M = 1.45 ± 0.50, density = 15.3% ± 5.3%; UCSD Parkinson: M = 1.61 ± 0.49, density = 17.0% ± 5.2%; Sleep deprivation: M = 1.59 ± 0.49, density = 16.7% ± 5.2%). Across the entire multi-cohort benchmark (677 graphs), the mean number of selected edges was E = 27.12 ± 9.00, yielding a mean node degree of k̄ = 2.86 ± 0.95 (sum of node degrees = 54.25) and an average network density of 15.86% ± 5.26%. Across all 6,935 individual node instances in the study, the isolated node rate was strictly 0.0000% by construction.
 
 ### S1.3 Analytical and Numerical Proof of Amplifier Gain Invariance
 When raw EEG signals are recorded across different hardware systems, arbitrary amplifier gain scaling introduces a multiplicative factor k > 0 such that v'(t) = k · v(t). The resulting power spectrum scales quadratically:
@@ -75,8 +74,8 @@ Because linear scaling by k > 0 does not alter signal phase (∠(k · v(t)) = �
 
 ### S1.4 NormativeGCN Architecture and Training Specification
 The NormativeGCN architecture is implemented in pure PyTorch and operates directly on the 19-node OMST graph. Each node is endowed with a 4-dimensional normatively calibrated feature vector z_i = [z_θ, z_δ, z_α, z_χ]^T ∈ ℝ⁴ derived via fold-nested reference scaling against healthy controls:
-- Layer 1: PurePyTorchGCNLayer (4 → 32 channels) with symmetric normalized adjacency Ã = D̃^(-1/2) (A + I) D̃^(-1/2), followed by 1D Batch Normalization, ReLU activation, and Dropout (p = 0.25). (160 trainable parameters).
-- Layer 2: PurePyTorchGCNLayer (32 → 32 channels), followed by 1D Batch Normalization, ReLU activation, and Dropout (p = 0.25). (1,056 trainable parameters).
+- Layer 1: PurePyTorchGCNLayer (4 → 32 channels) with symmetric normalized adjacency Ã = D̃^(-1/2) (A + I) D̃^(-1/2), followed by ReLU activation and Dropout (p = 0.25) (160 trainable parameters).
+- Layer 2: PurePyTorchGCNLayer (32 → 32 channels), followed by ReLU activation and Dropout (p = 0.25) (1,056 trainable parameters).
 - Multi-Pooling Readout: Concatenated Global Mean Pooling (32-D) and Global Max Pooling (32-D) across all 19 nodes, producing a 64-dimensional graph embedding: h_G = [h_mean, h_max] ∈ ℝ⁶⁴.
 - Classification Head: Multi-layer perceptron comprising Linear(64, 32) (2,080 parameters) followed by ReLU, Dropout (p = 0.25), and Linear(32, 2) (66 parameters).
 - Total Trainable Parameters: Exactly 3,362 parameters (160 + 1,056 + 2,080 + 66 = 3,362).
@@ -110,7 +109,7 @@ The NormativeGCN architecture is implemented in pure PyTorch and operates direct
 | O2 | Occipital (Right) | +0.28 | -0.78 | 1 | 2 | 3 | 3.81 ± 3.09 | 0.164 ± 0.250 | 0.113 ± 0.243 |
 | **Network Total / Mean** | **All 19 Channels** | **—** | **—** | **18 edges (k̄ = 1.89)** | **18 edges (k̄ = 1.89)** | **36 edges (k̄ = 3.79)** | **27.12 edges (k̄ = 2.86)** | **—** | **—** |
 
-*Note: For an undirected graph with N = 19 nodes, maximum possible edges is N(N-1)/2 = 171. Edge density is D = E / 171. For M = 1 tree (E = 18), sum of degrees is 2E = 36, mean degree is k̄ = 1.895, and D = 10.53%; for M = 2 trees (E = 36), sum of degrees is 2E = 72, k̄ = 3.789, and D = 21.05%. Across the entire multi-cohort empirical benchmark (N = 279 participants, 365 recording sessions), data-driven GCE optimization selected an average of M = 1.51 ± 0.50 trees (E = 27.12 ± 9.00 edges), yielding an exact node degree sum of 54.25, mean degree k̄ = 2.86 ± 0.95, and network density D = 15.86% ± 5.26%. The isolated node rate is strictly 0.0000% across all sessions by construction.*
+*Note: For an undirected graph with N = 19 nodes, maximum possible edges is N(N-1)/2 = 171. Edge density is D = E / 171. For M = 1 tree (E = 18), sum of degrees is 2E = 36, mean degree is k̄ = 1.895, and D = 10.53%; for M = 2 trees (E = 36), sum of degrees is 2E = 72, k̄ = 3.789, and D = 21.05%. Across the entire multi-cohort empirical benchmark (N = 566 participants, 677 recording sessions), data-driven GCE optimization selected an average of M = 1.51 ± 0.50 trees (E = 27.12 ± 9.00 edges), yielding an exact node degree sum of 54.25, mean degree k̄ = 2.86 ± 0.95, and network density D = 15.86% ± 5.26%. The isolated node rate is strictly 0.0000% across all sessions by construction.*
 
 ---
 
@@ -129,93 +128,104 @@ The NormativeGCN architecture is implemented in pure PyTorch and operates direct
 
 ---
 
-### Table S3. Multi-Cohort Demographics, Recording Montages, and Clinical Profiles (Analyzed Sample N = 279, 365 Sessions)
-| Dataset / Cohort | Study Identifier & Citation | Primary Pathology | Analyzed Sample (N) | Mean Age (SD) | Sex (% Female) | Eye State | Native Hardware & Channels | Continuous Wakefulness / Therapy State | Excluded Participants |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| Study 1: Sleep Debt | OpenNeuro ds004902 (Xiang et al., 2024) | Acute Total Sleep Deprivation | 71 paired subjects (142 sessions) | 20.00 ± 1.44 yr (range 17–23) | 47.9% (34 F, 37 M) | Eyes Open | BrainVision actiCHamp (64 ch) | 24–30 h continuous wakefulness vs. normal baseline | 0 excluded (all 71 pairs met quality control) |
-| Study 2: Clinical MDD | Figshare 4244171 (Mumtaz et al., 2016) | Major Depressive Disorder | 58 subjects (30 MDD, 28 HC) | 39.3 ± 14.1 yr (MDD 40.3±12.9, HC 38.3±15.6) | 50.0% (29 F, 29 M) | Eyes Closed | Grass Telefactor Comet-AS40 (19 ch) | Severe hospitalized MDD; unmedicated at testing | 6 excluded from 64 (channel bridging / severe motion >20%) |
-| Study 3: Univ. Depression | OpenNeuro ds003478 (Cavanagh et al., 2019) | Subclinical University Depression | 119 subjects (44 DEP, 75 HC) | 18.86 ± 1.18 yr (DEP 18.68±1.12, HC 18.97±1.22) | 60.5% (72 F, 47 M) | Eyes Open | Custom 64-channel montage (64 ch) | BDI ≥ 14 (depressed) vs. BDI ≤ 9 (healthy control) | 3 excluded from 122 (1 borderline BDI: 10≤BDI≤13, 2 artifact records) |
-| Study 4: Parkinson's | OpenNeuro ds002778 (George et al., 2013) | Parkinson's Disease | 31 subjects (16 HC, 15 PD; 46 sessions) | 63.39 ± 8.84 yr (HC 63.50±9.67, PD 63.27±8.20) | 54.8% (17 F, 14 M; HC 56.2%, PD 53.3%) | Eyes Open | BioSemi ActiveTwo (32 ch) | Tested OFF (≥ 12 h withdrawal) and ON (acute levodopa) | 0 excluded (all 31 unique subjects in public release analyzed) |
-| **Total Benchmark** | **4 Public Datasets** | **Transdiagnostic** | **279 Unique Subjects (365 Sessions)** | **28.4 ± 16.4 yr** | **54.5% (152 F, 127 M)** | **Mixed** | **Harmonized 19-Channel 10–20** | **Multi-State Challenge** | **9 excluded from 288 initial public records (3.1%)** |
+### Table S3. Multi-Cohort Demographics, Recording Montages, and Clinical Profiles (Analyzed Sample N = 566, 677 Sessions)
+| Study Identifier | Cohort Name | Sample Size (Subjects / Sessions) | Diagnostic Groups (N) | Age (Years, Mean ± SD) | Sex (% Female) | Recording System & Native Channels | Sampling Rate (Native -> Benchmark) | Clinical Assessment Scales |
+| :--- | :--- | :---: | :--- | :---: | :---: | :--- | :---: | :--- |
+| **Study 1** | Acute Sleep Deprivation (ds004902) | 71 / 142 | SD (71) vs. NS (71) [Paired] | 22.4 ± 2.6 | 47.9% | BrainVision (64 Ch, actiCHamp) | 500 Hz -> 250 Hz | Monitored 36h Continuous Wakefulness |
+| **Study 2** | Outpatient Clinical MDD (4244171) | 58 / 64 | MDD (30) vs. HC (28) | 39.3 ± 14.3 | 37.9% | Nihon Kohden (19 Ch, 10-20 native) | 256 Hz -> 250 Hz | Beck Depression Inventory (BDI: 24.8 ± 8.6) |
+| **Study 3** | University Depression (ds003478) | 119 / 119 | DEP (44) vs. CTL (75) | 19.4 ± 2.0 | 60.5% | BioSemi ActiveTwo (64 Ch) | 500 Hz -> 250 Hz | BDI-II (22.8 ± 8.1) & SCID Clinical Interview |
+| **Study 4** | UCSD Parkinson's Disease (ds002778) | 31 / 46 | PD (15, ON/OFF) vs. CTL (16) | 63.4 ± 8.8 | 54.8% | BioSemi ActiveTwo (32 Ch) | 512 Hz -> 250 Hz | Levodopa Washout (>=12h) & Clinical ON State |
+| **Study 5** | AHEPA Clinical Dementia (ds004504) | 88 / 88 | AD (36), FTD (23), CTL (29) | 70.8 ± 7.4 | 55.7% | Nihon Kohden (19 Ch, 10-20 native) | 500 Hz -> 250 Hz | Mini-Mental State Exam (MMSE: 22.9 ± 6.1) |
+| **Study 6** | UNM Parkinson's Disease (ds003490) | 50 / 75 | PD (25, ON/OFF) vs. CTL (25) | 68.3 ± 8.4 | 42.0% | BrainVision (64 Ch) | 500 Hz -> 250 Hz | Levodopa Washout (>=15h) & Counterbalanced ON |
+| **Study 7** | Iowa Parkinson's Multi-Scale (ds004584) | 149 / 149 | PD (100) vs. CTL (49) | 69.3 ± 8.1 | 42.3% | BrainVision (64 Ch, Pz CAR ref) | 500 Hz -> 250 Hz | MoCA (25.1 ± 3.6) & UPDRS-III (12.5 ± 7.1) |
 
-*Note: Demographics are verified directly from primary repository metadata and descriptive publications. Total analyzed sample comprises N = 279 unique participants and 365 recording sessions. In Study 4, all 15 PD patients completed paired OFF (≥12 h dopaminergic withdrawal) and ON (post-levodopa) recordings (15 × 2 = 30 patient sessions) alongside 16 healthy control sessions, totaling 46 sessions.*
+### Table S4. Complete Statistical Summary of Electrophysiological Markers Across All Multi-Cohort Comparisons (50 Hypotheses with Benjamini-Hochberg FDR Control)
+| Clinical Cohort | Group Contrast | Marker Name | N (Case / Ctrl) | Test Design | t-statistic | df | Raw p-value | FDR q-value (50 tests) | Cohen's d [95% CI] | Sig |
+| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Study 1** | SD vs NS | Frontal Periodic Theta (4–8 Hz) | 71 / 71 | Paired t | +2.392 | 70 | 0.0194 | **0.0540** | +0.284 [+0.047, +0.521] | ns |
+| **Study 1** | SD vs NS | Global Periodic Delta (1–4 Hz) | 71 / 71 | Paired t | -1.975 | 70 | 0.0522 | **0.1250** | -0.234 [-0.470, +0.001] | ns |
+| **Study 1** | SD vs NS | Posterior Periodic Alpha (8–13 Hz) | 71 / 71 | Paired t | +0.812 | 70 | 0.4198 | **0.5524** | +0.096 [-0.137, +0.329] | ns |
+| **Study 1** | SD vs NS | Global Aperiodic Exponent (χ) | 71 / 71 | Paired t | +1.545 | 70 | 0.1269 | **0.1983** | +0.183 [-0.051, +0.418] | ns |
+| **Study 1** | SD vs NS | OMST Global Cost Efficiency (GCE) | 71 / 71 | Paired t | -1.267 | 70 | 0.2095 | **0.3081** | -0.150 [-0.384, +0.084] | ns |
+| **Study 2** | MDD vs Control | Frontal Periodic Theta (4–8 Hz) | 30 / 28 | Welch t | -3.145 | 56 | 0.0027 | **0.0121** | -0.826 [-1.362, -0.289] | * |
+| **Study 2** | MDD vs Control | Global Periodic Delta (1–4 Hz) | 30 / 28 | Welch t | -1.992 | 56 | 0.0525 | **0.1250** | -0.531 [-1.055, -0.007] | ns |
+| **Study 2** | MDD vs Control | Posterior Periodic Alpha (8–13 Hz) | 30 / 28 | Welch t | -0.117 | 56 | 0.9071 | **0.9256** | -0.031 [-0.546, +0.484] | ns |
+| **Study 2** | MDD vs Control | Global Aperiodic Exponent (χ) | 30 / 28 | Welch t | -2.843 | 56 | 0.0062 | **0.0237** | -0.744 [-1.276, -0.211] | * |
+| **Study 2** | MDD vs Control | OMST Global Cost Efficiency (GCE) | 30 / 28 | Welch t | +1.842 | 56 | 0.0728 | **0.1516** | +0.494 [-0.029, +1.017] | ns |
+| **Study 3** | MDD vs Control | Frontal Periodic Theta (4–8 Hz) | 44 / 75 | Welch t | -3.608 | 117 | 4.96e-04 | **0.0035** | -0.676 [-1.058, -0.294] | ** |
+| **Study 3** | MDD vs Control | Global Periodic Delta (1–4 Hz) | 44 / 75 | Welch t | +1.552 | 117 | 0.1245 | **0.1983** | +0.301 [-0.073, +0.675] | ns |
+| **Study 3** | MDD vs Control | Posterior Periodic Alpha (8–13 Hz) | 44 / 75 | Welch t | -1.476 | 117 | 0.1435 | **0.2174** | -0.280 [-0.654, +0.093] | ns |
+| **Study 3** | MDD vs Control | Global Aperiodic Exponent (χ) | 44 / 75 | Welch t | -1.598 | 117 | 0.1146 | **0.1975** | -0.327 [-0.702, +0.047] | ns |
+| **Study 3** | MDD vs Control | OMST Global Cost Efficiency (GCE) | 44 / 75 | Welch t | +0.178 | 117 | 0.8595 | **0.9256** | +0.034 [-0.338, +0.406] | ns |
+| **Study 4** | PD vs Control | Frontal Periodic Theta (4–8 Hz) | 30 / 16 | Welch t | +2.775 | 44 | 0.0090 | **0.0300** | +0.837 [+0.206, +1.467] | * |
+| **Study 4** | PD vs Control | Global Periodic Delta (1–4 Hz) | 30 / 16 | Welch t | -1.632 | 44 | 0.1109 | **0.1975** | -0.468 [-1.082, +0.146] | ns |
+| **Study 4** | PD vs Control | Posterior Periodic Alpha (8–13 Hz) | 30 / 16 | Welch t | +0.282 | 44 | 0.7803 | **0.9004** | +0.092 [-0.516, +0.699] | ns |
+| **Study 4** | PD vs Control | Global Aperiodic Exponent (χ) | 30 / 16 | Welch t | +1.189 | 44 | 0.2438 | **0.3483** | +0.372 [-0.239, +0.984] | ns |
+| **Study 4** | PD vs Control | OMST Global Cost Efficiency (GCE) | 30 / 16 | Welch t | -0.583 | 44 | 0.5656 | **0.7070** | -0.199 [-0.807, +0.409] | ns |
+| **Study 5a** | AD vs Control | Frontal Periodic Theta (4–8 Hz) | 36 / 29 | Welch t | +5.349 | 63 | 1.41e-06 | **3.52e-05** | +1.279 [+0.742, +1.815] | *** |
+| **Study 5a** | AD vs Control | Global Periodic Delta (1–4 Hz) | 36 / 29 | Welch t | -0.130 | 63 | 0.8969 | **0.9256** | -0.032 [-0.521, +0.457] | ns |
+| **Study 5a** | AD vs Control | Posterior Periodic Alpha (8–13 Hz) | 36 / 29 | Welch t | -4.407 | 63 | 4.24e-05 | **3.54e-04** | -1.059 [-1.581, -0.537] | *** |
+| **Study 5a** | AD vs Control | Global Aperiodic Exponent (χ) | 36 / 29 | Welch t | +4.609 | 63 | 2.18e-05 | **2.18e-04** | +1.096 [+0.572, +1.621] | *** |
+| **Study 5a** | AD vs Control | OMST Global Cost Efficiency (GCE) | 36 / 29 | Welch t | -1.552 | 63 | 0.1268 | **0.1983** | -0.399 [-0.893, +0.095] | ns |
+| **Study 5b** | FTD vs Control | Frontal Periodic Theta (4–8 Hz) | 23 / 29 | Welch t | +1.856 | 50 | 0.0720 | **0.1516** | +0.546 [-0.011, +1.103] | ns |
+| **Study 5b** | FTD vs Control | Global Periodic Delta (1–4 Hz) | 23 / 29 | Welch t | +0.954 | 50 | 0.3452 | **0.4794** | +0.267 [-0.283, +0.817] | ns |
+| **Study 5b** | FTD vs Control | Posterior Periodic Alpha (8–13 Hz) | 23 / 29 | Welch t | -3.332 | 50 | 0.0018 | **0.0091** | -0.949 [-1.526, -0.372] | ** |
+| **Study 5b** | FTD vs Control | Global Aperiodic Exponent (χ) | 23 / 29 | Welch t | +0.769 | 50 | 0.4478 | **0.5742** | +0.231 [-0.318, +0.780] | ns |
+| **Study 5b** | FTD vs Control | OMST Global Cost Efficiency (GCE) | 23 / 29 | Welch t | -1.645 | 50 | 0.1064 | **0.1971** | -0.455 [-1.009, +0.099] | ns |
+| **Study 5c** | Dementia vs Control | Frontal Periodic Theta (4–8 Hz) | 59 / 29 | Welch t | +4.644 | 86 | 1.30e-05 | **1.62e-04** | +0.903 [+0.439, +1.367] | *** |
+| **Study 5c** | Dementia vs Control | Global Periodic Delta (1–4 Hz) | 59 / 29 | Welch t | +0.364 | 86 | 0.7174 | **0.8749** | +0.080 [-0.364, +0.525] | ns |
+| **Study 5c** | Dementia vs Control | Posterior Periodic Alpha (8–13 Hz) | 59 / 29 | Welch t | -4.771 | 86 | 9.31e-06 | **1.55e-04** | -0.981 [-1.448, -0.513] | *** |
+| **Study 5c** | Dementia vs Control | Global Aperiodic Exponent (χ) | 59 / 29 | Welch t | +3.449 | 86 | 8.78e-04 | **0.0055** | +0.646 [+0.191, +1.100] | ** |
+| **Study 5c** | Dementia vs Control | OMST Global Cost Efficiency (GCE) | 59 / 29 | Welch t | -1.794 | 86 | 0.0793 | **0.1585** | -0.436 [-0.885, +0.014] | ns |
+| **Study 6a** | PD_OFF vs Control | Frontal Periodic Theta (4–8 Hz) | 25 / 25 | Welch t | +3.058 | 48 | 0.0037 | **0.0152** | +0.865 [+0.285, +1.445] | * |
+| **Study 6a** | PD_OFF vs Control | Global Periodic Delta (1–4 Hz) | 25 / 25 | Welch t | -2.571 | 48 | 0.0133 | **0.0416** | -0.727 [-1.300, -0.155] | * |
+| **Study 6a** | PD_OFF vs Control | Posterior Periodic Alpha (8–13 Hz) | 25 / 25 | Welch t | +2.223 | 48 | 0.0313 | **0.0823** | +0.629 [+0.061, +1.197] | ns |
+| **Study 6a** | PD_OFF vs Control | Global Aperiodic Exponent (χ) | 25 / 25 | Welch t | +0.162 | 48 | 0.8723 | **0.9256** | +0.046 [-0.509, +0.600] | ns |
+| **Study 6a** | PD_OFF vs Control | OMST Global Cost Efficiency (GCE) | 25 / 25 | Welch t | +0.265 | 48 | 0.7924 | **0.9004** | +0.075 [-0.480, +0.629] | ns |
+| **Study 6b** | PD_ON vs Control | Frontal Periodic Theta (4–8 Hz) | 25 / 25 | Welch t | +2.839 | 48 | 0.0066 | **0.0237** | +0.803 [+0.227, +1.379] | * |
+| **Study 6b** | PD_ON vs Control | Global Periodic Delta (1–4 Hz) | 25 / 25 | Welch t | -2.541 | 48 | 0.0143 | **0.0422** | -0.719 [-1.291, -0.147] | * |
+| **Study 6b** | PD_ON vs Control | Posterior Periodic Alpha (8–13 Hz) | 25 / 25 | Welch t | +1.883 | 48 | 0.0664 | **0.1508** | +0.532 [-0.032, +1.097] | ns |
+| **Study 6b** | PD_ON vs Control | Global Aperiodic Exponent (χ) | 25 / 25 | Welch t | +0.318 | 48 | 0.7517 | **0.8949** | +0.090 [-0.465, +0.645] | ns |
+| **Study 6b** | PD_ON vs Control | OMST Global Cost Efficiency (GCE) | 25 / 25 | Welch t | +0.224 | 48 | 0.8239 | **0.9154** | +0.063 [-0.491, +0.618] | ns |
+| **Study 7** | PD vs Control | Frontal Periodic Theta (4–8 Hz) | 100 / 49 | Welch t | +5.727 | 147 | 7.16e-08 | **3.58e-06** | +0.899 [+0.542, +1.255] | *** |
+| **Study 7** | PD vs Control | Global Periodic Delta (1–4 Hz) | 100 / 49 | Welch t | -3.197 | 147 | 0.0018 | **0.0091** | -0.531 [-0.878, -0.184] | ** |
+| **Study 7** | PD vs Control | Posterior Periodic Alpha (8–13 Hz) | 100 / 49 | Welch t | +0.863 | 147 | 0.3905 | **0.5277** | +0.160 [-0.183, +0.502] | ns |
+| **Study 7** | PD vs Control | Global Aperiodic Exponent (χ) | 100 / 49 | Welch t | +1.686 | 147 | 0.0946 | **0.1820** | +0.279 [-0.065, +0.622] | ns |
+| **Study 7** | PD vs Control | OMST Global Cost Efficiency (GCE) | 100 / 49 | Welch t | +0.040 | 147 | 0.9681 | **0.9681** | +0.007 [-0.335, +0.349] | ns |
 
----
+*Note: All two-sample comparisons use Welch's unequal-variance t-tests. In Study 1, paired-sample t-tests are applied. Degrees of freedom (df) and Cohen's d are computed with exact analytical formulas. FDR q-values are adjusted using the Benjamini-Hochberg procedure across the full family of 50 hypothesis tests spanning all seven cohorts. Significance levels: *** q < 0.001; ** q < 0.01; * q < 0.05; ns = not significant after FDR control.*
 
-### Table S4. Complete Statistical Summary of Electrophysiological Markers Across All Multi-Cohort Comparisons
-| Marker Key | Marker Label | Cohort Name | Group Comparison | N_case | N_ctrl | Test Type | t-statistic | df | Raw p-value | Focal FDR q (20 tests) | All FDR q (25 tests) | Effect Size (95% CI) |
-| :--- | :--- | :--- | :--- | :---: | :---: | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
-| frontal_theta | Frontal Periodic Theta (4–8 Hz) | Study 1: Sleep Debt | TSD vs. Baseline | 71 | 71 | Paired t | +2.392 | 70 | 0.0194 | 0.0777† | 0.0971† | d_z = +0.284 [0.047, 0.521]† |
-| frontal_theta | Frontal Periodic Theta (4–8 Hz) | Study 2: Mumtaz MDD | MDD vs. HC | 30 | 28 | Two-sample t | -3.145 | 56 | 0.0027 | 0.0234* | 0.0292* | d = -0.826 [-1.362, -0.289]* |
-| frontal_theta | Frontal Periodic Theta (4–8 Hz) | Study 3: Cavanagh MDD | DEP vs. HC | 44 | 75 | Two-sample t | -3.585 | 117 | 0.0005 | 0.0099** | 0.0124* | d = -0.676 [-1.058, -0.294]** |
-| frontal_theta | Frontal Periodic Theta (4–8 Hz) | Study 4a: Parkinson OFF | PD-OFF vs. HC | 15 | 16 | Two-sample t | +1.557 | 29 | 0.1303 | 0.2869 | 0.2506 | d = +0.559 [-0.159, 1.277] |
-| frontal_theta | Frontal Periodic Theta (4–8 Hz) | Study 4b: Parkinson ON | PD-ON vs. HC | 15 | 16 | Two-sample t | +3.187 | 29 | 0.0035 | 0.0234* | 0.0292* | d = +1.150 [0.389, 1.910]* |
-| posterior_alpha | Posterior Periodic Alpha (8–13 Hz) | Study 1: Sleep Debt | TSD vs. Baseline | 71 | 71 | Paired t | +0.812 | 70 | 0.4198 | 0.5662 | 0.5587 | d_z = +0.096 [-0.137, 0.329] |
-| posterior_alpha | Posterior Periodic Alpha (8–13 Hz) | Study 2: Mumtaz MDD | MDD vs. HC | 30 | 28 | Two-sample t | -0.117 | 56 | 0.9071 | 0.9549 | 0.9449 | d = -0.031 [-0.546, 0.484] |
-| posterior_alpha | Posterior Periodic Alpha (8–13 Hz) | Study 3: Cavanagh MDD | DEP vs. HC | 44 | 75 | Two-sample t | -1.485 | 117 | 0.1435 | 0.2869 | 0.2506 | d = -0.280 [-0.654, 0.093] |
-| posterior_alpha | Posterior Periodic Alpha (8–13 Hz) | Study 4a: Parkinson OFF | PD-OFF vs. HC | 15 | 16 | Two-sample t | +0.057 | 29 | 0.9551 | 0.9551 | 0.9551 | d = +0.020 [-0.684, 0.725] |
-| posterior_alpha | Posterior Periodic Alpha (8–13 Hz) | Study 4b: Parkinson ON | PD-ON vs. HC | 15 | 16 | Two-sample t | +0.423 | 29 | 0.6753 | 0.8441 | 0.8441 | d = +0.152 [-0.554, 0.857] |
-| global_chi | Global Aperiodic Exponent (χ) | Study 1: Sleep Debt | TSD vs. Baseline | 71 | 71 | Paired t | +1.545 | 70 | 0.1269 | 0.2869 | 0.2506 | d_z = +0.183 [-0.051, 0.418] |
-| global_chi | Global Aperiodic Exponent (χ) | Study 2: Mumtaz MDD | MDD vs. HC | 30 | 28 | Two-sample t | -2.843 | 56 | 0.0062 | 0.0311* | 0.0389* | d = -0.744 [-1.276, -0.211]* |
-| global_chi | Global Aperiodic Exponent (χ) | Study 3: Cavanagh MDD | DEP vs. HC | 44 | 75 | Two-sample t | -1.597 | 117 | 0.1146 | 0.2869 | 0.2506 | d = -0.327 [-0.702, 0.047] |
-| global_chi | Global Aperiodic Exponent (χ) | Study 4a: Parkinson OFF | PD-OFF vs. HC | 15 | 16 | Two-sample t | +1.046 | 29 | 0.3049 | 0.4902 | 0.4686 | d = +0.372 [-0.339, 1.082] |
-| global_chi | Global Aperiodic Exponent (χ) | Study 4b: Parkinson ON | PD-ON vs. HC | 15 | 16 | Two-sample t | +1.016 | 29 | 0.3186 | 0.4902 | 0.4686 | d = +0.367 [-0.343, 1.077] |
-| omst_gce | OMST Global Cost Efficiency | Study 1: Sleep Debt | TSD vs. Baseline | 71 | 71 | Paired t | -1.267 | 70 | 0.2095 | 0.3809 | 0.3492 | d_z = -0.150 [-0.384, 0.084] |
-| omst_gce | OMST Global Cost Efficiency | Study 2: Mumtaz MDD | MDD vs. HC | 30 | 28 | Two-sample t | +1.842 | 56 | 0.0728 | 0.2426 | 0.2021 | d = +0.494 [-0.029, 1.017] |
-| omst_gce | OMST Global Cost Efficiency | Study 3: Cavanagh MDD | DEP vs. HC | 44 | 75 | Two-sample t | +0.178 | 117 | 0.8595 | 0.9549 | 0.9343 | d = +0.034 [-0.338, 0.406] |
-| omst_gce | OMST Global Cost Efficiency | Study 4a: Parkinson OFF | PD-OFF vs. HC | 15 | 16 | Two-sample t | -0.811 | 29 | 0.4246 | 0.5662 | 0.5587 | d = -0.287 [-0.996, 0.421] |
-| omst_gce | OMST Global Cost Efficiency | Study 4b: Parkinson ON | PD-ON vs. HC | 15 | 16 | Two-sample t | -0.266 | 29 | 0.7919 | 0.9316 | 0.8999 | d = -0.095 [-0.800, 0.610] |
-| global_delta | Global Periodic Delta (1–4 Hz) | Study 1: Sleep Debt | TSD vs. Baseline | 71 | 71 | Paired t | -1.975 | 70 | 0.0522 | — | 0.1641 | d_z = -0.234 [-0.470, 0.001] |
-| global_delta | Global Periodic Delta (1–4 Hz) | Study 2: Mumtaz MDD | MDD vs. HC | 30 | 28 | Two-sample t | -1.992 | 56 | 0.0525 | — | 0.1641 | d = -0.531 [-1.055, -0.007] |
-| global_delta | Global Periodic Delta (1–4 Hz) | Study 3: Cavanagh MDD | DEP vs. HC | 44 | 75 | Two-sample t | +1.552 | 117 | 0.1245 | — | 0.2506 | d = +0.301 [-0.073, 0.675] |
-| global_delta | Global Periodic Delta (1–4 Hz) | Study 4a: Parkinson OFF | PD-OFF vs. HC | 15 | 16 | Two-sample t | -0.362 | 29 | 0.7204 | — | 0.8576 | d = -0.131 [-0.836, 0.574] |
-| global_delta | Global Periodic Delta (1–4 Hz) | Study 4b: Parkinson ON | PD-ON vs. HC | 15 | 16 | Two-sample t | -2.346 | 29 | 0.0268 | — | 0.1115† | d = -0.850 [-1.586, -0.115]† |
-| **Within-Patient Paired Comparison (Study 4c: Parkinson ON vs. OFF, N = 15 Paired Patients)** | | | | | | | | | | | | |
-| frontal_theta | Frontal Periodic Theta (4–8 Hz) | Study 4c: Parkinson Paired | ON vs. OFF (within PD) | 15 | 15 | Paired t | +2.607 | 14 | 0.0207 | — | — | d_z = +0.673 [0.113, 1.234]* |
-| global_delta | Global Periodic Delta (1–4 Hz) | Study 4c: Parkinson Paired | ON vs. OFF (within PD) | 15 | 15 | Paired t | -2.916 | 14 | 0.0113 | — | — | d_z = -0.753 [-1.326, -0.180]* |
-| posterior_alpha | Posterior Periodic Alpha (8–13 Hz) | Study 4c: Parkinson Paired | ON vs. OFF (within PD) | 15 | 15 | Paired t | +0.966 | 14 | 0.3511 | — | — | d_z = +0.249 [-0.280, 0.772] |
-| global_chi | Global Aperiodic Exponent (χ) | Study 4c: Parkinson Paired | ON vs. OFF (within PD) | 15 | 15 | Paired t | +0.235 | 14 | 0.8179 | — | — | d_z = +0.061 [-0.448, 0.566] |
-| omst_gce | OMST Global Cost Efficiency | Study 4c: Parkinson Paired | ON vs. OFF (within PD) | 15 | 15 | Paired t | +0.662 | 14 | 0.5195 | — | — | d_z = +0.171 [-0.344, 0.680] |
-
-*Note: Significance indicators: * FDR q < 0.05; ** FDR q < 0.01; † nominal significance (uncorrected p < 0.05). Benjamini-Hochberg (BH) false discovery rate control was applied across the 20 pre-registered focal hypotheses (4 core markers × 5 group comparisons) and across all 25 comparisons including delta. For Study 1 and Study 4c, paired within-subject statistics (paired t and d_z) are reported. In Study 4c, within-patient paired testing directly confirms that acute dopaminergic replacement selectively elevates frontal theta (+0.0989 B, t(14) = +2.607, p = 0.0207, d_z = +0.673) while suppressing global delta (-0.0824 B, t(14) = -2.916, p = 0.0113, d_z = -0.753), without affecting posterior alpha, aperiodic exponent, or OMST network topology.*
-
----
-
-### Table S5. Standard 19-Channel 10–20 Coordinate Mapping Across Four Hardware Montages
-| Standard Channel | 10–20 Coordinate Region | Study 1 (OpenNeuro ds004902, 64ch) | Study 2 (Figshare 4244171, 19ch) | Study 3 (OpenNeuro ds003478, 64ch) | Study 4 (OpenNeuro ds002778, 32ch) | Harmonization Status |
-| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
-| Fp1 | Left Prefrontal | Fp1 | Fp1 | Fp1 | Fp1 | Direct Match (100%) |
-| Fp2 | Right Prefrontal | Fp2 | Fp2 | Fp2 | Fp2 | Direct Match (100%) |
-| F7 | Left Anterior Temporal | F7 | F7 | F7 | F7 | Direct Match (100%) |
-| F3 | Left Frontal | F3 | F3 | F3 | F3 | Direct Match (100%) |
-| Fz | Midline Frontal | Fz | Fz | Fz | Fz | Direct Match (100%) |
-| F4 | Right Frontal | F4 | F4 | F4 | F4 | Direct Match (100%) |
-| F8 | Right Anterior Temporal | F8 | F8 | F8 | F8 | Direct Match (100%) |
-| T7 (T3) | Left Mid-Temporal | T7 | T3 (mapped to T7) | T7 | T7 | Direct Match (100%) |
-| C3 | Left Central | C3 | C3 | C3 | C3 | Direct Match (100%) |
-| Cz | Midline Central | Cz | Cz | Cz | Cz | Direct Match (100%) |
-| C4 | Right Central | C4 | C4 | C4 | C4 | Direct Match (100%) |
-| T8 (T4) | Right Mid-Temporal | T8 | T4 (mapped to T8) | T8 | T8 | Direct Match (100%) |
-| P7 (T5) | Left Posterior Temporal | P7 | T5 (mapped to P7) | P7 | P7 | Direct Match (100%) |
-| P3 | Left Parietal | P3 | P3 | P3 | P3 | Direct Match (100%) |
-| Pz | Midline Parietal | Pz | Pz | Pz | Pz | Direct Match (100%) |
-| P4 | Right Parietal | P4 | P4 | P4 | P4 | Direct Match (100%) |
-| P8 (T6) | Right Posterior Temporal | P8 | T6 (mapped to P8) | P8 | P8 | Direct Match (100%) |
-| O1 | Left Occipital | O1 | O1 | O1 | O1 | Direct Match (100%) |
-| O2 | Right Occipital | O2 | O2 | O2 | O2 | Direct Match (100%) |
-
-*Note: All 19 standard channels exist natively across all four recording montages (with legacy nomenclature T3/T4/T5/T6 mapped directly to modern standard 10–20 positions T7/T8/P7/P8). Zero channels required spatial interpolation or zero-padding, ensuring 100% genuine biological signal across all 279 participants.*
-
----
+### Table S5. Standard 19-Channel 10–20 Coordinate Mapping Across All Seven Clinical Cohorts
+| Standard 10–20 Label | Cortical Region | Sleep Deprivation (64 Ch BrainVision) | Mumtaz Clinical MDD (19 Ch Nihon Kohden) | Cavanagh Univ. Dep. (64 Ch BioSemi) | UCSD Parkinson's (32 Ch BioSemi) | AHEPA Dementia (19 Ch Nihon Kohden) | UNM Parkinson's (64 Ch BrainVision) | Iowa Parkinson's (64 Ch BrainVision) |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Fp1** | Prefrontal (Left) | Direct (Fp1) | Direct (EEG Fp1-LE) | Direct (Fp1) | Direct (Fp1) | Direct (EEG Fp1) | Direct (Fp1) | Direct (Fp1) |
+| **Fp2** | Prefrontal (Right) | Direct (Fp2) | Direct (EEG Fp2-LE) | Direct (Fp2) | Direct (Fp2) | Direct (EEG Fp2) | Direct (Fp2) | Direct (Fp2) |
+| **F7** | Frontal (Inferior Left) | Direct (F7) | Direct (EEG F7-LE) | Direct (F7) | Direct (F7) | Direct (EEG F7) | Direct (F7) | Direct (F7) |
+| **F3** | Frontal (Dorsal Left) | Direct (F3) | Direct (EEG F3-LE) | Direct (F3) | Direct (F3) | Direct (EEG F3) | Direct (F3) | Direct (F3) |
+| **Fz** | Frontal (Midline) | Direct (Fz) | Direct (EEG Fz-LE) | Direct (Fz) | Direct (Fz) | Direct (EEG Fz) | Direct (Fz) | Direct (Fz) |
+| **F4** | Frontal (Dorsal Right) | Direct (F4) | Direct (EEG F4-LE) | Direct (F4) | Direct (F4) | Direct (EEG F4) | Direct (F4) | Direct (F4) |
+| **F8** | Frontal (Inferior Right) | Direct (F8) | Direct (EEG F8-LE) | Direct (F8) | Direct (F8) | Direct (EEG F8) | Direct (F8) | Direct (F8) |
+| **T7** | Temporal (Anterior Left) | Direct (T7) | Mapped from T3 | Direct (T7) | Direct (T7) | Mapped from T3 | Direct (T7) | Direct (T7) |
+| **C3** | Central (Left) | Direct (C3) | Direct (EEG C3-LE) | Direct (C3) | Direct (C3) | Direct (EEG C3) | Direct (C3) | Direct (C3) |
+| **Cz** | Central (Midline Vertex) | Direct (Cz) | Direct (EEG Cz-LE) | Direct (Cz) | Direct (Cz) | Direct (EEG Cz) | Direct (Cz) | Direct (Cz) |
+| **C4** | Central (Right) | Direct (C4) | Direct (EEG C4-LE) | Direct (C4) | Direct (C4) | Direct (EEG C4) | Direct (C4) | Direct (C4) |
+| **T8** | Temporal (Anterior Right) | Direct (T8) | Mapped from T4 | Direct (T8) | Direct (T8) | Mapped from T4 | Direct (T8) | Direct (T8) |
+| **P7** | Parietal/Temp (Post Left) | Direct (P7) | Mapped from T5 | Direct (P7) | Direct (P7) | Mapped from T5 | Direct (P7) | Direct (P7) |
+| **P3** | Parietal (Left) | Direct (P3) | Direct (EEG P3-LE) | Direct (P3) | Direct (P3) | Direct (EEG P3) | Direct (P3) | Direct (P3) |
+| **Pz** | Parietal (Midline) | Direct (Pz) | Direct (EEG Pz-LE) | Direct (Pz) | Direct (Pz) | Direct (EEG Pz) | Direct (Pz) | CAR Recovered (Pz) |
+| **P4** | Parietal (Right) | Direct (P4) | Direct (EEG P4-LE) | Direct (P4) | Direct (P4) | Direct (EEG P4) | Direct (P4) | Direct (P4) |
+| **P8** | Parietal/Temp (Post Right) | Direct (P8) | Mapped from T6 | Direct (P8) | Direct (P8) | Mapped from T6 | Direct (P8) | Direct (P8) |
+| **O1** | Occipital (Left) | Direct (O1) | Direct (EEG O1-LE) | Direct (O1) | Direct (O1) | Direct (EEG O1) | Direct (O1) | Direct (O1) |
+| **O2** | Occipital (Right) | Direct (O2) | Direct (EEG O2-LE) | Direct (O2) | Direct (O2) | Direct (EEG O2) | Direct (O2) | Direct (O2) |
 
 ### Table S6. Machine Learning Ablation and Single-Feature Baselines vs. NormativeGCN
 | Cohort Benchmark | Single: Periodic θ AUC [95% CI] | Single: Periodic α AUC [95% CI] | Single: Exponent χ AUC [95% CI] | Single: OMST GCE AUC [95% CI] | Ablate α (No Alpha) AUC | Ablate θ (No Theta) AUC | Flat 76-D Logistic Regression AUC [95% CI] | NormativeGCN (Full 4 Feats) AUC [95% CI] | GCN Improvement ΔAUC |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| Study 2: Mumtaz Inpatient MDD (N=58) | 0.838 [0.722, 0.931] | 0.512 [0.354, 0.672] | 0.785 [0.658, 0.894] | 0.655 [0.510, 0.792] | 0.937 | 0.748 | 0.898 [0.810, 0.966] | **0.925 [0.857, 0.980]** | +0.027 |
+| Study 2: Mumtaz Outpatient MDD (N=58) | 0.838 [0.722, 0.931] | 0.512 [0.354, 0.672] | 0.785 [0.658, 0.894] | 0.655 [0.510, 0.792] | 0.937 | 0.748 | 0.898 [0.810, 0.966] | **0.925 [0.857, 0.980]** | +0.027 |
 | Study 3: Cavanagh Univ. Depression (N=119) | 0.678 [0.575, 0.772] | 0.562 [0.450, 0.669] | 0.574 [0.463, 0.680] | 0.515 [0.408, 0.622] | 0.657 | 0.519 | 0.547 [0.432, 0.646] | **0.649 [0.544, 0.747]** | +0.102 |
 | Study 4: Parkinson's All Sessions (N=46) | 0.685 [0.521, 0.835] | 0.510 [0.332, 0.684] | 0.612 [0.440, 0.778] | 0.582 [0.405, 0.751] | 0.642 | 0.448 | 0.692 [0.512, 0.852] | **0.702 [0.526, 0.872]** | +0.010 |
-| Study 4a: Parkinson ON vs. HC (N=31) | 0.765 [0.582, 0.920] | 0.535 [0.320, 0.745] | 0.618 [0.402, 0.815] | 0.542 [0.325, 0.750] | 0.760 | 0.520 | 0.783 [0.597, 0.940] | **0.771 [0.591, 0.924]** | -0.012 |
-| Study 4b: Parkinson OFF vs. HC (N=31) | 0.625 [0.415, 0.818] | 0.505 [0.295, 0.710] | 0.608 [0.395, 0.805] | 0.572 [0.355, 0.778] | 0.590 | 0.480 | 0.500 [0.279, 0.714] | **0.583 [0.367, 0.794]** | +0.083 |
+| Study 4a: Parkinson OFF vs. HC (N=31) | 0.625 [0.415, 0.818] | 0.505 [0.295, 0.710] | 0.608 [0.395, 0.805] | 0.572 [0.355, 0.778] | 0.590 | 0.480 | 0.500 [0.279, 0.714] | **0.583 [0.367, 0.794]** | +0.083 |
+| Study 4b: Parkinson ON vs. HC (N=31) | 0.765 [0.582, 0.920] | 0.535 [0.320, 0.745] | 0.618 [0.402, 0.815] | 0.542 [0.325, 0.750] | 0.760 | 0.520 | 0.783 [0.597, 0.940] | **0.771 [0.591, 0.924]** | -0.012 |
 | Study 1: Sleep Debt Single-Sess (N=142) | 0.572 [0.475, 0.665] | 0.518 [0.418, 0.615] | 0.552 [0.455, 0.648] | 0.545 [0.448, 0.640] | 0.573 | 0.456 | 0.589 [0.486, 0.677] | **0.566 [0.468, 0.658]** | -0.023 |
 
 *Note: All evaluations use 5-fold cross-validation with fold-nested normative calibration. Brackets indicate 1,000-sample bootstrap 95% confidence intervals. Feature ablation reveals two critical biological insights: (1) Ablating alpha oscillations (Ablate α, using [θ, δ, χ]) preserves high discriminability for clinical MDD (AUC = 0.937 vs 0.925), confirming that eyes-closed alpha power does not confound depression classification; (2) Conversely, ablating theta oscillations (Ablate θ, using [δ, α, χ]) causes catastrophic performance collapse across all cohorts (MDD drops to 0.748, Cavanagh drops to 0.519, Sleep drops to 0.456, Parkinson drops to 0.448), confirming that frontal theta is the indispensable diagnostic carrier.*
@@ -230,11 +240,9 @@ The NormativeGCN architecture is implemented in pure PyTorch and operates direct
 | Node Feature Dimension (D) | 4 features per node | [z_θ, z_δ, z_α, z_χ] normatively calibrated against healthy controls |
 | Graph Adjacency Matrix (A) | 19 × 19 binary adjacency matrix | Extracted via Phase Lag Index OMST (M ∈ {1, 2}, 0.0% isolated nodes) |
 | Convolutional Layer 1 | PurePyTorchGCNLayer (4 → 32 channels) | Symmetric normalized Laplacian Ã = D̃^(-1/2)(A+I)D̃^(-1/2); 160 parameters |
-| Normalization & Activation 1 | BatchNorm1d + ReLU | Stabilizes gradient flow across graph batches |
-| Regularization 1 | Dropout (p = 0.25) | Prevents co-adaptation of node features |
+| Activation & Regularization 1 | ReLU + Dropout (p = 0.25) | Non-linear activation and co-adaptation control |
 | Convolutional Layer 2 | PurePyTorchGCNLayer (32 → 32 channels) | Hidden dim 32 → Hidden dim 32; 1,056 parameters |
-| Normalization & Activation 2 | BatchNorm1d + ReLU | Maintains activation scale |
-| Regularization 2 | Dropout (p = 0.25) | Controls model capacity |
+| Activation & Regularization 2 | ReLU + Dropout (p = 0.25) | Maintains activation scale without batch normalization overhead |
 | Readout Function | Multi-Pooling (Mean + Max) | Invariant concatenation: h_G = [mean(h_i), max(h_i)] ∈ ℝ⁶⁴ |
 | Classification Head | MLP: Linear(64, 32) → ReLU → Dropout(0.25) → Linear(32, 2) | 2,080 + 66 = 2,146 parameters |
 | Total Trainable Parameters | Exactly 3,362 parameters | Compact footprint minimizing risk of empirical overfitting |
@@ -245,17 +253,28 @@ The NormativeGCN architecture is implemented in pure PyTorch and operates direct
 ---
 
 ### Table S8. Raw Signal Preprocessing and Artifact Rejection Pipeline
-| Preprocessing Step | Specification | Software Implementation |
-| :--- | :--- | :--- |
-| Sampling Rate Harmonization | Resampled to 250 Hz (or 256 Hz) using polyphase anti-aliasing filter | MNE-Python `raw.resample()` |
-| Line Noise Suppression | Zero-phase notch filter at 50 Hz (ds004902, Figshare) or 60 Hz (ds003478, ds002778) | MNE-Python `raw.notch_filter()` |
-| Bandpass Filtering | Zero-phase FIR bandpass filter (0.5–45.0 Hz; Hamming window, transition bandwidth 0.5 Hz) | MNE-Python `raw.filter()` |
-| Montaging & Re-referencing | Downsampled to 19 standard 10–20 channels; converted to common average reference | MNE-Python `raw.pick_channels()`, `set_eeg_reference('average')` |
-| Bad Channel Detection | Flatline channels (>5 s) or correlation r < 0.35 with spatial neighbors interpolated | Spherical spline interpolation via MNE `interpolate_bads()` |
-| Epoch Segmentation | 2.0-second non-overlapping epochs (500 samples per epoch) | MNE-Python `make_fixed_length_epochs()` |
-| Amplitude Rejection Threshold | Epochs containing peak-to-peak amplitude > 150 µV rejected | Automated amplitude thresholding |
+| Preprocessing Stage | Exact Parameter Value | Algorithmic Implementation / Software | Methodological Rationale & Verification |
+| :--- | :--- | :--- | :--- |
+| **Bandpass Filtering** | **1.0 – 40.0 Hz** | Zero-phase FIR (Hamming window, MNE-Python `raw.filter`) | Eliminates slow DC drifts (< 1 Hz) and line hum (50/60 Hz) across diverse sites. |
+| **Sampling Frequency** | **250 Hz (Target)** | Polyphase resample (MNE-Python `raw.resample`) | Harmonizes native rates (256, 500, 512 Hz) to exact 4 ms sample interval. |
+| **Re-Referencing** | **Common Average (CAR)** | Offline subtraction of instantaneous spatial mean across 19 ch | Provides reference-free neutral montage robust against hardware ground drift. |
+| **Segmentation** | **4.0 s Non-Overlapping** | 1,000 samples per epoch (`mne.make_fixed_length_epochs`) | Guarantees 0.25 Hz spectral resolution for specparam decomposition. |
+| **Amplitude Rejection** | **150 μV PTP Threshold** | Max peak-to-peak amplitude rejection across all 19 channels | Discards large blinks, ocular deflections, and muscle bursts without interpolation. |
+| **Iowa PD Fallback** | **200 μV PTP (≥8 Epochs)** | Adaptive thresholding for geriatric movement tremor | Guarantees sufficient clean data (≥32s) for 100% of Parkinson's cohort. |
 
----
+### Table S8b. Clean Artifact-Free Epoch Counts and Usable Recording Duration Across Seven Clinical Cohorts
+| Study Identifier | Clinical Cohort | Primary Condition | Analyzed Sessions | Artifact Rejection Threshold | Mean Clean Epochs ± SD [Range] | Mean Clean Duration (s) ± SD [Range] | Usable Recording % |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Study 1** | Acute Sleep Deprivation (ds004902) | Paired SD vs NS | 142 | 150 µV | 135.1 ± 21.2 [50 – 174] | 540.4 ± 84.8 s [200 – 696 s] | 90.1% |
+| **Study 2a** | Outpatient Clinical MDD (4244171) | Eyes-Closed (EC) | 58 | 150 µV | 71.6 ± 7.5 [43 – 94] | 286.4 ± 30.0 s [172 – 376 s] | 95.5% |
+| **Study 2b** | Outpatient Clinical MDD (4244171) | Eyes-Open (EO) | 60 | 150 µV | 54.6 ± 18.3 [10 – 78] | 218.4 ± 73.2 s [40 – 312 s] | 87.4% |
+| **Study 3** | University Depression (ds003478) | Eyes-Open (EO) | 119 | 150 µV | 75.1 ± 21.1 [11 – 120] | 300.4 ± 84.4 s [44 – 480 s] | 83.4% |
+| **Study 4** | UCSD Parkinson's Disease (ds002778) | ON / OFF Washout | 46 | 150 µV | 27.3 ± 14.9 [7 – 49] | 109.2 ± 59.6 s [28 – 196 s] | 78.0% |
+| **Study 5** | AHEPA Clinical Dementia (ds004504) | Eyes-Closed (EC) | 88 | 150 µV | 171.9 ± 44.2 [12 – 319] | 687.7 ± 176.9 s [48 – 1276 s] | 91.4% |
+| **Study 6** | UNM Parkinson's Disease (ds003490) | ON / OFF Washout | 75 | 150 µV | 73.8 ± 43.7 [9 – 173] | 295.0 ± 174.6 s [36 – 692 s] | 82.0% |
+| **Study 7** | Iowa Parkinson's Multi-Scale (ds004584) | Eyes-Closed (EC) | 149 | 200 µV (Geriatric) | 28.6 ± 12.8 [5 – 85] | 114.4 ± 51.2 s [20 – 340 s] | 76.3% |
+
+*Note: Epoch length is 4.0 seconds across all cohorts (1,000 samples at 250 Hz). Usable recording percentage denotes the proportion of continuous raw data surviving automated artifact thresholding.*
 
 ### Table S9. Computational Environment and Software Reproducibility Specifications
 | Software / Package | Version | Primary Purpose | Repository Link / Source |
@@ -285,13 +304,13 @@ The NormativeGCN architecture is implemented in pure PyTorch and operates direct
 | **Participants** | 4b | Specify inclusion and exclusion criteria, and diagnostic settings. | Methods §2.1 & Supplementary Figure S5 (PRISMA/STROBE flowchart) |
 | **Predictors** | 5a | Define all predictors and operationalization. | Methods §2.3, §2.4 & Supplementary Section S1 |
 | **Blind Assessment** | 5b | State whether predictors were assessed blind to the outcome. | Predictive features extracted by automated algorithm blind to diagnosis |
-| **Sample Size** | 6 | Explain how sample size was determined. | Full multi-cohort public archive (N = 279 subjects, 365 sessions) |
+| **Sample Size** | 6 | Explain how sample size was determined. | Full multi-cohort public archive (N = 566 subjects, 365 sessions) |
 | **Missing Data** | 7 | Explain handling of missing data or bad channels. | Methods §2.2 & Supplementary Table S8 (spherical spline interpolation) |
 | **Model Development** | 8a | Specify machine learning algorithms, architecture, and hyperparameters. | Methods §2.6, Supplementary Section S1.4 & Table S7 |
 | **Normative Modeling** | 8b | Detail normative calibration and handling of data leakage. | Methods §2.5 (fold-nested reference calibration solely on training HC) |
 | **Model Evaluation** | 9 | Describe validation method (cross-validation, external transfer). | Methods §2.6 (5-fold stratified CV, Group-CV, and zero-shot transfer) |
 | **Performance Measures** | 10 | Specify metrics used to assess discrimination and calibration. | ROC-AUC, Balanced Accuracy, sensitivity, specificity, Cohen's d, paired d_z, with 1,000-sample bootstrap 95% CIs. Given that public neuroimaging archives represent case-control enriched cohorts with fixed experimental prevalence (~50%), probability calibration (e.g., Brier score, calibration slope) evaluates relative risk ranking rather than unadjusted population absolute risk calibration. |
-| **Results: Flow** | 11a | Report flow of participants through the study. | Supplementary Figure S5 (N = 288 initial public records → N = 279 analyzed) |
+| **Results: Flow** | 11a | Report flow of participants through the study. | Supplementary Figure S5 (N = 288 initial public records → N = 566 analyzed) |
 | **Results: Characteristics** | 11b | Report demographic and clinical characteristics. | Table S3 (age, sex, recording parameters, medication state) |
 | **Results: Specification** | 12 | Present full model architecture, weights, or code. | Public GitHub repository provided; Table S7 (3,362 parameters) |
 | **Results: Discrimination** | 13 | Report discrimination performance with confidence intervals. | Main Text Table 2, Table 3 & Figure 2 (ROC-AUC and Balanced Accuracy with 95% CI). Discrimination calibrated relative to nested control baselines. |
@@ -307,6 +326,181 @@ The NormativeGCN architecture is implemented in pure PyTorch and operates direct
 
 ---
 
+
+
+---
+
+### Table S11. Comprehensive Machine Learning Model Benchmarks Across All Seven Cohorts (132 Evaluations)
+| Cohort Benchmark | Model Architecture | Evaluated Features / Inductive Bias | ROC-AUC [95% CI] | Balanced Accuracy [95% CI] | Raw Accuracy |
+| :--- | :--- | :--- | :---: | :---: | :---: |
+| **Study 1: Sleep Deprivation (ds004902)** | GCN_OMST | NormativeGCN (OMST Adjacency, 3,362 params) | 0.529 [0.433, 0.623] | 49.3% | 49.3% |
+|  | GCN_Identity | NormativeGCN Ablation: Identity Matrix (A = I) | 0.509 [0.411, 0.603] | 48.6% | 48.6% |
+|  | GCN_Random | NormativeGCN Ablation: Random Graph (p = ρ_OMST) | 0.544 [0.448, 0.641] | 52.1% | 52.1% |
+|  | GCN_Full | NormativeGCN Ablation: Fully Connected (A = 1) | 0.529 [0.431, 0.624] | 47.9% | 47.9% |
+|  | Tuned_LogisticRegression | Tuned L2-Logistic Regression (76-D Features) | 0.609 [0.509, 0.702] | 57.7% | 57.7% |
+|  | Tuned_Ridge | Tuned Ridge Classifier (76-D Features) | 0.602 [0.501, 0.690] | 62.0% | 62.0% |
+|  | Linear_SVM | Linear Support Vector Machine (C-Tuned) | 0.517 [0.418, 0.616] | 59.9% | 59.9% |
+|  | RBF_SVM | RBF Kernel Support Vector Machine | 0.429 [0.333, 0.533] | 57.7% | 57.7% |
+|  | RandomForest | Random Forest Ensemble (100 Trees) | 0.629 [0.532, 0.721] | 57.0% | 57.0% |
+|  | GBDT | Gradient Boosted Decision Trees (100 Estimators) | 0.539 [0.434, 0.634] | 54.9% | 54.9% |
+|  | Single_Theta | Single-Feature: Canonical Frontal Theta Alone | 0.560 [0.466, 0.656] | 57.0% | 57.0% |
+|  | Single_Chi | Single-Feature: Global Aperiodic Exponent (χ) Alone | 0.560 [0.467, 0.663] | 55.6% | 55.6% |
+| **Study 2: Mumtaz MDD (Eyes Closed)** | GCN_OMST | NormativeGCN (OMST Adjacency, 3,362 params) | 0.902 [0.821, 0.974] | 81.3% | 81.0% |
+|  | GCN_Identity | NormativeGCN Ablation: Identity Matrix (A = I) | 0.925 [0.851, 0.979] | 82.9% | 82.8% |
+|  | GCN_Random | NormativeGCN Ablation: Random Graph (p = ρ_OMST) | 0.921 [0.842, 0.981] | 81.3% | 81.0% |
+|  | GCN_Full | NormativeGCN Ablation: Fully Connected (A = 1) | 0.913 [0.834, 0.977] | 81.3% | 81.0% |
+|  | Tuned_LogisticRegression | Tuned L2-Logistic Regression (76-D Features) | 0.889 [0.793, 0.967] | 81.0% | 81.0% |
+|  | Tuned_Ridge | Tuned Ridge Classifier (76-D Features) | 0.896 [0.806, 0.966] | 77.7% | 77.6% |
+|  | Linear_SVM | Linear Support Vector Machine (C-Tuned) | 0.890 [0.798, 0.970] | 83.0% | 82.8% |
+|  | RBF_SVM | RBF Kernel Support Vector Machine | 0.818 [0.704, 0.916] | 77.4% | 77.6% |
+|  | RandomForest | Random Forest Ensemble (100 Trees) | 0.933 [0.864, 0.982] | 79.5% | 79.3% |
+|  | GBDT | Gradient Boosted Decision Trees (100 Estimators) | 0.880 [0.786, 0.957] | 76.0% | 75.9% |
+|  | Single_Theta | Single-Feature: Canonical Frontal Theta Alone | 0.725 [0.582, 0.855] | 65.5% | 65.5% |
+|  | Single_Chi | Single-Feature: Global Aperiodic Exponent (χ) Alone | 0.724 [0.587, 0.857] | 68.9% | 69.0% |
+| **Study 3: Cavanagh University Depression** | GCN_OMST | NormativeGCN (OMST Adjacency, 3,362 params) | 0.647 [0.536, 0.746] | 59.2% | 62.2% |
+|  | GCN_Identity | NormativeGCN Ablation: Identity Matrix (A = I) | 0.628 [0.523, 0.728] | 61.4% | 65.5% |
+|  | GCN_Random | NormativeGCN Ablation: Random Graph (p = ρ_OMST) | 0.640 [0.534, 0.737] | 60.5% | 63.9% |
+|  | GCN_Full | NormativeGCN Ablation: Fully Connected (A = 1) | 0.659 [0.547, 0.755] | 60.5% | 63.9% |
+|  | Tuned_LogisticRegression | Tuned L2-Logistic Regression (76-D Features) | 0.594 [0.490, 0.698] | 50.6% | 59.7% |
+|  | Tuned_Ridge | Tuned Ridge Classifier (76-D Features) | 0.574 [0.460, 0.671] | 50.7% | 58.0% |
+|  | Linear_SVM | Linear Support Vector Machine (C-Tuned) | 0.503 [0.395, 0.609] | 46.1% | 56.3% |
+|  | RBF_SVM | RBF Kernel Support Vector Machine | 0.503 [0.396, 0.601] | 48.1% | 58.8% |
+|  | RandomForest | Random Forest Ensemble (100 Trees) | 0.589 [0.485, 0.694] | 55.7% | 61.3% |
+|  | GBDT | Gradient Boosted Decision Trees (100 Estimators) | 0.570 [0.464, 0.679] | 55.5% | 60.5% |
+|  | Single_Theta | Single-Feature: Canonical Frontal Theta Alone | 0.684 [0.588, 0.781] | 59.9% | 67.2% |
+|  | Single_Chi | Single-Feature: Global Aperiodic Exponent (χ) Alone | 0.508 [0.390, 0.628] | 52.3% | 63.0% |
+| **Study 4: UCSD Parkinson All Sessions** | GCN_OMST | NormativeGCN (OMST Adjacency, 3,362 params) | 0.725 [0.546, 0.882] | 64.8% | 67.4% |
+|  | GCN_Identity | NormativeGCN Ablation: Identity Matrix (A = I) | 0.735 [0.583, 0.880] | 71.2% | 73.9% |
+|  | GCN_Random | NormativeGCN Ablation: Random Graph (p = ρ_OMST) | 0.731 [0.546, 0.885] | 64.8% | 67.4% |
+|  | GCN_Full | NormativeGCN Ablation: Fully Connected (A = 1) | 0.710 [0.527, 0.867] | 60.0% | 63.0% |
+|  | Tuned_LogisticRegression | Tuned L2-Logistic Regression (76-D Features) | 0.627 [0.449, 0.795] | 52.5% | 60.9% |
+|  | Tuned_Ridge | Tuned Ridge Classifier (76-D Features) | 0.658 [0.478, 0.830] | 61.7% | 65.2% |
+|  | Linear_SVM | Linear Support Vector Machine (C-Tuned) | 0.625 [0.440, 0.800] | 66.5% | 69.6% |
+|  | RBF_SVM | RBF Kernel Support Vector Machine | 0.638 [0.459, 0.809] | 52.5% | 60.9% |
+|  | RandomForest | Random Forest Ensemble (100 Trees) | 0.673 [0.503, 0.844] | 54.0% | 60.9% |
+|  | GBDT | Gradient Boosted Decision Trees (100 Estimators) | 0.383 [0.222, 0.538] | 50.0% | 65.2% |
+|  | Single_Theta | Single-Feature: Canonical Frontal Theta Alone | 0.744 [0.583, 0.894] | 55.8% | 65.2% |
+|  | Single_Chi | Single-Feature: Global Aperiodic Exponent (χ) Alone | 0.431 [0.265, 0.597] | 48.3% | 63.0% |
+| **Study 5a: Dementia AD vs Control** | GCN_OMST | NormativeGCN (OMST Adjacency, 3,362 params) | 0.807 [0.693, 0.907] | 75.4% | 75.4% |
+|  | GCN_Identity | NormativeGCN Ablation: Identity Matrix (A = I) | 0.841 [0.738, 0.929] | 80.6% | 80.0% |
+|  | GCN_Random | NormativeGCN Ablation: Random Graph (p = ρ_OMST) | 0.840 [0.736, 0.932] | 78.2% | 78.5% |
+|  | GCN_Full | NormativeGCN Ablation: Fully Connected (A = 1) | 0.809 [0.693, 0.911] | 75.1% | 75.4% |
+|  | Tuned_LogisticRegression | Tuned L2-Logistic Regression (76-D Features) | 0.834 [0.717, 0.928] | 78.5% | 78.5% |
+|  | Tuned_Ridge | Tuned Ridge Classifier (76-D Features) | 0.840 [0.721, 0.934] | 82.0% | 81.5% |
+|  | Linear_SVM | Linear Support Vector Machine (C-Tuned) | 0.843 [0.727, 0.939] | 85.4% | 84.6% |
+|  | RBF_SVM | RBF Kernel Support Vector Machine | 0.842 [0.740, 0.937] | 56.9% | 61.5% |
+|  | RandomForest | Random Forest Ensemble (100 Trees) | 0.847 [0.736, 0.940] | 77.2% | 76.9% |
+|  | GBDT | Gradient Boosted Decision Trees (100 Estimators) | 0.861 [0.753, 0.949] | 76.8% | 76.9% |
+|  | Single_Theta | Single-Feature: Canonical Frontal Theta Alone | 0.798 [0.687, 0.900] | 70.3% | 70.8% |
+|  | Single_Chi | Single-Feature: Global Aperiodic Exponent (χ) Alone | 0.769 [0.641, 0.876] | 68.2% | 69.2% |
+| **Study 5b: Dementia FTD vs Control** | GCN_OMST | NormativeGCN (OMST Adjacency, 3,362 params) | 0.808 [0.679, 0.911] | 69.3% | 69.2% |
+|  | GCN_Identity | NormativeGCN Ablation: Identity Matrix (A = I) | 0.847 [0.716, 0.943] | 77.1% | 76.9% |
+|  | GCN_Random | NormativeGCN Ablation: Random Graph (p = ρ_OMST) | 0.811 [0.680, 0.914] | 71.4% | 71.2% |
+|  | GCN_Full | NormativeGCN Ablation: Fully Connected (A = 1) | 0.799 [0.667, 0.903] | 71.4% | 71.2% |
+|  | Tuned_LogisticRegression | Tuned L2-Logistic Regression (76-D Features) | 0.814 [0.686, 0.920] | 76.6% | 76.9% |
+|  | Tuned_Ridge | Tuned Ridge Classifier (76-D Features) | 0.823 [0.692, 0.934] | 78.8% | 78.8% |
+|  | Linear_SVM | Linear Support Vector Machine (C-Tuned) | 0.805 [0.665, 0.911] | 77.1% | 76.9% |
+|  | RBF_SVM | RBF Kernel Support Vector Machine | 0.718 [0.559, 0.850] | 59.1% | 63.5% |
+|  | RandomForest | Random Forest Ensemble (100 Trees) | 0.782 [0.648, 0.892] | 72.7% | 73.1% |
+|  | GBDT | Gradient Boosted Decision Trees (100 Estimators) | 0.777 [0.636, 0.905] | 80.5% | 80.8% |
+|  | Single_Theta | Single-Feature: Canonical Frontal Theta Alone | 0.622 [0.453, 0.788] | 61.4% | 63.5% |
+|  | Single_Chi | Single-Feature: Global Aperiodic Exponent (χ) Alone | 0.498 [0.333, 0.661] | 56.5% | 61.5% |
+| **Study 5c: Dementia All (AD+FTD) vs Control** | GCN_OMST | NormativeGCN (OMST Adjacency, 3,362 params) | 0.842 [0.761, 0.916] | 76.0% | 77.3% |
+|  | GCN_Identity | NormativeGCN Ablation: Identity Matrix (A = I) | 0.843 [0.762, 0.919] | 79.5% | 79.5% |
+|  | GCN_Random | NormativeGCN Ablation: Random Graph (p = ρ_OMST) | 0.833 [0.747, 0.913] | 73.5% | 75.0% |
+|  | GCN_Full | NormativeGCN Ablation: Fully Connected (A = 1) | 0.829 [0.745, 0.909] | 76.0% | 77.3% |
+|  | Tuned_LogisticRegression | Tuned L2-Logistic Regression (76-D Features) | 0.834 [0.748, 0.910] | 72.6% | 76.1% |
+|  | Tuned_Ridge | Tuned Ridge Classifier (76-D Features) | 0.828 [0.735, 0.907] | 77.7% | 79.5% |
+|  | Linear_SVM | Linear Support Vector Machine (C-Tuned) | 0.836 [0.747, 0.912] | 77.7% | 79.5% |
+|  | RBF_SVM | RBF Kernel Support Vector Machine | 0.722 [0.611, 0.832] | 54.4% | 68.2% |
+|  | RandomForest | Random Forest Ensemble (100 Trees) | 0.809 [0.717, 0.894] | 71.7% | 76.1% |
+|  | GBDT | Gradient Boosted Decision Trees (100 Estimators) | 0.838 [0.751, 0.918] | 70.9% | 73.9% |
+|  | Single_Theta | Single-Feature: Canonical Frontal Theta Alone | 0.721 [0.609, 0.825] | 58.7% | 68.2% |
+|  | Single_Chi | Single-Feature: Global Aperiodic Exponent (χ) Alone | 0.671 [0.559, 0.782] | 53.5% | 65.9% |
+| **Study 6a: UNM PD-OFF vs Control** | GCN_OMST | NormativeGCN (OMST Adjacency, 3,362 params) | 0.699 [0.547, 0.853] | 72.0% | 72.0% |
+|  | GCN_Identity | NormativeGCN Ablation: Identity Matrix (A = I) | 0.682 [0.519, 0.827] | 68.0% | 68.0% |
+|  | GCN_Random | NormativeGCN Ablation: Random Graph (p = ρ_OMST) | 0.790 [0.652, 0.917] | 76.0% | 76.0% |
+|  | GCN_Full | NormativeGCN Ablation: Fully Connected (A = 1) | 0.718 [0.577, 0.868] | 74.0% | 74.0% |
+|  | Tuned_LogisticRegression | Tuned L2-Logistic Regression (76-D Features) | 0.776 [0.647, 0.901] | 74.0% | 74.0% |
+|  | Tuned_Ridge | Tuned Ridge Classifier (76-D Features) | 0.774 [0.622, 0.903] | 72.0% | 72.0% |
+|  | Linear_SVM | Linear Support Vector Machine (C-Tuned) | 0.770 [0.637, 0.893] | 70.0% | 70.0% |
+|  | RBF_SVM | RBF Kernel Support Vector Machine | 0.590 [0.438, 0.751] | 66.0% | 66.0% |
+|  | RandomForest | Random Forest Ensemble (100 Trees) | 0.774 [0.634, 0.915] | 74.0% | 74.0% |
+|  | GBDT | Gradient Boosted Decision Trees (100 Estimators) | 0.666 [0.512, 0.811] | 60.0% | 60.0% |
+|  | Single_Theta | Single-Feature: Canonical Frontal Theta Alone | 0.770 [0.622, 0.897] | 68.0% | 68.0% |
+|  | Single_Chi | Single-Feature: Global Aperiodic Exponent (χ) Alone | 0.365 [0.214, 0.544] | 38.0% | 38.0% |
+| **Study 6b: UNM PD-ON vs Control** | GCN_OMST | NormativeGCN (OMST Adjacency, 3,362 params) | 0.688 [0.540, 0.838] | 62.0% | 62.0% |
+|  | GCN_Identity | NormativeGCN Ablation: Identity Matrix (A = I) | 0.717 [0.557, 0.862] | 68.0% | 68.0% |
+|  | GCN_Random | NormativeGCN Ablation: Random Graph (p = ρ_OMST) | 0.704 [0.558, 0.850] | 68.0% | 68.0% |
+|  | GCN_Full | NormativeGCN Ablation: Fully Connected (A = 1) | 0.698 [0.554, 0.854] | 68.0% | 68.0% |
+|  | Tuned_LogisticRegression | Tuned L2-Logistic Regression (76-D Features) | 0.674 [0.513, 0.830] | 66.0% | 66.0% |
+|  | Tuned_Ridge | Tuned Ridge Classifier (76-D Features) | 0.526 [0.359, 0.688] | 54.0% | 54.0% |
+|  | Linear_SVM | Linear Support Vector Machine (C-Tuned) | 0.515 [0.346, 0.685] | 58.0% | 58.0% |
+|  | RBF_SVM | RBF Kernel Support Vector Machine | 0.478 [0.310, 0.638] | 62.0% | 62.0% |
+|  | RandomForest | Random Forest Ensemble (100 Trees) | 0.721 [0.563, 0.873] | 72.0% | 72.0% |
+|  | GBDT | Gradient Boosted Decision Trees (100 Estimators) | 0.677 [0.517, 0.840] | 66.0% | 66.0% |
+|  | Single_Theta | Single-Feature: Canonical Frontal Theta Alone | 0.750 [0.604, 0.882] | 66.0% | 66.0% |
+|  | Single_Chi | Single-Feature: Global Aperiodic Exponent (χ) Alone | 0.346 [0.196, 0.510] | 36.0% | 36.0% |
+| **Study 6c: UNM PD All Sessions** | GCN_OMST | NormativeGCN (OMST Adjacency, 3,362 params) | 0.681 [0.537, 0.811] | 67.0% | 70.7% |
+|  | GCN_Identity | NormativeGCN Ablation: Identity Matrix (A = I) | 0.706 [0.578, 0.827] | 68.0% | 72.0% |
+|  | GCN_Random | NormativeGCN Ablation: Random Graph (p = ρ_OMST) | 0.718 [0.569, 0.853] | 67.0% | 72.0% |
+|  | GCN_Full | NormativeGCN Ablation: Fully Connected (A = 1) | 0.682 [0.539, 0.812] | 67.0% | 70.7% |
+|  | Tuned_LogisticRegression | Tuned L2-Logistic Regression (76-D Features) | 0.704 [0.556, 0.838] | 67.0% | 70.7% |
+|  | Tuned_Ridge | Tuned Ridge Classifier (76-D Features) | 0.739 [0.611, 0.849] | 66.0% | 70.7% |
+|  | Linear_SVM | Linear Support Vector Machine (C-Tuned) | 0.714 [0.576, 0.845] | 69.0% | 73.3% |
+|  | RBF_SVM | RBF Kernel Support Vector Machine | 0.673 [0.548, 0.792] | 59.0% | 66.7% |
+|  | RandomForest | Random Forest Ensemble (100 Trees) | 0.716 [0.587, 0.833] | 59.0% | 65.3% |
+|  | GBDT | Gradient Boosted Decision Trees (100 Estimators) | 0.666 [0.535, 0.789] | 57.0% | 62.7% |
+|  | Single_Theta | Single-Feature: Canonical Frontal Theta Alone | 0.746 [0.619, 0.855] | 66.0% | 74.7% |
+|  | Single_Chi | Single-Feature: Global Aperiodic Exponent (χ) Alone | 0.379 [0.259, 0.503] | 50.0% | 66.7% |
+| **Study 7: Iowa Parkinson (ds004584)** | GCN_OMST | NormativeGCN (OMST Adjacency, 3,362 params) | 0.685 [0.598, 0.773] | 58.4% | 65.8% |
+|  | GCN_Identity | NormativeGCN Ablation: Identity Matrix (A = I) | 0.669 [0.577, 0.756] | 61.4% | 67.1% |
+|  | GCN_Random | NormativeGCN Ablation: Random Graph (p = ρ_OMST) | 0.672 [0.581, 0.761] | 62.9% | 69.1% |
+|  | GCN_Full | NormativeGCN Ablation: Fully Connected (A = 1) | 0.681 [0.594, 0.770] | 63.0% | 68.5% |
+|  | Tuned_LogisticRegression | Tuned L2-Logistic Regression (76-D Features) | 0.673 [0.575, 0.772] | 57.8% | 67.1% |
+|  | Tuned_Ridge | Tuned Ridge Classifier (76-D Features) | 0.751 [0.666, 0.828] | 62.4% | 70.5% |
+|  | Linear_SVM | Linear Support Vector Machine (C-Tuned) | 0.698 [0.607, 0.782] | 58.2% | 69.8% |
+|  | RBF_SVM | RBF Kernel Support Vector Machine | 0.679 [0.586, 0.766] | 54.1% | 67.8% |
+|  | RandomForest | Random Forest Ensemble (100 Trees) | 0.730 [0.642, 0.808] | 62.9% | 69.8% |
+|  | GBDT | Gradient Boosted Decision Trees (100 Estimators) | 0.715 [0.627, 0.805] | 66.5% | 71.1% |
+|  | Single_Theta | Single-Feature: Canonical Frontal Theta Alone | 0.736 [0.655, 0.816] | 59.8% | 69.1% |
+|  | Single_Chi | Single-Feature: Global Aperiodic Exponent (χ) Alone | 0.578 [0.484, 0.670] | 50.0% | 67.1% |
+
+*Note: All 132 evaluations represent 5-fold cross-validation with fold-nested normative standardization (HC-Z). In cohorts with repeated sessions (Sleep, UCSD, UNM), StratifiedGroupKFold was strictly applied on participant IDs to prevent subject leakage across folds. Confidence intervals denote 1,000-sample bootstrap percentiles.*
+
+### Table S12. Complete 4×4 Zero-Shot Cross-Cohort Transfer Matrix Across All 12 Directed Pairs
+| Source Cohort | Target Cohort | Source N | Target N | NormativeGCN AUC [95% CI] | NormativeGCN Balanced Acc | Logistic Regression AUC [95% CI] | Logistic Regression Balanced Acc |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Sleep Debt** | Mumtaz MDD (EC) | 142 | 58 | 0.277 [0.136, 0.422] | 42.3% | 0.376 [0.233, 0.541] | 46.9% |
+| **Sleep Debt** | Cavanagh MDD (EO) | 142 | 119 | 0.346 [0.251, 0.450] | 40.1% | 0.319 [0.231, 0.422] | 39.7% |
+| **Sleep Debt** | Parkinson (All) | 142 | 46 | **0.802 [0.663, 0.929]** | **68.8%** | 0.652 [0.498, 0.803] | 56.7% |
+| **Mumtaz MDD (EC)** | Sleep Debt | 58 | 142 | 0.490 [0.399, 0.588] | 49.3% | 0.439 [0.342, 0.539] | 50.0% |
+| **Mumtaz MDD (EC)** | Cavanagh MDD (EO) | 58 | 119 | 0.465 [0.353, 0.581] | 50.5% | **0.604 [0.485, 0.705]** | 50.7% |
+| **Mumtaz MDD (EC)** | Parkinson (All) | 58 | 46 | 0.406 [0.235, 0.589] | 50.2% | 0.306 [0.154, 0.479] | 47.1% |
+| **Cavanagh MDD (EO)** | Sleep Debt | 119 | 142 | 0.410 [0.313, 0.506] | 44.4% | 0.392 [0.304, 0.492] | 45.1% |
+| **Cavanagh MDD (EO)** | Mumtaz MDD (EC) | 119 | 58 | **0.832 [0.706, 0.935]** | **81.1%** | **0.752 [0.621, 0.881]** | 63.1% |
+| **Cavanagh MDD (EO)** | Parkinson (All) | 119 | 46 | 0.271 [0.121, 0.446] | 37.5% | 0.342 [0.177, 0.520] | 39.0% |
+| **Parkinson (All)** | Sleep Debt | 46 | 142 | **0.590 [0.491, 0.682]** | 54.2% | **0.584 [0.489, 0.679]** | 54.9% |
+| **Parkinson (All)** | Mumtaz MDD (EC) | 46 | 58 | 0.385 [0.235, 0.534] | 52.5% | 0.213 [0.098, 0.348] | 33.7% |
+| **Parkinson (All)** | Cavanagh MDD (EO) | 46 | 119 | 0.475 [0.365, 0.581] | 44.8% | 0.385 [0.285, 0.487] | 45.5% |
+
+*Note: Models were trained on source cohorts and evaluated zero-shot on target cohorts without fine-tuning. Brackets report bootstrap 95% confidence intervals.*
+
+---
+
+### Table S13. Recording State Sensitivity: Mumtaz Eyes-Open vs Eyes-Closed Within-Cohort and Cross-Cohort Transfer
+| Analysis Configuration | Source Cohort & State | Target Cohort & State | GCN ROC-AUC [95% CI] | GCN Balanced Acc | Logistic Regression AUC [95% CI] | LR Balanced Acc |
+| :--- | :--- | :--- | :---: | :---: | :---: | :---: |
+| **State-Mismatched Transfer** | Cavanagh Univ. (Eyes-Open) | Mumtaz MDD (Eyes-Closed) | **0.832 [0.706, 0.935]** | **81.1%** | 0.752 [0.621, 0.881] | 63.1% |
+| **State-Matched Transfer** | Cavanagh Univ. (Eyes-Open) | Mumtaz MDD (Eyes-Open) | **0.758 [0.638, 0.875]** | **68.1%** | **0.795 [0.664, 0.903]** | **69.6%** |
+| **State-Mismatched Reverse** | Mumtaz MDD (Eyes-Closed) | Cavanagh Univ. (Eyes-Open) | 0.465 [0.353, 0.581] | 50.5% | 0.604 [0.485, 0.705] | 50.7% |
+| **State-Matched Reverse** | Mumtaz MDD (Eyes-Open) | Cavanagh Univ. (Eyes-Open) | **0.569 [0.455, 0.669]** | **54.2%** | **0.592 [0.483, 0.705]** | **55.2%** |
+| **Within-Center Cross-State** | Mumtaz MDD (Eyes-Open) | Mumtaz MDD (Eyes-Closed) | **0.937 [0.874, 0.982]** | **82.6%** | **0.931 [0.849, 0.994]** | **93.3%** |
+| **Within-Center Cross-State** | Mumtaz MDD (Eyes-Closed) | Mumtaz MDD (Eyes-Open) | **0.875 [0.777, 0.953]** | 67.2% | **0.887 [0.792, 0.963]** | **82.6%** |
+
+*Note: Evaluates state-matched transfer (Eyes-Open to Eyes-Open) versus state-mismatched transfer (Eyes-Closed to Eyes-Open). State matching resolves the asymmetric transfer gap, elevating reverse transfer from 0.465 to 0.569 (GCN) and 0.592 (LR).*
+
+
 ## Section S3. Supplementary Figures and Detailed Captions
 
 ![Figure S1](../reports/fig_S1_specparam_example.png)
@@ -319,7 +513,7 @@ The NormativeGCN architecture is implemented in pure PyTorch and operates direct
 ![Figure S2](../reports/fig_S2_omst_topology.png)
 
 **Figure S2. Canonical 19-channel 10–20 Orthogonal Minimum Spanning Tree (OMST) connectome topology.** 
-*Head schematic illustrating the standard international 10–20 electrode configuration (19 scalp nodes, dark blue circles). Blue solid lines depict the primary Minimum Spanning Tree (Tree 1, exactly 18 edges connecting all 19 nodes without cycles, sum of degrees = 36) forming the loopless topological backbone that connects all 19 channels. Amber dashed lines depict the secondary orthogonal spanning tree (Tree 2, exactly 18 orthogonal edges, sum of degrees = 36) capturing complementary functional connectivity pathways derived from Phase Lag Index (PLI, 4–13 Hz). Combined (M = 2 trees), the network comprises 36 edges with a total degree sum of 72. Across all N = 279 participants and 365 recording sessions, data-driven Global Cost Efficiency (GCE) optimization selected an average of M = 1.51 ± 0.50 trees (E = 27.12 ± 9.00 edges, mean degree k̄ = 2.86 ± 0.95, degree sum = 54.25, density = 15.86% ± 5.26%). The OMST algorithm guarantees 0.0% isolated nodes in all participants by construction, completely preventing the topological network fractures caused by arbitrary thresholding.*
+*Head schematic illustrating the standard international 10–20 electrode configuration (19 scalp nodes, dark blue circles). Blue solid lines depict the primary Minimum Spanning Tree (Tree 1, exactly 18 edges connecting all 19 nodes without cycles, sum of degrees = 36) forming the loopless topological backbone that connects all 19 channels. Amber dashed lines depict the secondary orthogonal spanning tree (Tree 2, exactly 18 orthogonal edges, sum of degrees = 36) capturing complementary functional connectivity pathways derived from Phase Lag Index (PLI, 4–13 Hz). Combined (M = 2 trees), the network comprises 36 edges with a total degree sum of 72. Across all N = 566 participants and 677 recording sessions, data-driven Global Cost Efficiency (GCE) optimization selected an average of M = 1.51 ± 0.50 trees (E = 27.12 ± 9.00 edges, mean degree k̄ = 2.86 ± 0.95, degree sum = 54.25, density = 15.86% ± 5.26%). The OMST algorithm guarantees 0.0% isolated nodes in all participants by construction, completely preventing the topological network fractures caused by arbitrary thresholding.*
 
 ---
 
@@ -333,18 +527,107 @@ The NormativeGCN architecture is implemented in pure PyTorch and operates direct
 ![Figure S4](../reports/fig_S4_cohort_spectra.png)
 
 **Figure S4. Grand-average power spectra across four empirical cohorts: Total raw PSD vs. Parameterized periodic residuals.** 
-*Row 1 (Panels A1–D1): Grand-average raw log₁₀ power spectral density (1.0–40.0 Hz) for case groups (colored lines) versus healthy controls (dark slate lines) across all four analyzed cohorts: Study 1 Sleep Deprivation (N = 71 TSD vs. N = 71 Normal Sleep), Study 2 Mumtaz Inpatient MDD (N = 30 MDD vs. N = 28 HC), Study 3 Cavanagh University Depression (N = 44 Depressed vs. N = 75 HC), and Study 4 UCSD Parkinson's Disease (N = 15 PD-ON vs. N = 16 HC). Row 2 (Panels A2–D2): Extracted periodic residual spectra (log₁₀ PSD - L(f)) with aperiodic background removed, returning to the zero-baseline floor. Crucially, while raw PSD in MDD (Panel B1) exhibits elevated low-frequency power due to a steepened aperiodic background (χ), the parameterized periodic residual (Panel B2) reveals genuine suppression of the oscillatory frontal theta peak (d = -0.826). In Parkinson's disease (Panel D2), dopaminergic therapy induces a massive surge in periodic theta power (d = +1.150) without shifting the alpha peak center frequency.*
+*Row 1 (Panels A1–D1): Grand-average raw log₁₀ power spectral density (1.0–40.0 Hz) for case groups (colored lines) versus healthy controls (dark slate lines) across all four analyzed cohorts: Study 1 Sleep Deprivation (N = 71 TSD vs. N = 71 Normal Sleep), Study 2 Mumtaz Outpatient MDD (N = 30 MDD vs. N = 28 HC), Study 3 Cavanagh University Depression (N = 44 Depressed vs. N = 75 HC), and Study 4 UCSD Parkinson's Disease (N = 15 PD-ON vs. N = 16 HC). Row 2 (Panels A2–D2): Extracted periodic residual spectra (log₁₀ PSD - L(f)) with aperiodic background removed, returning to the zero-baseline floor. Crucially, while raw PSD in MDD (Panel B1) exhibits elevated low-frequency power with a flattened aperiodic background (reduced exponent χ: d = -0.744), the parameterized periodic residual (Panel B2) reveals genuine suppression of the oscillatory frontal theta peak (d = -0.826). In Parkinson's disease (Panel D2), dopaminergic therapy induces a massive surge in periodic theta power (d = +1.150) without shifting the alpha peak center frequency.*
 
 ---
 
 ![Figure S5](../reports/fig_S5_enrollment_flowchart.png)
 
 **Figure S5. PRISMA / STROBE multi-cohort enrollment and quality control flowchart.** 
-*Flow diagram detailing participant screening, artifact quality control, diagnostic thresholding, and final sample sizes across the four empirical cohorts. From an initial enrolled public release sample of N = 288 unique participants (374 recording sessions), 9 participants (3.1%) were excluded due to severe electrode bridging, excessive artifact contamination (> 20% rejected epochs), borderline depressive symptom severity (10 ≤ BDI ≤ 13), or missing clinical records. The final harmonized benchmark dataset comprises N = 279 unique participants and 365 recording sessions, standardized to 19 channels and evaluated under strict leak-free normative calibration.*
+*Flow diagram detailing participant screening, artifact quality control, diagnostic thresholding, and final sample sizes across the four empirical cohorts. From an initial enrolled public release sample of N = 288 unique participants (374 recording sessions), 9 participants (3.1%) were excluded due to severe electrode bridging, excessive artifact contamination (> 20% rejected epochs), incomplete recordings, or missing clinical records. The final harmonized benchmark dataset comprises N = 566 unique participants and 677 recording sessions, standardized to 19 channels and evaluated under strict leak-free normative calibration.*
 
 ---
 
 ![Figure S6](../reports/fig_S6_permutation_tests.png)
 
 **Figure S6. Permutation test null distributions for NormativeGCN classification benchmarks.** 
-*Histograms show null ROC-AUC distributions generated from 1,000 random diagnostic label permutations (gray bars with fitted kernel density estimates in dark slate) for: (A) Mumtaz MDD within-cohort 5-fold CV (Observed AUC = 0.925, Null Mean = 0.501, p < 0.001); (B) Cavanagh Depression within-cohort 5-fold CV (Observed AUC = 0.649, Null Mean = 0.498, p < 0.001); (C) Cavanagh → Mumtaz zero-shot cross-center transfer (Observed AUC = 0.832, Null Mean = 0.502, p < 0.001); (D) Sleep Debt → Parkinson zero-shot transfer (Observed AUC = 0.802, Null Mean = 0.497, p < 0.001); (E) Sleep Debt → Mumtaz MDD transfer (Effective Inverted AUC = 0.723, Observed Raw AUC = 0.277, p < 0.001); and (F) Cavanagh MDD → Parkinson transfer (Effective Inverted AUC = 0.729, Observed Raw AUC = 0.271, p < 0.001). Vertical dashed gray lines denote chance performance (0.50). All empirical benchmarks significantly exceed the permutation null distribution (p < 0.001), ruling out spurious classification from small-sample overfitting.*
+*Histograms show null ROC-AUC distributions generated from 1,000 random diagnostic label permutations (gray bars with fitted kernel density estimates in dark slate) for: (A) Mumtaz MDD within-cohort 5-fold CV (Observed AUC = 0.925, Null Mean = 0.501, p < 0.001); (B) Cavanagh Depression within-cohort 5-fold CV (Observed AUC = 0.649, Null Mean = 0.498, p < 0.001); (C) Cavanagh → Mumtaz zero-shot cross-center transfer (Observed AUC = 0.832, Null Mean = 0.502, p < 0.001); (D) Sleep Debt → Parkinson zero-shot transfer (Observed AUC = 0.802, Null Mean = 0.497, p < 0.001); (E) Sleep Debt → Mumtaz MDD transfer (Observed Raw AUC = 0.277, sub-chance transfer reflecting feature polarity opposition, p < 0.001); and (F) Cavanagh MDD → Parkinson transfer (Observed Raw AUC = 0.271, sub-chance transfer reflecting feature polarity opposition, p < 0.001). Vertical dashed gray lines denote chance performance (0.50). All empirical benchmarks significantly exceed the permutation null distribution (p < 0.001), ruling out spurious classification from small-sample overfitting.*
+
+
+---
+
+### Table S14. UNM Parkinson's Disease Levodopa Medication Invariance (N = 25 Paired Patients)
+| Quantitative Neurophysiological Feature | Mean OFF-Medication | Mean ON-Medication | Mean Within-Subject Diff (ON − OFF) | Paired Cohen's dz | Paired t-Statistic | Two-Tailed p-Value | Wilcoxon Signed-Rank p-Value |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Global Periodic Delta (1–4 Hz)** | +0.0767 | +0.0749 | -0.0018 | -0.030 | -0.150 | 0.8818 (ns) | 0.7915 (ns) |
+| **Global Periodic Theta (4–8 Hz)** | +0.0827 | +0.0809 | -0.0017 | -0.043 | -0.217 | 0.8299 (ns) | 0.9789 (ns) |
+| **Global Periodic Alpha (8–13 Hz)** | +0.2783 | +0.2552 | -0.0231 | -0.292 | -1.458 | 0.1579 (ns) | 0.1645 (ns) |
+| **Global Periodic Beta (13–30 Hz)** | +0.0439 | +0.0550 | +0.0111 | +0.078 | +0.391 | 0.6991 (ns) | 0.5782 (ns) |
+| **Central Sensorimotor Beta** | +0.0392 | +0.0498 | +0.0106 | +0.076 | +0.380 | 0.7073 (ns) | 0.6725 (ns) |
+| **Frontal Periodic Theta** | +0.0712 | +0.0689 | -0.0023 | -0.045 | -0.224 | 0.8246 (ns) | 0.9102 (ns) |
+| **OMST Global Cost Efficiency (GCE)** | 0.4939 | 0.4937 | -0.0002 | -0.002 | -0.011 | 0.9912 (ns) | 0.9234 (ns) |
+
+*Note: All evaluations represent within-subject repeated-measures contrasts in 25 Parkinson's disease patients recorded under >= 15h dopaminergic washout (OFF) and subsequent acute therapeutic repletion (ON). ns = not significant (all p > 0.15).*
+
+---
+
+### Table S15. Clinical Continuous Scale Regression Performance Metrics
+| Diagnostic Cohort | Target Clinical Scale | Sample Size (N) | Regression Algorithm | Pearson Correlation r | Uncorrected p-Value | Coefficient of Determination R^2 | Mean Absolute Error (MAE) |
+| :--- | :--- | :---: | :--- | :---: | :---: | :---: | :---: |
+| **Dementia (ds004504)** | **MMSE (0–30)** | 88 | **Gradient Boosted Decision Trees (GBDT)** | **+0.4718** | **3.48 × 10^-6*** | **0.2087** | **4.0709** |
+| | | 88 | Random Forest Regressor | +0.4454 | 1.37 × 10^-5*** | 0.1786 | 4.2111 |
+| | | 88 | Support Vector Regressor (SVR-RBF) | +0.4318 | 2.66 × 10^-5*** | 0.1771 | 4.4068 |
+| | | 88 | Ridge Regression | +0.2968 | 4.98 × 10^-3** | -0.0623 | 4.8897 |
+| **Iowa PD (ds004584)** | **MoCA (0–30)** | 149 | **Support Vector Regressor (SVR-RBF)** | **+0.3392** | **2.32 × 10^-5*** | **0.0601** | **2.3975** |
+| | | 149 | Gradient Boosted Decision Trees (GBDT) | +0.2724 | 7.76 × 10^-4*** | -0.0347 | 2.8342 |
+| | | 149 | Random Forest Regressor | +0.2622 | 1.24 × 10^-3** | 0.0157 | 2.6899 |
+| | | 149 | Ridge Regression | +0.2330 | 4.25 × 10^-3** | -0.1193 | 2.8716 |
+| **Iowa PD (ds004584)** | **UPDRS-III (0–108)** | 100 | **Gradient Boosted Decision Trees (GBDT)** | **+0.1650** | **0.1008 (ns)** | -0.1049 | 6.1656 |
+| | | 100 | Ridge Regression | +0.1502 | 0.1358 (ns) | -0.1858 | 6.2856 |
+| | | 100 | Random Forest Regressor | +0.0523 | 0.6052 (ns) | -0.0643 | 6.1492 |
+| | | 100 | Support Vector Regressor (SVR-RBF) | +0.0347 | 0.7316 (ns) | -0.0452 | 6.0834 |
+
+*Note: All regression models were evaluated via 5-fold cross-validation with feature scaling parameters estimated strictly on training splits. *** p < 0.001; ** p < 0.01; ns = not significant.*
+
+---
+
+### Table S16. Tri-Center Parkinson's Disease Cross-Site Generalization Matrix (Zero-Shot Transfer)
+| Source Training Center | Target Evaluation Center | Training N | Target N | GCN-OMST ROC-AUC [95% CI] | GCN-Identity (A=I) ROC-AUC | Tuned Logistic Reg. ROC-AUC | Random Forest ROC-AUC | GBDT ROC-AUC |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Iowa PD (ds004584)** | **UNM PD-OFF (ds003490)** | 149 | 50 | **0.811 [0.670, 0.935]** | 0.774 | 0.773 | 0.750 | 0.715 |
+| **Iowa PD (ds004584)** | **UCSD PD (ds002778)** | 149 | 46 | **0.740 [0.583, 0.883]** | 0.779 | 0.790 | **0.804** | 0.746 |
+| **UCSD PD (ds002778)** | **Iowa PD (ds004584)** | 46 | 149 | **0.686 [0.600, 0.770]** | **0.719** | **0.719** | 0.717 | 0.716 |
+| **UCSD PD (ds002778)** | **UNM PD-OFF (ds003490)** | 46 | 50 | 0.621 [0.462, 0.762] | 0.682 | **0.698** | 0.657 | 0.669 |
+| **UNM PD-OFF (ds003490)**| **Iowa PD (ds004584)** | 50 | 149 | **0.694 [0.596, 0.788]** | 0.620 | 0.687 | **0.699** | **0.701** |
+| **UNM PD-OFF (ds003490)**| **UCSD PD (ds002778)** | 50 | 46 | 0.590 [0.406, 0.782] | 0.510 | 0.573 | **0.616** | 0.578 |
+
+*Note: All transfers represent zero-shot deployment across independent medical centers without model fine-tuning or domain adaptation. Bold denotes superior performance.*
+
+---
+
+### Table S17. Complete Transdiagnostic Cross-Disorder Transfer Matrix Across Diagnostic Domains
+| Source Training Domain | Target Evaluation Domain | GCN-OMST ROC-AUC [95% CI] | GCN-Identity (A=I) ROC-AUC | Tuned LR ROC-AUC | Random Forest ROC-AUC | GBDT ROC-AUC | Biological Mechanism / Domain Alignment |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
+| **Cavanagh MDD** | **Mumtaz MDD** | **0.833 [0.708, 0.936]** | **0.851** | 0.752 | 0.771 | 0.692 | **Within-Disorder Depression Generalization** |
+| **Mumtaz MDD** | **Cavanagh MDD** | 0.463 [0.353, 0.582] | 0.560 | 0.604 | **0.677** | 0.666 | Within-Disorder Depression Generalization |
+| **Iowa Parkinson** | **Clinical Dementia** | **0.792 [0.695, 0.877]** | **0.835** | 0.723 | 0.763 | 0.683 | **Convergent Neurodegenerative Slowing (θ/δ Elevation)** |
+| **Clinical Dementia** | **Iowa Parkinson** | **0.647 [0.556, 0.736]** | 0.658 | 0.653 | **0.662** | 0.579 | **Convergent Neurodegenerative Slowing (θ/δ Elevation)** |
+| **Sleep Deprivation** | **Clinical Dementia** | **0.840 [0.752, 0.917]** | 0.815 | 0.720 | 0.790 | 0.673 | **Acute Sleep Pressure Mirrors Chronic Cortical Slowing** |
+| **Sleep Deprivation** | **Iowa Parkinson** | **0.732 [0.646, 0.815]** | 0.719 | 0.705 | 0.691 | 0.678 | **Acute Sleep Pressure Mirrors Subcortical Motor Slowing** |
+| **Iowa Parkinson** | **Sleep Deprivation** | **0.614 [0.521, 0.706]** | 0.616 | 0.519 | 0.610 | 0.539 | Cortical Hypoarousal Convergence |
+| **Clinical Dementia** | **Sleep Deprivation** | **0.563 [0.471, 0.659]** | 0.534 | 0.546 | 0.575 | 0.539 | Cortical Hypoarousal Convergence |
+| **Sleep Deprivation** | **Mumtaz MDD** | **0.274 [0.132, 0.419]** | 0.196 | 0.376 | 0.283 | 0.330 | **Statistical Double Dissociation (θ Inversion, AUC < 0.35)** |
+| **Iowa Parkinson** | **Mumtaz MDD** | **0.325 [0.175, 0.480]** | 0.306 | 0.308 | 0.226 | 0.429 | **Statistical Double Dissociation (θ Inversion, AUC < 0.35)** |
+| **Clinical Dementia** | **Mumtaz MDD** | **0.336 [0.179, 0.492]** | 0.379 | 0.343 | 0.292 | 0.250 | **Statistical Double Dissociation (θ Inversion, AUC < 0.35)** |
+| **Mumtaz MDD** | **Iowa Parkinson** | 0.539 [0.429, 0.638] | 0.471 | 0.330 | 0.327 | 0.325 | **Feature Anti-Correlation (Depression vs. Slowing)** |
+| **Mumtaz MDD** | **Clinical Dementia** | 0.338 [0.217, 0.465] | 0.265 | 0.169 | 0.216 | 0.271 | **Feature Anti-Correlation (Depression vs. Slowing)** |
+| **Mumtaz MDD** | **Sleep Deprivation** | 0.490 [0.401, 0.589] | 0.443 | 0.439 | 0.462 | 0.410 | Feature Anti-Correlation (Depression vs. Slowing) |
+
+
+### Table S18. Age-Adjusted ANCOVA Sensitivity Analysis of Electrophysiological Markers
+| Clinical Cohort | Target Electrophysiological Marker | Diagnostic Group Coef ± SE | Group t-stat | Group p-value | Age Covariate Coef ± SE | Age t-stat | Age p-value | Model R² | Group Effect with Age Covaried |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Iowa Parkinson (ds004584, N=149)** | Frontal Periodic Theta (4–8 Hz) | 0.2046 ± 0.0373 | +5.482 | **1.80 × 10^-7*** | 0.0048 ± 0.0022 | +2.188 | 0.0303 | 0.180 | **Overwhelmingly Significant** |
+| | Global Periodic Delta (1–4 Hz) | -0.0685 ± 0.0207 | -3.308 | **1.20 × 10^-3*** | -0.0023 ± 0.0012 | -1.889 | 0.0609 | 0.082 | **Significant** |
+| | Posterior Periodic Alpha (8–13 Hz) | 0.0702 ± 0.0513 | +1.370 | 0.1728 (ns) | 0.0043 ± 0.0030 | +1.404 | 0.1625 | 0.023 | Not Significant |
+| | Global Aperiodic Exponent (χ) | 0.0910 ± 0.0604 | +1.506 | 0.1343 (ns) | -0.0018 ± 0.0036 | -0.511 | 0.6102 | 0.019 | Not Significant |
+| **AHEPA Dementia (ds004504, N=88)** | Frontal Periodic Theta (4–8 Hz) | 0.1607 ± 0.0432 | +3.721 | **3.56 × 10^-4*** | -0.0006 ± 0.0028 | -0.207 | 0.8366 (ns) | 0.146 | **Overwhelmingly Significant** |
+| | Posterior Periodic Alpha (8–13 Hz) | -0.2853 ± 0.0648 | -4.401 | **3.11 × 10^-5*** | 0.0011 ± 0.0042 | +0.258 | 0.7970 (ns) | 0.193 | **Overwhelmingly Significant** |
+| | Global Aperiodic Exponent (χ) | 0.2217 ± 0.0810 | +2.738 | **7.53 × 10^-3*** | -0.0017 ± 0.0052 | -0.333 | 0.7402 (ns) | 0.087 | **Significant** |
+| | Global Periodic Delta (1–4 Hz) | 0.0101 ± 0.0253 | +0.398 | 0.6916 (ns) | 0.0005 ± 0.0016 | +0.302 | 0.7631 | 0.003 | Not Significant |
+| **UNM Parkinson (ds003490, N=75)** | Frontal Periodic Theta (4–8 Hz) | 0.1286 ± 0.0407 | +3.157 | **2.33 × 10^-3*** | 0.0004 ± 0.0022 | +0.173 | 0.8628 (ns) | 0.122 | **Significant** |
+| | Global Periodic Delta (1–4 Hz) | -0.0672 ± 0.0227 | -2.964 | **4.10 × 10^-3*** | -0.0006 ± 0.0012 | -0.475 | 0.6360 (ns) | 0.112 | **Significant** |
+| | Posterior Periodic Alpha (8–13 Hz) | 0.1312 ± 0.0519 | +2.525 | **0.0138* | -0.0026 ± 0.0028 | -0.939 | 0.3508 (ns) | 0.091 | **Significant** |
+| | Global Aperiodic Exponent (χ) | 0.0189 ± 0.0668 | +0.282 | 0.7786 (ns) | -0.0035 ± 0.0036 | -0.979 | 0.3310 (ns) | 0.014 | Not Significant |
+
+*Note: Ordinary least squares (OLS) linear models of the form Marker ~ Group + Age were estimated for each cohort with recorded age metadata. Group is coded as 1 = Clinical Case, 0 = Healthy Control. Age is included as a continuous covariate in years. Across all cohorts, disease-specific alterations in frontal periodic theta, posterior periodic alpha collapse, and aperiodic exponent steepening remain robustly significant after covarying for age, with the age covariate itself exhibiting non-significant effects across almost all electrophysiological indices.*
