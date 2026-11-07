@@ -149,8 +149,8 @@ def update_supplementary_material_md():
         text = f.read()
 
     # 1. Update Title
-    text = re.sub(r"# Supplementary Material: A Standardized[^\n]+",
-                  "# Supplementary Material: A Gain-Invariant, Leak-Free EEG Benchmark for Resolving Frontal Theta Dynamics and Cognitive Severity Across Multi-Site Clinical Cohorts", text)
+    text = re.sub(r"# Supplementary Material:[^\n]+",
+                  "# Supplementary Material: A Gain-Invariant, Leak-Free EEG Framework Delineates Frontal Theta Polarity and Challenges Graph Neural Network Superiority Across Clinical Cohorts", text)
 
     # 2. Replace Table S4 with complete 50-contrast table
     s4_table = build_full_table_s4_markdown()
@@ -310,6 +310,11 @@ def main():
     spec.loader.exec_module(remediation)
     remediation.update_main_manuscript()
     remediation.update_supplementary_material()
+
+    spec29 = importlib.util.spec_from_file_location("reconcile_supp", BENCHMARK_ROOT / "scripts" / "29_reconcile_supplementary_material.py")
+    reconcile_supp = importlib.util.module_from_spec(spec29)
+    spec29.loader.exec_module(reconcile_supp)
+    reconcile_supp.reconcile()
 
     # 2. Run Pandoc on Main Manuscript
     print(f"\n📦 Compiling Main Manuscript via Pandoc to {V2_DOCX.name}...")
