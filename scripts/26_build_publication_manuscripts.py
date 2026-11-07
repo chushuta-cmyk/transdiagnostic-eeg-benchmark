@@ -42,7 +42,7 @@ def update_main_manuscript_md():
         text = f.read()
 
     # 1. Update Title
-    new_title = "# A Gain-Invariant, Leak-Free EEG Benchmark: Resolving Frontal Theta Dynamics and Cognitive Severity Across Seven Multi-Site Cohorts (N = 566)"
+    new_title = "# A Gain-Invariant, Leak-Free EEG Framework Delineates Frontal Theta Polarity and Challenges Graph Neural Network Superiority Across Clinical Cohorts"
     text = re.sub(r"^#\s+[^\n]+", new_title, text)
 
     # 2. Update Abstract to concise, human, single-author voice (<250 words)
