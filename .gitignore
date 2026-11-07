@@ -1,14 +1,37 @@
-# Byte-compiled / optimized / DLL files
+# Raw BIDS & Preprocessed EEG binary files (keep out of Git)
+data/raw/
+data/derivatives/
+*.set
+*.fdt
+*.fif
+*.edf
+*.bdf
+*.vhdr
+*.vmrk
+*.eeg
+*.parquet
+*.pt
+*.pth
+
+# Python cache & environments
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
 
-# OS artifacts
+# OS & Editor files
 .DS_Store
 Thumbs.db
-
-# Large raw datasets (already safely kept in external folders)
-data/raw/
-
-# Temporary checkpoints
+~$*
+*.swp
 *.tmp
+
+# Manuscript drafts (local only - keep out of public GitHub repository)
+manuscript/
+*.docx
+*.bak
+Research_Proposal_and_Experimental_Design_EN.md
