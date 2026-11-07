@@ -156,6 +156,9 @@ The NormativeGCN architecture is implemented in pure PyTorch and operates direct
 *Note: Master participant and session accounting: The primary benchmark evaluates exactly N = 566 unique participants across 677 primary recording sessions (Study 1: 142; Study 2 EC: 58; Study 3: 119; Study 4: 46; Study 5: 88; Study 6: 75; Study 7: 149; sum = 677). When including the secondary eyes-open (EO) recording condition in Study 2 (N = 60 sessions), the total analyzed session count is exactly 737 sessions.*
 
 
+*Note: Master participant and session accounting: The primary benchmark evaluates exactly N = 566 unique participants across 677 primary recording sessions (Study 1: 142; Study 2 EC: 58; Study 3: 119; Study 4: 46; Study 5: 88; Study 6: 75; Study 7: 149; sum = 677). When including the secondary eyes-open (EO) recording condition in Study 2 (N = 60 sessions), the total analyzed session count is exactly 737 sessions.*
+
+
 ### Table S4. Complete Statistical Summary of Electrophysiological Markers Across All Multi-Cohort Comparisons (50 Hypotheses with Benjamini-Hochberg FDR Control)
 | Clinical Cohort | Group Contrast | Marker Name | N (Case / Ctrl) | Test Design | t-statistic | df | Raw p-value | FDR q-value (50 tests) | Cohen's d [95% CI] | Sig |
 | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -210,7 +213,7 @@ The NormativeGCN architecture is implemented in pure PyTorch and operates direct
 | **Study 7** | PD vs Control | Global Aperiodic Exponent (χ) | 100 / 49 | Welch t | +1.686 | 147 | 0.0946 | **0.1820** | +0.279 [-0.065, +0.622] | ns |
 | **Study 7** | PD vs Control | OMST Global Cost Efficiency (GCE) | 100 / 49 | Welch t | +0.040 | 147 | 0.9681 | **0.9681** | +0.007 [-0.335, +0.349] | ns |
 
-*Note: All two-sample comparisons use Welch's unequal-variance t-tests. In Study 1, paired-sample t-tests are applied. Degrees of freedom (df) and Cohen's d are computed with exact analytical formulas. FDR q-values are adjusted using the Benjamini-Hochberg procedure across the full family of 50 hypothesis tests spanning all seven cohorts. Significance levels: *** q < 0.001; ** q < 0.01; * q < 0.05; ns = not significant after FDR control.*
+*Note: All two-sample comparisons use Welch's unequal-variance t-tests with Satterthwaite-approximated degrees of freedom. In Study 1, paired-sample t-tests are applied. Effect sizes report Cohen's d for independent-group comparisons and paired d_z for repeated-measures within-subject contrasts in Study 1, alongside exact analytical 95% confidence intervals. All 50 primary hypothesis tests across all cohort contrasts and electrophysiological markers were pooled into a single comprehensive family for Benjamini-Hochberg FDR control to maintain conservative overall type I error control across the entire multi-cohort benchmark. Significance levels: *** q < 0.001; ** q < 0.01; * q < 0.05; ns = not significant after FDR control.*
 
 ### Table S5. Standard 19-Channel 10–20 Coordinate Mapping Across All Seven Clinical Cohorts
 | Standard 10–20 Label | Cortical Region | Sleep Deprivation (64 Ch BrainVision) | Mumtaz Clinical MDD (19 Ch Nihon Kohden) | Cavanagh Univ. Dep. (64 Ch BioSemi) | UCSD Parkinson's (32 Ch BioSemi) | AHEPA Dementia (19 Ch Nihon Kohden) | UNM Parkinson's (64 Ch BrainVision) | Iowa Parkinson's (64 Ch BrainVision) |
@@ -292,6 +295,9 @@ The NormativeGCN architecture is implemented in pure PyTorch and operates direct
 | **Study 5** | AHEPA Clinical Dementia (ds004504) | Eyes-Closed (EC) | 88 | 150 µV | 171.9 ± 44.2 [12 – 319] | 687.7 ± 176.9 s [48 – 1276 s] | 91.4% |
 | **Study 6** | UNM Parkinson's Disease (ds003490) | ON / OFF Washout | 75 | 150 µV | 73.8 ± 43.7 [9 – 173] | 295.0 ± 174.6 s [36 – 692 s] | 82.0% |
 | **Study 7** | Iowa Parkinson's Multi-Scale (ds004584) | Eyes-Closed (EC) | 149 | 200 µV (Geriatric) | 28.6 ± 12.8 [5 – 85] | 114.4 ± 51.2 s [20 – 340 s] | 76.3% |
+
+*Note: Master participant and session accounting: The primary benchmark evaluates exactly N = 566 unique participants across 677 primary recording sessions (Study 1: 142; Study 2 EC: 58; Study 3: 119; Study 4: 46; Study 5: 88; Study 6: 75; Study 7: 149; sum = 677). When including the secondary eyes-open (EO) recording condition in Study 2 (N = 60 sessions), the total analyzed session count is exactly 737 sessions.*
+
 
 *Note: Master participant and session accounting: The primary benchmark evaluates exactly N = 566 unique participants across 677 primary recording sessions (Study 1: 142; Study 2 EC: 58; Study 3: 119; Study 4: 46; Study 5: 88; Study 6: 75; Study 7: 149; sum = 677). When including the secondary eyes-open (EO) recording condition in Study 2 (N = 60 sessions), the total analyzed session count is exactly 737 sessions.*
 
@@ -555,11 +561,11 @@ The NormativeGCN architecture is implemented in pure PyTorch and operates direct
 | | | 100 | Random Forest Regressor | +0.0523 | 0.6052 (ns) | -0.0643 | 6.1492 |
 | | | 100 | Support Vector Regressor (SVR-RBF) | +0.0347 | 0.7316 (ns) | -0.0452 | 6.0834 |
 
-*Note: All regression models were evaluated via 5-fold cross-validation with feature scaling parameters estimated strictly on training splits. *** p < 0.001; ** p < 0.01; ns = not significant.*
+*Note: All regression models were evaluated via out-of-fold predictions using 5-fold cross-validation with feature scaling estimated strictly on training splits. Age was not included as a covariate in primary regression models; comprehensive age-adjusted sensitivity analyses confirming robust marker retention are reported in Table S18. *** p < 0.001; ** p < 0.01; ns = not significant.*
 
 ---
 
-### Table S16. Tri-Center Parkinson's Disease Cross-Site Generalization Matrix (Zero-Shot Transfer)
+### Table S16. Tri-Center Parkinson's Disease Cross-Site Transfer Matrix (Site-Calibrated Transfer)
 | Source Training Center | Target Evaluation Center | Training N | Target N | GCN-OMST ROC-AUC [95% CI] | GCN-Identity (A=I) ROC-AUC | Tuned Logistic Reg. ROC-AUC | Random Forest ROC-AUC | GBDT ROC-AUC |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Iowa PD (ds004584)** | **UNM PD-OFF (ds003490)** | 149 | 50 | **0.811 [0.670, 0.935]** | 0.774 | 0.773 | 0.750 | 0.715 |
@@ -569,7 +575,7 @@ The NormativeGCN architecture is implemented in pure PyTorch and operates direct
 | **UNM PD-OFF (ds003490)**| **Iowa PD (ds004584)** | 50 | 149 | **0.694 [0.596, 0.788]** | 0.620 | 0.687 | **0.699** | **0.701** |
 | **UNM PD-OFF (ds003490)**| **UCSD PD (ds002778)** | 50 | 46 | 0.590 [0.406, 0.782] | 0.510 | 0.573 | **0.616** | 0.578 |
 
-*Note: All transfers represent zero-shot deployment across independent medical centers without model fine-tuning or domain adaptation. Bold denotes superior performance.*
+*Note: All transfers represent site-calibrated deployment across independent medical centers without model retraining. Bold denotes superior performance.*
 
 ---
 
@@ -623,7 +629,7 @@ The NormativeGCN architecture is implemented in pure PyTorch and operates direct
 ![Figure S2](../reports/fig_S2_omst_topology.png)
 
 **Figure S2. Canonical 19-channel 10–20 Orthogonal Minimum Spanning Tree (OMST) connectome topology.** 
-*Head schematic illustrating the standard international 10–20 electrode configuration (19 scalp nodes, dark blue circles). Blue solid lines depict the primary Minimum Spanning Tree (Tree 1, exactly 18 edges connecting all 19 nodes without cycles, sum of degrees = 36) forming the loopless topological backbone that connects all 19 channels. Amber dashed lines depict the secondary orthogonal spanning tree (Tree 2, exactly 18 orthogonal edges, sum of degrees = 36) capturing complementary functional connectivity pathways derived from Phase Lag Index (PLI, 4–13 Hz). Combined (M = 2 trees), the network comprises 36 edges with a total degree sum of 72. Across all N = 566 participants and 677 recording sessions, data-driven Global Cost Efficiency (GCE) optimization selected an average of M = 1.51 ± 0.50 trees (E = 27.12 ± 9.00 edges, mean degree k̄ = 2.86 ± 0.95, degree sum = 54.25, density = 15.86% ± 5.26%). The OMST algorithm guarantees 0.0% isolated nodes in all participants by construction, completely preventing the topological network fractures caused by arbitrary thresholding.*
+*Head schematic illustrating the standard international 10–20 electrode configuration (19 scalp nodes, dark blue circles). Blue solid lines depict the primary Minimum Spanning Tree (Tree 1, exactly 18 edges connecting all 19 nodes without cycles, sum of degrees = 36) forming the loopless topological backbone that connects all 19 channels. Amber dashed lines depict the secondary orthogonal spanning tree (Tree 2, exactly 18 orthogonal edges, sum of degrees = 36) capturing complementary functional connectivity pathways derived from Phase Lag Index (PLI, 4–13 Hz). Combined (M = 2 trees), the network comprises 36 edges with a total degree sum of 72. Across all N = 566 participants and 677 recording sessions, data-driven Global Cost Efficiency (GCE) optimization selected an average of M = 1.51 ± 0.50 trees (E = 27.12 ± 9.00 edges, mean degree k̄ = 2.86 ± 0.95, degree sum = 54.25, density = 15.86% ± 5.26%). The OMST algorithm guarantees 0.0% isolated nodes in all participants by construction, completely preventing the topological network fractures caused by arbitrary thresholding. Schematic illustration of canonical OMST topology; empirical individual participant networks follow this backbone structure with quantitative edge weight variation derived from pairwise Phase Lag Index coupling.*
 
 ---
 

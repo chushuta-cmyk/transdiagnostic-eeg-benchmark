@@ -99,7 +99,7 @@ def build_full_table_s4_markdown():
         line = f"| **{cohort_name}** | {r['case_group']} vs {r['ref_group']} | {r['marker_label']} | {n_str} | {test_type} | {t_val} | {df_val} | {p_val} | **{q_val}** | {d_str} | {sig_str} |"
         lines.append(line)
 
-    lines.append("\n*Note: All two-sample comparisons use Welch's unequal-variance t-tests. In Study 1, paired-sample t-tests are applied. Degrees of freedom (df) and Cohen's d are computed with exact analytical formulas. FDR q-values are adjusted using the Benjamini-Hochberg procedure across the full family of 50 hypothesis tests spanning all seven cohorts. Significance levels: *** q < 0.001; ** q < 0.01; * q < 0.05; ns = not significant after FDR control.*")
+    lines.append("\n*Note: All two-sample comparisons use Welch's unequal-variance t-tests with Satterthwaite-approximated degrees of freedom. In Study 1, paired-sample t-tests are applied. Effect sizes report Cohen's d for independent-group comparisons and paired d_z for repeated-measures within-subject contrasts in Study 1, alongside exact analytical 95% confidence intervals. All 50 primary hypothesis tests across all cohort contrasts and electrophysiological markers were pooled into a single comprehensive family for Benjamini-Hochberg FDR control to maintain conservative overall type I error control across the entire multi-cohort benchmark. Significance levels: *** q < 0.001; ** q < 0.01; * q < 0.05; ns = not significant after FDR control.*")
     return "\n".join(lines)
 
 

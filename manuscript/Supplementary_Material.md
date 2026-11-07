@@ -153,6 +153,9 @@ The NormativeGCN architecture is implemented in pure PyTorch and operates direct
 *Note: Master participant and session accounting: The primary benchmark evaluates exactly N = 566 unique participants across 677 primary recording sessions (Study 1: 142; Study 2 EC: 58; Study 3: 119; Study 4: 46; Study 5: 88; Study 6: 75; Study 7: 149; sum = 677). When including the secondary eyes-open (EO) recording condition in Study 2 (N = 60 sessions), the total analyzed session count is exactly 737 sessions.*
 
 
+*Note: Master participant and session accounting: The primary benchmark evaluates exactly N = 566 unique participants across 677 primary recording sessions (Study 1: 142; Study 2 EC: 58; Study 3: 119; Study 4: 46; Study 5: 88; Study 6: 75; Study 7: 149; sum = 677). When including the secondary eyes-open (EO) recording condition in Study 2 (N = 60 sessions), the total analyzed session count is exactly 737 sessions.*
+
+
 ### Table S4. Complete Statistical Summary of Electrophysiological Markers Across All Multi-Cohort Comparisons (50 Hypotheses with Benjamini-Hochberg FDR Control)
 | Clinical Cohort | Group Contrast | Marker Name | N (Case / Ctrl) | Test Design | t-statistic | df | Raw p-value | FDR q-value (50 tests) | Cohen's d [95% CI] | Sig |
 | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -207,7 +210,7 @@ The NormativeGCN architecture is implemented in pure PyTorch and operates direct
 | **Study 7** | PD vs Control | Global Aperiodic Exponent (χ) | 100 / 49 | Welch t | +1.686 | 147 | 0.0946 | **0.1820** | +0.279 [-0.065, +0.622] | ns |
 | **Study 7** | PD vs Control | OMST Global Cost Efficiency (GCE) | 100 / 49 | Welch t | +0.040 | 147 | 0.9681 | **0.9681** | +0.007 [-0.335, +0.349] | ns |
 
-*Note: All two-sample comparisons use Welch's unequal-variance t-tests. In Study 1, paired-sample t-tests are applied. Degrees of freedom (df) and Cohen's d are computed with exact analytical formulas. FDR q-values are adjusted using the Benjamini-Hochberg procedure across the full family of 50 hypothesis tests spanning all seven cohorts. Significance levels: *** q < 0.001; ** q < 0.01; * q < 0.05; ns = not significant after FDR control.*
+*Note: All two-sample comparisons use Welch's unequal-variance t-tests with Satterthwaite-approximated degrees of freedom. In Study 1, paired-sample t-tests are applied. Effect sizes report Cohen's d for independent-group comparisons and paired d_z for repeated-measures within-subject contrasts in Study 1, alongside exact analytical 95% confidence intervals. All 50 primary hypothesis tests across all cohort contrasts and electrophysiological markers were pooled into a single comprehensive family for Benjamini-Hochberg FDR control to maintain conservative overall type I error control across the entire multi-cohort benchmark. Significance levels: *** q < 0.001; ** q < 0.01; * q < 0.05; ns = not significant after FDR control.*
 
 ### Table S5. Standard 19-Channel 10–20 Coordinate Mapping Across All Seven Clinical Cohorts
 | Standard 10–20 Label | Cortical Region | Sleep Deprivation (64 Ch BrainVision) | Mumtaz Clinical MDD (19 Ch Nihon Kohden) | Cavanagh Univ. Dep. (64 Ch BioSemi) | UCSD Parkinson's (32 Ch BioSemi) | AHEPA Dementia (19 Ch Nihon Kohden) | UNM Parkinson's (64 Ch BrainVision) | Iowa Parkinson's (64 Ch BrainVision) |
@@ -293,6 +296,9 @@ The NormativeGCN architecture is implemented in pure PyTorch and operates direct
 *Note: Master participant and session accounting: The primary benchmark evaluates exactly N = 566 unique participants across 677 primary recording sessions (Study 1: 142; Study 2 EC: 58; Study 3: 119; Study 4: 46; Study 5: 88; Study 6: 75; Study 7: 149; sum = 677). When including the secondary eyes-open (EO) recording condition in Study 2 (N = 60 sessions), the total analyzed session count is exactly 737 sessions.*
 
 
+*Note: Master participant and session accounting: The primary benchmark evaluates exactly N = 566 unique participants across 677 primary recording sessions (Study 1: 142; Study 2 EC: 58; Study 3: 119; Study 4: 46; Study 5: 88; Study 6: 75; Study 7: 149; sum = 677). When including the secondary eyes-open (EO) recording condition in Study 2 (N = 60 sessions), the total analyzed session count is exactly 737 sessions.*
+
+
 *Note: Epoch length is 4.0 seconds across all cohorts (1,000 samples at 250 Hz). Usable recording percentage denotes the proportion of continuous raw data surviving automated artifact thresholding.*
 
 ### Table S9. Computational Environment and Software Reproducibility Specifications
@@ -339,7 +345,7 @@ The NormativeGCN architecture is implemented in pure PyTorch and operates direct
 | **Interpretation** | 17 | Provide an overall interpretation of findings in biological context. | Discussion §4.2, §4.3, §4.4 (E/I balance, dopaminergic pharmacodynamics, frontal theta polarity dissociation) |
 | **Generalizability** | 18 | Discuss generalizability to other settings and clinical populations. | Discussion §4.1, §4.4 (site-calibrated cross-hospital transfer across three independent Parkinson's medical centers) |
 | **Data Availability** | 19 | Provide data availability statement with persistent identifiers. | Back Matter: OpenNeuro ds004902, ds003478, ds002778, ds004504, ds003490, ds004584; Figshare 4244171 |
-| **Code Availability** | 20 | Provide code availability statement with public URL. | Back Matter: https://github.com/chushutan/transdiagnostic-eeg-benchmark |
+| **Code Availability** | 20 | Provide code availability statement with public URL. | Back Matter: https://github.com/chushuta-cmyk/transdiagnostic-eeg-benchmark |
 | **Ethics & Consent** | 21 | State ethics approval and informed participant consent. | Back Matter: Institutional Review Board (IRB) approved primary studies with written informed consent |
 | **Competing Interests** | 22 | Declare financial and non-financial competing interests. | Back Matter: The author declares no competing financial or non-financial interests |
 

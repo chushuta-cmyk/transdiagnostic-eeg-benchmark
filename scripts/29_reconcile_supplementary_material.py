@@ -145,7 +145,27 @@ Multiplicative gain invariance eliminates scale disparities without requiring ar
         "From a master enrolled public release sample of N = 574 unique participants across seven clinical cohorts (685 enrolled sessions), exactly 8 participants (1.4%) were excluded according to pre-specified quality criteria (Study 2: 6 participants excluded due to excessive artifact contamination > 20% rejected epochs; Study 3: 2 participants excluded due to ambiguous borderline BDI screening scores 10 ≤ BDI ≤ 13; exactly 0 excluded across the other five cohorts). The final harmonized benchmark dataset comprises exactly N = 566 unique participants and 677 primary recording sessions (737 sessions including eyes-open recordings)"
     )
 
-    # 10. Reorganize Document Structure:
+    # 10. Refine Table S15 and Table S16 notes, and Figure S2 caption
+    text = text.replace(
+        "*Note: All regression models were evaluated via 5-fold cross-validation with feature scaling parameters estimated strictly on training splits. *** p < 0.001; ** p < 0.01; ns = not significant.*",
+        "*Note: All regression models were evaluated via out-of-fold predictions using 5-fold cross-validation with feature scaling estimated strictly on training splits. Age was not included as a covariate in primary regression models; comprehensive age-adjusted sensitivity analyses confirming robust marker retention are reported in Table S18. *** p < 0.001; ** p < 0.01; ns = not significant.*"
+    )
+
+    text = text.replace(
+        "### Table S16. Tri-Center Parkinson's Disease Cross-Site Generalization Matrix (Zero-Shot Transfer)",
+        "### Table S16. Tri-Center Parkinson's Disease Cross-Site Transfer Matrix (Site-Calibrated Transfer)"
+    )
+    text = text.replace(
+        "*Note: All transfers represent zero-shot deployment across independent medical centers without model fine-tuning or domain adaptation. Bold denotes superior performance.*",
+        "*Note: All transfers represent site-calibrated deployment across independent medical centers without model retraining. Bold denotes superior performance.*"
+    )
+
+    text = text.replace(
+        "The OMST algorithm guarantees 0.0% isolated nodes in all participants by construction, completely preventing the topological network fractures caused by arbitrary thresholding.*",
+        "The OMST algorithm guarantees 0.0% isolated nodes in all participants by construction, completely preventing the topological network fractures caused by arbitrary thresholding. Schematic illustration of canonical OMST topology; empirical individual participant networks follow this backbone structure with quantitative edge weight variation derived from pairwise Phase Lag Index coupling.*"
+    )
+
+    # 11. Reorganize Document Structure:
     # Move Tables S14-S18 into Section S2 (so all tables appear sequentially before figures)
     # Check if Tables S14-S18 are currently after Figure S6
     fig_idx = text.find("![Figure S1]")
