@@ -300,6 +300,27 @@ def format_docx_styling(doc_path: Path):
     print(f"✓ Styled: {doc_path.name} ({doc_path.stat().st_size / 1024 / 1024:.2f} MB)")
 
 
+
+def patch_settings(docx_path: Path):
+    """Inject Cambria Math font setting into word/settings.xml so equations render in Word."""
+    import zipfile
+    math_pr = '<m:mathPr><m:mathFont m:val="Cambria Math"/><m:brkBin m:val="before"/><m:brkBinSub m:val="--"/><m:smallFrac m:val="0"/><m:dispDef/><m:lMargin m:val="0"/><m:rMargin m:val="0"/><m:defJc m:val="center"/><m:wrapIndent m:val="1440"/><m:intLim m:val="subSup"/><m:naryLim m:val="undOvr"/></m:mathPr>'
+    with zipfile.ZipFile(docx_path, 'r') as z_in:
+        content_dict = {item.filename: z_in.read(item.filename) for item in z_in.infolist()}
+    
+    settings_xml = content_dict['word/settings.xml'].decode('utf-8')
+    if '<m:mathPr>' not in settings_xml:
+        idx = settings_xml.find('>') + 1
+        new_settings = settings_xml[:idx] + math_pr + settings_xml[idx:]
+        content_dict['word/settings.xml'] = new_settings.encode('utf-8')
+        with zipfile.ZipFile(docx_path, 'w', zipfile.ZIP_DEFLATED) as z_out:
+            for fname, data in content_dict.items():
+                z_out.writestr(fname, data)
+        print(f"✓ Injected Cambria Math mathPr into {docx_path.name}")
+    else:
+        print(f"mathPr already present in {docx_path.name}")
+
+
 def main():
     print("=" * 80)
     print("🚀 Step 26: Compiling Publication Manuscripts with Native Math & Academic Tables")
@@ -346,6 +367,7 @@ def main():
     else:
         print("✓ Pandoc compilation successful for Main Manuscript")
         format_docx_styling(V2_DOCX)
+        patch_settings(V2_DOCX)
 
     # 3. Run Pandoc on Supplementary Material
     print(f"\n📦 Compiling Supplementary Material via Pandoc to {SUPP_DOCX.name}...")
@@ -362,10 +384,20 @@ def main():
     else:
         print("✓ Pandoc compilation successful for Supplementary Material")
         format_docx_styling(SUPP_DOCX)
+        patch_settings(SUPP_DOCX)
         # copy to Supplementary_Material.docx
         import shutil
         shutil.copy(SUPP_DOCX, SUPP_DOCX_COPY)
         print(f"✓ Mirrored to: {SUPP_DOCX_COPY.name}")
+
+    ARTIFACT_DIR = Path("/Users/tan/.gemini/antigravity/brain/d5fe5c10-15e9-43a6-af60-4b1baf6f9a8a")
+    if ARTIFACT_DIR.exists():
+        import shutil
+        shutil.copy(V2_MD, ARTIFACT_DIR / V2_MD.name)
+        shutil.copy(V2_DOCX, ARTIFACT_DIR / V2_DOCX.name)
+        shutil.copy(SUPP_MD, ARTIFACT_DIR / SUPP_MD.name)
+        shutil.copy(SUPP_DOCX, ARTIFACT_DIR / SUPP_DOCX.name)
+        print(f"✓ Mirrored all 4 publication deliverables to Artifact Directory")
 
     print("\n🎉 Step 26 complete! All publication deliverables compiled with authentic Word equations, three-line tables, and unified statistics!")
 
