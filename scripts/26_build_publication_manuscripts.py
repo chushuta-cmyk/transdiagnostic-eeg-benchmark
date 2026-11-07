@@ -45,10 +45,16 @@ def update_main_manuscript_md():
     new_title = "# A Gain-Invariant, Leak-Free EEG Framework Delineates Frontal Theta Polarity and Challenges Graph Neural Network Superiority Across Clinical Cohorts"
     text = re.sub(r"^#\s+[^\n]+", new_title, text)
 
-    # 2. Update Abstract to concise, human, single-author voice (<250 words)
+    # 2. Update Abstract to structured, concise, human, single-author voice (<250 words)
     new_abstract = """## Abstract
 
-Quantitative electroencephalography (qEEG) offers non-invasive access to human neural dynamics, but its clinical translation is obstructed by amplifier gain variability, inconsistent preprocessing, and subtle data leakage. Graph Neural Networks (GNNs) have emerged as popular architectures for EEG decoding, yet whether topological graph inductive biases provide tangible benefits over standard statistical features remains unproven. Here, I introduce an open, leak-free, gain-invariant 19-channel benchmarking framework evaluated across seven independent clinical cohorts (N = 566 unique participants, 677 recording sessions) spanning acute sleep deprivation, major depressive disorder, Parkinson's disease, and clinical dementia. The framework combines parameterized periodic–aperiodic decomposition with parameter-free Orthogonal Minimum Spanning Tree (OMST) connectomics and participant-stratified, fold-nested normative calibration. Across 12 machine learning architectures, GNNs did not systematically outperform classical regularized baselines; instead, simple biophysical markers carried the primary diagnostic signal. Specifically, frontal periodic theta exhibited an inverted biophysical polarity: suppressed in depression ($d = -0.83$) but elevated in Parkinson's ($d = +1.11$) and dementia ($d = +0.81$). Furthermore, the harmonised features supported site-calibrated cross-hospital transfer across three Parkinson's medical centers (AUC range: 0.62–0.81) and modestly tracked continuous cognitive severity (MoCA, MMSE). This study establishes an empirical benchmark and cautions against assuming graph superiority in clinical EEG analysis.
+**Background:** Quantitative electroencephalography (qEEG) offers non-invasive access to human neural dynamics, but its clinical translation is obstructed by amplifier gain variability, inconsistent preprocessing, and subtle data leakage. Graph Neural Networks (GNNs) have emerged as popular architectures for EEG decoding, yet whether topological graph inductive biases provide tangible benefits over standard statistical features remains unproven.
+
+**Methods:** Here, I introduce an open, leak-free, gain-invariant 19-channel benchmarking framework evaluated across seven independent clinical cohorts (N = 566 unique participants, 677 recording sessions) spanning acute sleep deprivation, major depressive disorder, Parkinson's disease, and clinical dementia. The framework combines parameterized periodic–aperiodic decomposition with parameter-free Orthogonal Minimum Spanning Tree (OMST) connectomics and participant-stratified, fold-nested normative calibration across 12 machine learning configurations.
+
+**Results:** Across 12 machine learning configurations, GNNs did not systematically outperform classical regularized baselines; instead, simple biophysical markers carried the primary diagnostic signal. Specifically, frontal periodic theta exhibited an inverted biophysical polarity: suppressed in depression ($d = -0.68$ to $-0.83$) but elevated across Parkinson's disease ($d = +0.80$ to $+1.15$) and dementia ($d = +0.55$ to $+1.28$). Furthermore, the harmonised features supported site-calibrated cross-hospital transfer across three Parkinson's medical centers (AUC up to 0.81, range: 0.59–0.81) and modestly tracked continuous cognitive severity (MoCA, MMSE).
+
+**Conclusions:** This study establishes an empirical multi-cohort benchmark, demonstrates biophysical polarity across neuropsychiatric disorders, and cautions against assuming graph superiority in clinical EEG analysis.
 
 **Keywords**: Quantitative EEG, Spectral Parameterization, Gain Invariance, Orthogonal Minimum Spanning Trees, Frontal Theta Dynamics, Parkinson's Disease, Clinical Dementia, Major Depressive Disorder, Graph Neural Networks, Multi-Site Generalization."""
 
@@ -315,6 +321,15 @@ def main():
     reconcile_supp = importlib.util.module_from_spec(spec29)
     spec29.loader.exec_module(reconcile_supp)
     reconcile_supp.reconcile()
+
+    # Step 30: Comprehensive 23-point peer review synchronization & validation
+    spec30 = importlib.util.spec_from_file_location("sync_30", BENCHMARK_ROOT / "scripts" / "30_apply_final_peer_review_synchronization.py")
+    sync_30 = importlib.util.module_from_spec(spec30)
+    spec30.loader.exec_module(sync_30)
+    sync_30.sync_main_manuscript()
+    sync_30.sync_supplementary_material()
+    if not sync_30.verify_synchronization():
+        raise RuntimeError("Peer review synchronization verification failed.")
 
     # 2. Run Pandoc on Main Manuscript
     print(f"\n📦 Compiling Main Manuscript via Pandoc to {V2_DOCX.name}...")
