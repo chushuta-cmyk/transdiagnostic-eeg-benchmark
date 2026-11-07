@@ -40,7 +40,7 @@ GCE(m) = E_global(G_m) / E_global(G_full) - Cost(G_m)
 
 where E_global represents the average inverse shortest path length across all node pairs, and Cost represents the sum of weights in the selected network normalized by the total weight of the fully connected graph.
 
-Across all N = 566 subjects and 677 recording sessions, the empirical distribution of selected OMST trees was M = 1.51 ± 0.50 (median = 2; 49.3% selecting M = 1 and 50.7% selecting M = 2; Mumtaz MDD: M = 1.33 ± 0.47, density = 14.0% ± 4.9%; Cavanagh depression: M = 1.45 ± 0.50, density = 15.3% ± 5.3%; UCSD Parkinson: M = 1.61 ± 0.49, density = 17.0% ± 5.2%; Sleep deprivation: M = 1.59 ± 0.49, density = 16.7% ± 5.2%). Across the entire multi-cohort benchmark (677 graphs), the mean number of selected edges was E = 27.12 ± 9.00, yielding a mean node degree of k̄ = 2.86 ± 0.95 (sum of node degrees = 54.25) and an average network density of 15.86% ± 5.26%. Across all 6,935 individual node instances in the study, the isolated node rate was strictly 0.0000% by construction.
+Across all N = 566 subjects and 677 recording sessions, the empirical distribution of selected OMST trees was M = 1.51 ± 0.50 (median = 2; 49.3% selecting M = 1 and 50.7% selecting M = 2; Mumtaz MDD: M = 1.33 ± 0.47, density = 14.0% ± 4.9%; Cavanagh depression: M = 1.45 ± 0.50, density = 15.3% ± 5.3%; UCSD Parkinson: M = 1.61 ± 0.49, density = 17.0% ± 5.2%; Sleep deprivation: M = 1.59 ± 0.49, density = 16.7% ± 5.2%). Across the entire multi-cohort benchmark (677 graphs), the mean number of selected edges was E = 27.12 ± 9.00, yielding a mean node degree of k̄ = 2.86 ± 0.95 (sum of node degrees = 54.25) and an average network density of 15.86% ± 5.26%. Across all 12,863 individual node instances (677 recording sessions × 19 channels) in the study, the isolated node rate was strictly 0.0000% by construction.
 
 ### S1.3 Analytical and Numerical Proof of Amplifier Gain Invariance
 When raw EEG signals are recorded across different hardware systems, arbitrary amplifier gain scaling introduces a multiplicative factor k > 0 such that v'(t) = k · v(t). The resulting power spectrum scales quadratically:
@@ -219,15 +219,17 @@ The NormativeGCN architecture is implemented in pure PyTorch and operates direct
 | **O2** | Occipital (Right) | Direct (O2) | Direct (EEG O2-LE) | Direct (O2) | Direct (O2) | Direct (EEG O2) | Direct (O2) | Direct (O2) |
 
 ### Table S6. Machine Learning Ablation and Single-Feature Baselines vs. NormativeGCN
-| Cohort Benchmark | Single: Periodic θ AUC [95% CI] | Single: Periodic α AUC [95% CI] | Single: Exponent χ AUC [95% CI] | Single: OMST GCE AUC [95% CI] | Ablate α (No Alpha) AUC | Ablate θ (No Theta) AUC | Flat 76-D Logistic Regression AUC [95% CI] | NormativeGCN (Full 4 Feats) AUC [95% CI] | GCN Improvement ΔAUC |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| Study 2: Mumtaz Outpatient MDD (N=58) | 0.838 [0.722, 0.931] | 0.512 [0.354, 0.672] | 0.785 [0.658, 0.894] | 0.655 [0.510, 0.792] | 0.937 | 0.748 | 0.898 [0.810, 0.966] | **0.925 [0.857, 0.980]** | +0.027 |
-| Study 3: Cavanagh Univ. Depression (N=119) | 0.678 [0.575, 0.772] | 0.562 [0.450, 0.669] | 0.574 [0.463, 0.680] | 0.515 [0.408, 0.622] | 0.657 | 0.519 | 0.547 [0.432, 0.646] | **0.649 [0.544, 0.747]** | +0.102 |
-| Study 4: Parkinson's All Sessions (N=46) | 0.685 [0.521, 0.835] | 0.510 [0.332, 0.684] | 0.612 [0.440, 0.778] | 0.582 [0.405, 0.751] | 0.642 | 0.448 | 0.692 [0.512, 0.852] | **0.702 [0.526, 0.872]** | +0.010 |
-| Study 4a: Parkinson OFF vs. HC (N=31) | 0.625 [0.415, 0.818] | 0.505 [0.295, 0.710] | 0.608 [0.395, 0.805] | 0.572 [0.355, 0.778] | 0.590 | 0.480 | 0.500 [0.279, 0.714] | **0.583 [0.367, 0.794]** | +0.083 |
-| Study 4b: Parkinson ON vs. HC (N=31) | 0.765 [0.582, 0.920] | 0.535 [0.320, 0.745] | 0.618 [0.402, 0.815] | 0.542 [0.325, 0.750] | 0.760 | 0.520 | 0.783 [0.597, 0.940] | **0.771 [0.591, 0.924]** | -0.012 |
-| Study 1: Sleep Debt Single-Sess (N=142) | 0.572 [0.475, 0.665] | 0.518 [0.418, 0.615] | 0.552 [0.455, 0.648] | 0.545 [0.448, 0.640] | 0.573 | 0.456 | 0.589 [0.486, 0.677] | **0.566 [0.468, 0.658]** | -0.023 |
-
+| Cohort Benchmark | Single: Periodic θ AUC [95% CI] | Single: Periodic α AUC [95% CI] | Single: Exponent χ AUC [95% CI] | Single: OMST GCE AUC [95% CI] | Flat 76-D Logistic Regression AUC [95% CI] | NormativeGCN (OMST 4 Feats) AUC [95% CI] | GCN vs. Best Baseline ΔAUC |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Study 2: Mumtaz Outpatient MDD (N=58)** | 0.694 [0.545, 0.828] | 0.512 [0.354, 0.672] | 0.785 [0.658, 0.894] | 0.655 [0.510, 0.792] | 0.889 [0.793, 0.967] | 0.902 [0.821, 0.974] | -0.031 (RF: 0.933) |
+| **Study 3: Cavanagh Univ. Depression (N=119)**| **0.684 [0.588, 0.781]** | 0.562 [0.450, 0.669] | 0.574 [0.463, 0.680] | 0.515 [0.408, 0.622] | 0.594 [0.490, 0.698] | 0.647 [0.536, 0.746] | -0.037 (θ: 0.684) |
+| **Study 4: UCSD Parkinson All (N=46)** | **0.744 [0.583, 0.894]** | 0.510 [0.332, 0.684] | 0.612 [0.440, 0.778] | 0.582 [0.405, 0.751] | 0.627 [0.449, 0.795] | 0.725 [0.546, 0.882] | -0.019 (θ: 0.744) |
+| **Study 5a: Dementia AD vs. CTL (N=65)** | 0.798 [0.681, 0.900] | 0.756 [0.638, 0.865] | 0.812 [0.702, 0.910] | 0.618 [0.485, 0.742] | 0.834 [0.727, 0.925] | 0.807 [0.692, 0.908] | -0.054 (GBDT: 0.861) |
+| **Study 5b: Dementia FTD vs. CTL (N=52)** | 0.622 [0.453, 0.788] | 0.745 [0.602, 0.871] | 0.603 [0.438, 0.760] | 0.589 [0.421, 0.745] | 0.814 [0.686, 0.920] | 0.808 [0.679, 0.911] | -0.039 (A=I: 0.847) |
+| **Study 5c: Clinical Dementia All (N=88)** | 0.721 [0.609, 0.825] | 0.782 [0.680, 0.873] | 0.710 [0.598, 0.814] | 0.612 [0.489, 0.728] | 0.834 [0.748, 0.910] | **0.842 [0.761, 0.916]** | **+0.004** |
+| **Study 6a: UNM PD-OFF vs. CTL (N=50)** | 0.770 [0.622, 0.897] | 0.688 [0.531, 0.835] | 0.528 [0.362, 0.690] | 0.512 [0.345, 0.675] | 0.776 [0.647, 0.901] | 0.699 [0.547, 0.853] | -0.091 (Rand: 0.790) |
+| **Study 7: Iowa Parkinson Cohort (N=149)** | 0.736 [0.655, 0.816] | 0.538 [0.442, 0.631] | 0.602 [0.508, 0.693] | 0.505 [0.408, 0.601] | 0.673 [0.575, 0.772] | 0.685 [0.598, 0.773] | -0.066 (Ridge: 0.751)|
+| **Study 1: Sleep Debt Single-Sess (N=142)** | 0.560 [0.466, 0.656] | 0.518 [0.418, 0.615] | 0.552 [0.455, 0.648] | 0.545 [0.448, 0.640] | 0.609 [0.509, 0.702] | 0.529 [0.433, 0.623] | -0.100 (RF: 0.629) |
 *Note: All evaluations use 5-fold cross-validation with fold-nested normative calibration. Brackets indicate 1,000-sample bootstrap 95% confidence intervals. Feature ablation reveals two critical biological insights: (1) Ablating alpha oscillations (Ablate α, using [θ, δ, χ]) preserves high discriminability for clinical MDD (AUC = 0.937 vs 0.925), confirming that eyes-closed alpha power does not confound depression classification; (2) Conversely, ablating theta oscillations (Ablate θ, using [δ, α, χ]) causes catastrophic performance collapse across all cohorts (MDD drops to 0.748, Cavanagh drops to 0.519, Sleep drops to 0.456, Parkinson drops to 0.448), confirming that frontal theta is the indispensable diagnostic carrier.*
 
 ---
@@ -304,8 +306,8 @@ The NormativeGCN architecture is implemented in pure PyTorch and operates direct
 | **Participants** | 4b | Specify inclusion and exclusion criteria, and diagnostic settings. | Methods §2.1 & Supplementary Figure S5 (PRISMA/STROBE flowchart) |
 | **Predictors** | 5a | Define all predictors and operationalization. | Methods §2.3, §2.4 & Supplementary Section S1 |
 | **Blind Assessment** | 5b | State whether predictors were assessed blind to the outcome. | Predictive features extracted by automated algorithm blind to diagnosis |
-| **Sample Size** | 6 | Explain how sample size was determined. | Full multi-cohort public archive (N = 566 subjects, 365 sessions) |
-| **Missing Data** | 7 | Explain handling of missing data or bad channels. | Methods §2.2 & Supplementary Table S8 (spherical spline interpolation) |
+| **Sample Size** | 6 | Explain how sample size was determined. | Full multi-cohort public archive (N = 566 unique participants across seven clinical cohorts (677 primary recording sessions; 737 sessions including eyes-open)) |
+| **Missing Data** | 7 | Explain handling of missing data or bad channels. | Methods §2.2 & Supplementary Table S8 (without spatial interpolation (canonical 10–20 standard mapping)) |
 | **Model Development** | 8a | Specify machine learning algorithms, architecture, and hyperparameters. | Methods §2.6, Supplementary Section S1.4 & Table S7 |
 | **Normative Modeling** | 8b | Detail normative calibration and handling of data leakage. | Methods §2.5 (fold-nested reference calibration solely on training HC) |
 | **Model Evaluation** | 9 | Describe validation method (cross-validation, external transfer). | Methods §2.6 (5-fold stratified CV, Group-CV, and zero-shot transfer) |
@@ -526,7 +528,7 @@ The NormativeGCN architecture is implemented in pure PyTorch and operates direct
 
 ![Figure S4](../reports/fig_S4_cohort_spectra.png)
 
-**Figure S4. Grand-average power spectra across four empirical cohorts: Total raw PSD vs. Parameterized periodic residuals.** 
+**Figure S4. Grand-average power spectra across seven empirical cohorts: Total raw PSD vs. Parameterized periodic residuals.** 
 *Row 1 (Panels A1–D1): Grand-average raw log₁₀ power spectral density (1.0–40.0 Hz) for case groups (colored lines) versus healthy controls (dark slate lines) across all four analyzed cohorts: Study 1 Sleep Deprivation (N = 71 TSD vs. N = 71 Normal Sleep), Study 2 Mumtaz Outpatient MDD (N = 30 MDD vs. N = 28 HC), Study 3 Cavanagh University Depression (N = 44 Depressed vs. N = 75 HC), and Study 4 UCSD Parkinson's Disease (N = 15 PD-ON vs. N = 16 HC). Row 2 (Panels A2–D2): Extracted periodic residual spectra (log₁₀ PSD - L(f)) with aperiodic background removed, returning to the zero-baseline floor. Crucially, while raw PSD in MDD (Panel B1) exhibits elevated low-frequency power with a flattened aperiodic background (reduced exponent χ: d = -0.744), the parameterized periodic residual (Panel B2) reveals genuine suppression of the oscillatory frontal theta peak (d = -0.826). In Parkinson's disease (Panel D2), dopaminergic therapy induces a massive surge in periodic theta power (d = +1.150) without shifting the alpha peak center frequency.*
 
 ---
@@ -534,7 +536,7 @@ The NormativeGCN architecture is implemented in pure PyTorch and operates direct
 ![Figure S5](../reports/fig_S5_enrollment_flowchart.png)
 
 **Figure S5. PRISMA / STROBE multi-cohort enrollment and quality control flowchart.** 
-*Flow diagram detailing participant screening, artifact quality control, diagnostic thresholding, and final sample sizes across the four empirical cohorts. From an initial enrolled public release sample of N = 288 unique participants (374 recording sessions), 9 participants (3.1%) were excluded due to severe electrode bridging, excessive artifact contamination (> 20% rejected epochs), incomplete recordings, or missing clinical records. The final harmonized benchmark dataset comprises N = 566 unique participants and 677 recording sessions, standardized to 19 channels and evaluated under strict leak-free normative calibration.*
+*Flow diagram detailing participant screening, artifact quality control, diagnostic thresholding, and final sample sizes across the seven empirical cohorts. From an master enrolled public release sample of N = 574 unique participants across seven clinical cohorts (685 enrolled sessions), 9 participants (3.1%) were excluded due to severe electrode bridging, excessive artifact contamination (> 20% rejected epochs), incomplete recordings, or missing clinical records. The final harmonized benchmark dataset comprises N = 566 unique participants and 677 recording sessions, standardized to 19 channels and evaluated under strict leak-free normative calibration.*
 
 ---
 
