@@ -237,7 +237,7 @@ def evaluate_cohort_all_models(graph_list, cohort_name: str, use_group_kfold: bo
         oof_preds["GBDT"][val_idx] = gbdt.predict(X_va)
 
         # 11. Single Feature: Frontal Theta alone
-        frontal_nodes = [0, 1, 2, 3, 4]  # Fp1, Fp2, F7, F3, Fz
+        frontal_nodes = [0, 1, 2, 3, 16]  # Fp1, Fp2, F3, F4, Fz
         theta_tr = train_z[:, frontal_nodes, 0].mean(dim=-1).unsqueeze(-1).numpy()
         theta_va = val_z[:, frontal_nodes, 0].mean(dim=-1).unsqueeze(-1).numpy()
         lr_theta = LogisticRegression(random_state=42).fit(theta_tr, y_tr)
