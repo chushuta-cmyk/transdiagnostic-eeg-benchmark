@@ -36,7 +36,12 @@ def fmt_p(p: float, bold_sig: bool = False, with_stars: bool = False) -> str:
     if p < 0.001:
         mant, exp = f"{p:.2e}".split("e")
         exp_i = int(exp)
-        s = f"${mant} \\times 10^{{{exp_i}}}$"
+        super_digits = {
+            "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴",
+            "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹", "-": "⁻"
+        }
+        exp_str = "".join(super_digits.get(c, c) for c in str(exp_i))
+        s = f"{mant} × 10{exp_str}"
     else:
         s = f"{p:.4f}"
     if bold_sig and p < 0.05:
@@ -111,7 +116,7 @@ def build_main_table_1() -> str:
         )
 
     lines.append(
-        "\n*Note: Standardized effect sizes report paired Cohen's $d_z$ for the repeated-measures crossover design in Study 1 and independent-groups Cohen's $d$ (with two-sample Welch's unequal-variance $t$-tests) for Studies 2–7, accompanied by analytical 95% confidence intervals. Electrophysiological markers are canonically defined across standard scalp montages: (i) **Frontal Periodic $\\theta$ (4–8 Hz)** is the mean residual across five frontocentral electrodes (`Fp1, Fp2, F3, F4, Fz`); (ii) **Posterior Periodic $\\alpha$ (8–13 Hz)** is the mean residual across five parietal-occipital electrodes (`P3, P4, Pz, O1, O2`); (iii) **Global Periodic $\\delta$ (1–4 Hz)** is the mean residual across all 19 canonical 10–20 electrodes; (iv) **Global Aperiodic Exponent $\\chi$** is the mean spectral slope across all 19 electrodes; and (v) **OMST Efficiency (GCE)** is the global cost efficiency computed on the $19 \\times 19$ Orthogonal Minimum Spanning Tree thresholded PLI network. In Study 1, paired $d_z = +0.284$ converts to an independent-groups equivalent effect size of $d_{\\text{IG}} = d_z \\sqrt{2(1 - r)} = +0.267$ (95% CI $[+0.007, +0.528]$, accounting for within-subject test-retest correlation $r = 0.5709$ across $N = 71$ pairs via Morris & DeShon, 2002). In Study 4 (UCSD Parkinson's), both this table and Figure 1 report the strictly participant-independent comparison averaging ON and OFF sessions within each PD patient ($N = 15$ unique PD patients vs. $N = 16$ HCs: frontal periodic $\\theta$ $d = +0.918$ [$+0.177, +1.658$], Welch $t = +2.560$, $df = 29.0$, $p = 0.0159$, $q_{10} = 0.0199$); single-session-per-participant medication contrasts yield $d = +0.559$ ($p = 0.1303$, ns) in Study 4a PD-OFF ($15/16$) and $d = +1.150$ ($p = 0.0035$) in Study 4b PD-ON ($15/16$), while pooling all $30$ PD sessions against $16$ HCs without participant averaging yields $d = +0.837$ ($p = 0.0090$). Bold effect-size cells indicate uncorrected $p < 0.05$. In the rightmost column, $q_{10}$ denotes Benjamini–Hochberg false discovery rate (FDR) adjusted $q$-values across the 10 primary frontal periodic theta contrasts shown in this table; other marker columns report uncorrected two-sided Welch $t$-test $p$-values, whereas Supplementary Table S4 reports conservative pooled FDR adjustment ($q_{50}$) across all 50 marker-by-contrast tests (under $q_{50}$, Study 1 frontal periodic theta is $q_{50} = 0.0540$, ns, and Study 4 is $q_{50} = 0.0468$, \\*). Significance thresholds: \\*\\*\\* $q_{10} < 0.001$; \\*\\* $q_{10} < 0.01$; \\* $q_{10} < 0.05$; ns = not statistically significant.*"
+        "\n*Note: Standardized effect sizes report paired Cohen's dz for the repeated-measures crossover design in Study 1 and independent-groups Cohen's d (with two-sample Welch's unequal-variance t-tests) for Studies 2–7, accompanied by analytical 95% confidence intervals. Electrophysiological markers are canonically defined across standard scalp montages: (i) **Frontal Periodic θ (4–8 Hz)** is the mean residual across five frontocentral electrodes (`Fp1, Fp2, F3, F4, Fz`); (ii) **Posterior Periodic α (8–13 Hz)** is the mean residual across five parietal-occipital electrodes (`P3, P4, Pz, O1, O2`); (iii) **Global Periodic δ (1–4 Hz)** is the mean residual across all 19 canonical 10–20 electrodes; (iv) **Global Aperiodic Exponent χ** is the mean spectral slope across all 19 electrodes; and (v) **OMST Efficiency (GCE)** is the global cost efficiency computed on the 19 × 19 Orthogonal Minimum Spanning Tree thresholded PLI network. In Study 1, paired dz = +0.284 converts to an independent-groups equivalent effect size of d_IG = dz · sqrt(2(1 - r)) = +0.267 (95% CI [+0.007, +0.528], accounting for within-subject test-retest correlation r = 0.5709 across N = 71 pairs via Morris & DeShon, 2002). In Study 4 (UCSD Parkinson's), both this table and Figure 1 report the strictly participant-independent comparison averaging ON and OFF sessions within each PD patient (N = 15 unique PD patients vs. N = 16 HCs: frontal periodic θ d = +0.918 [+0.177, +1.658], Welch t = +2.560, df = 29.0, p = 0.0159, q₁₀ = 0.0199); single-session-per-participant medication contrasts yield d = +0.559 (p = 0.1303, ns) in Study 4a PD-OFF (15/16) and d = +1.150 (p = 0.0035) in Study 4b PD-ON (15/16), while pooling all 30 PD sessions against 16 HCs without participant averaging yields d = +0.837 (p = 0.0090). Bold effect-size cells indicate uncorrected p < 0.05. In the rightmost column, q₁₀ denotes Benjamini–Hochberg false discovery rate (FDR) adjusted q-values across the 10 primary frontal periodic theta contrasts shown in this table; other marker columns report uncorrected two-sided Welch t-test p-values, whereas Supplementary Table S4 reports conservative pooled FDR adjustment (q₅₀) across all 50 marker-by-contrast tests (under q₅₀, Study 1 frontal periodic theta is q₅₀ = 0.0540, ns, and Study 4 is q₅₀ = 0.0468, *). Significance thresholds: *** q₁₀ < 0.001; ** q₁₀ < 0.01; * q₁₀ < 0.05; ns = not statistically significant.*"
     )
     return "\n".join(lines)
 
@@ -175,7 +180,7 @@ def build_main_table_2() -> str:
     ]
     lines.append("| **Mean Across 9 Primary Contrasts** | " + " | ".join(mean_cells) + " |")
     lines.append(
-        "\n*Note: Entries report out-of-fold ROC-AUC from 5-fold cross-validation (`StratifiedGroupKFold` grouped by participant ID in repeated-session cohorts) with fold-nested healthy-control normative standardization. Bold denotes the highest ROC-AUC within each row. This table presents the 9 primary diagnostic contrasts (108 model evaluations); two additional medication-state contrasts in Study 6 (UNM PD-ON vs. HC and UNM All Sessions vs. HC) bring the complete within-cohort benchmark in Supplementary Table S11 to $11 \\times 12 = 132$ evaluations. In Study 4 (UCSD Parkinson's, $N = 46$ sessions, $P = 76$ flattened features), sequential histogram gradient boosting (`max_depth = 4`, 100 iterations) degraded below chance ($\\text{AUC} = 0.383$), whereas L2-regularized linear models and bagged shallow trees (`RandomForest`, `max_depth = 5`) remained more stable. Pairwise Wilcoxon signed-rank tests are reported in Supplementary Table S11b.*"
+        "\n*Note: Entries report out-of-fold ROC-AUC from 5-fold cross-validation (`StratifiedGroupKFold` grouped by participant ID in repeated-session cohorts) with fold-nested healthy-control normative standardization. Bold denotes the highest ROC-AUC within each row. This table presents the 9 primary diagnostic contrasts (108 model evaluations); two additional medication-state contrasts in Study 6 (UNM PD-ON vs. HC and UNM All Sessions vs. HC) bring the complete within-cohort benchmark in Supplementary Table S11 to 11 × 12 = 132 evaluations. In Study 4 (UCSD Parkinson's, N = 46 sessions, P = 76 flattened features), sequential histogram gradient boosting (`max_depth = 4`, 100 iterations) degraded below chance (AUC = 0.383), whereas L2-regularized linear models and bagged shallow trees (`RandomForest`, `max_depth = 5`) remained more stable. Pairwise Wilcoxon signed-rank tests are reported in Supplementary Table S11b.*"
     )
     return "\n".join(lines)
 
@@ -280,8 +285,8 @@ def _compute_all_20_regressions():
         task_res.sort(key=lambda t: t[2], reverse=True)
         for idx, (m_name, n_v, r, p, r2, mae) in enumerate(task_res):
             rows.append({
-                "cohort": c_lbl if idx == 0 else "",
-                "scale": sc_lbl if idx == 0 else "",
+                "cohort": c_lbl,
+                "scale": sc_lbl,
                 "is_best": idx == 0,
                 "n": n_v,
                 "model": m_name,
@@ -315,7 +320,7 @@ def build_main_table_4() -> str:
             f"| {r['cohort']} | {r['scale']} | {r['n']} | {m_str} | {r_str} | {p_str} | {r2_str} | {mae_str} |"
         )
     lines.append(
-        "\n*Note: All models were evaluated as exploratory cross-sectional analyses using 5-fold out-of-fold predictions on the 76 flattened channel-by-feature predictors, with feature standardization estimated strictly within training folds. Negative out-of-fold $R^2$ values indicate that prediction mean squared error exceeds the target-fold variance around the sample mean (i.e., worse than predicting a constant mean), reflecting the high noise floor of continuous severity prediction from resting 19-channel EEG. For motor symptom severity in Parkinson's disease (UPDRS-III, $N = 100$), predictions failed to reach significance across all regressors (best: GBDT $r = +0.165, p = 0.1008, R^2 = -0.105$, MAE = 6.166), demonstrating that resting EEG features reflect cognitive decline rather than motor impairment. Significance thresholds: \\*\\*\\* $p < 0.001$; \\*\\* $p < 0.01$; \\* $p < 0.05$; ns = not statistically significant ($p \\ge 0.05$).*"
+        "\n*Note: All models were evaluated as exploratory cross-sectional analyses using 5-fold out-of-fold predictions on the 76 flattened channel-by-feature predictors, with feature standardization estimated strictly within training folds. Negative out-of-fold R² values indicate that prediction mean squared error exceeds the target-fold variance around the sample mean (i.e., worse than predicting a constant mean), reflecting the high noise floor of continuous severity prediction from resting 19-channel EEG. For motor symptom severity in Parkinson's disease (UPDRS-III, N = 100), predictions failed to reach significance across all regressors (best: GBDT r = +0.165, p = 0.1008, R² = -0.105, MAE = 6.166), demonstrating that resting EEG features reflect cognitive decline rather than motor impairment. Significance thresholds: *** p < 0.001; ** p < 0.01; * p < 0.05; ns = not statistically significant (p ≥ 0.05).*"
     )
     return "\n".join(lines)
 
@@ -387,10 +392,10 @@ def build_supp_table_s1() -> str:
             f"| {ch} | {reg} | {px} | {py} | {d1} | {d2} | {dc} | {dm:.2f} ± {ds:.2f} | {bm:.3f} ± {bs:.3f} | {cm:.3f} ± {cs:.3f} |"
         )
     lines.append(
-        "| **Network Total / Mean** | **All 19 Channels** | **—** | **—** | **18 edges ($\\bar{k}=1.89$)** | **18 edges ($\\bar{k}=1.89$)** | **36 edges ($\\bar{k}=3.79$)** | **27.33 edges ($\\bar{k}=2.88$)** | **—** | **—** |"
+        "| **Network Total / Mean** | **All 19 Channels** | **—** | **—** | **18 edges (mean k = 1.89)** | **18 edges (mean k = 1.89)** | **36 edges (mean k = 3.79)** | **27.33 edges (mean k = 2.88)** | **—** | **—** |"
     )
     lines.append(
-        "\n*Note: For an undirected 19-node graph, maximum possible edges are $N(N-1)/2 = 171$. For $M = 1$ tree ($E = 18$), total degree sum is $36$, mean degree is $\\bar{k} = 1.895$, and edge density is $10.53\\%$; for $M = 2$ orthogonal trees ($E = 36$), total degree sum is $72$, $\\bar{k} = 3.789$, and edge density is $21.05\\%$. Across all $N = 566$ analyzed participants and $677$ primary recording sessions ($12,863$ node instances), Global Cost Efficiency (GCE) optimization selected $M = 1.52 \\pm 0.50$ trees ($48.15\\%$ $M = 1$, $51.85\\%$ $M = 2$), yielding $E = 27.33 \\pm 9.00$ edges, degree sum $54.66$, mean node degree $\\bar{k} = 2.88 \\pm 0.95$, edge density $15.98\\% \\pm 5.26\\%$, mean $\\text{GCE} = 0.4939 \\pm 0.0438$, and an isolated node rate of $0.0000\\%$.*"
+        "\n*Note: For an undirected 19-node graph, maximum possible edges are N(N - 1) / 2 = 171. For M = 1 tree (E = 18), total degree sum is 36, mean degree is mean k = 1.895, and edge density is 10.53%; for M = 2 orthogonal trees (E = 36), total degree sum is 72, mean k = 3.789, and edge density is 21.05%. Across all N = 566 analyzed participants and 677 primary recording sessions (12,863 node instances), Global Cost Efficiency (GCE) optimization selected M = 1.52 ± 0.50 trees (48.15% M = 1, 51.85% M = 2), yielding E = 27.33 ± 9.00 edges, degree sum 54.66, mean node degree mean k = 2.88 ± 0.95, edge density 15.98% ± 5.26%, mean GCE = 0.4939 ± 0.0438, and an isolated node rate of 0.0000%.*"
     )
     return "\n".join(lines)
 
@@ -404,7 +409,7 @@ def build_supp_table_s4() -> str:
     ]
     for _, r in df.iterrows():
         n_str = f"{int(r['n_case'])} / {int(r['n_control'])}"
-        test_type = "Paired $t$" if r["is_paired"] else "Welch $t$"
+        test_type = "Paired t" if r["is_paired"] else "Welch t"
         t_str = f"{r['t_statistic']:+.3f}"
         df_str = f"{int(r['df_satterthwaite'])}" if r["is_paired"] else f"{r['df_satterthwaite']:.1f}"
         p_str = fmt_p(float(r["p_value"]))
@@ -417,7 +422,7 @@ def build_supp_table_s4() -> str:
             f"| **{c_short}** | {r['case_group']} vs. {r['ref_group']} | {r['marker_label']} | {n_str} | {test_type} | {t_str} | {df_str} | {p_str} | {q_str} | {d_str} | {st_str} |"
         )
     lines.append(
-        "\n*Note: Independent two-group contrasts use two-sample Welch's unequal-variance $t$-tests with exact Welch–Satterthwaite degrees of freedom ($df$); Study 1 uses within-subject paired $t$-tests ($df = 70$) and paired Cohen's $d_z$. Unlike Main Text Table 1—which applies Benjamini–Hochberg FDR across the 10 primary frontal periodic theta contrasts ($q_{10}$)—this supplementary table pools all 50 tests (10 cohort contrasts $\\times$ 5 markers, using participant-averaged PD sessions $15/16$ in Study 4 and separate OFF/ON contrasts in Study 6) into a single conservative benchmark-wide family ($q_{50}$). In Study 4, pooling all $30$ PD sessions against $16$ HCs without participant averaging yields $d = +0.837$ ($p = 0.0090$) for frontal periodic $\\theta$, $d = -0.453$ ($p = 0.1303$) for global $\\delta$, $d = +0.081$ ($p = 0.7885$) for posterior $\\alpha$, $d = +0.349$ ($p = 0.2562$) for global $\\chi$, and $d = -0.173$ ($p = 0.5975$) for OMST GCE. Significance thresholds: \\*\\*\\* $q_{50} < 0.001$; \\*\\* $q_{50} < 0.01$; \\* $q_{50} < 0.05$; ns = not statistically significant ($q_{50} \\ge 0.05$).*"
+        "\n*Note: Independent two-group contrasts use two-sample Welch's unequal-variance t-tests with exact Welch–Satterthwaite degrees of freedom (df); Study 1 uses within-subject paired t-tests (df = 70) and paired Cohen's dz. Unlike Main Text Table 1—which applies Benjamini–Hochberg FDR across the 10 primary frontal periodic theta contrasts (q₁₀)—this supplementary table pools all 50 tests (10 cohort contrasts × 5 markers, using participant-averaged PD sessions 15/16 in Study 4 and separate OFF/ON contrasts in Study 6) into a single conservative benchmark-wide family (q₅₀). In Study 4, pooling all 30 PD sessions against 16 HCs without participant averaging yields d = +0.837 (p = 0.0090) for frontal periodic θ, d = -0.453 (p = 0.1303) for global δ, d = +0.081 (p = 0.7885) for posterior α, d = +0.349 (p = 0.2562) for global χ, and d = -0.173 (p = 0.5975) for OMST GCE. Significance thresholds: *** q₅₀ < 0.001; ** q₅₀ < 0.01; * q₅₀ < 0.05; ns = not statistically significant (q₅₀ ≥ 0.05).*"
     )
     return "\n".join(lines)
 
@@ -450,7 +455,7 @@ def build_supp_table_s6() -> str:
             f"| {lbl} | {s_th} | {r['Single_Delta_auc']:.3f} | {r['Single_Alpha_auc']:.3f} | {r['Single_Chi_auc']:.3f} | {r['Single_GCE_auc']:.3f} | {g_f4} | {r['GCN_Ablate_Theta_auc']:.3f} | {r['GCN_Ablate_Delta_auc']:.3f} | {r['GCN_Ablate_Alpha_auc']:.3f} | {r['GCN_Ablate_Chi_auc']:.3f} |"
         )
     lines.append(
-        "\n*Note: All entries report 5-fold cross-validated ROC-AUC under identical fold splits and fold-nested healthy-control normative standardization (`Adam`, $\\eta = 0.005$, weight decay $10^{-4}$, 50 epochs for all `NormativeGCN` models; L2 `LogisticRegression` for univariate baselines). Single $\\theta$ uses the canonical 5-channel frontal periodic theta mean (`Fp1, Fp2, F3, F4, Fz`); Single $\\alpha$ uses the 5-channel posterior periodic alpha mean (`P3, P4, Pz, O1, O2`); Single $\\delta$ and Single $\\chi$ use 19-channel global means; Single GCE uses scalar OMST Global Cost Efficiency. Leave-one-feature-out columns train 3-feature `NormativeGCN` (`in_node_features = 3`) on binary OMST graphs by omitting one feature channel at a time relative to the 4-feature `GCN Full` (`GCN_OMST` in Table 2 and Table S11). Removing periodic theta (`Ablate θ`) substantially lowers `NormativeGCN` AUC across depression, Parkinson's, and frontotemporal/combined dementia contrasts (e.g., $0.902 \\to 0.727$ in Study 2 MDD, $0.725 \\to 0.508$ in Study 4 UCSD PD, $0.842 \\to 0.725$ in Study 5c Dementia All, and $0.685 \\to 0.550$ in Study 7 Iowa PD), whereas in Study 5a AD ($0.807 \\to 0.798$) posterior alpha and $\\chi$ retain strong complementary signal.*"
+        "\n*Note: All entries report 5-fold cross-validated ROC-AUC under identical fold splits and fold-nested healthy-control normative standardization (`Adam`, η = 0.005, weight decay 10⁻⁴, 50 epochs for all `NormativeGCN` models; L2 `LogisticRegression` for univariate baselines). Single θ uses the canonical 5-channel frontal periodic theta mean (`Fp1, Fp2, F3, F4, Fz`); Single α uses the 5-channel posterior periodic alpha mean (`P3, P4, Pz, O1, O2`); Single δ and Single χ use 19-channel global means; Single GCE uses scalar OMST Global Cost Efficiency. Leave-one-feature-out columns train 3-feature `NormativeGCN` (`in_node_features = 3`) on binary OMST graphs by omitting one feature channel at a time relative to the 4-feature `GCN Full` (`GCN_OMST` in Table 2 and Table S11). Removing periodic theta (`Ablate θ`) substantially lowers `NormativeGCN` AUC across depression, Parkinson's, and frontotemporal/combined dementia contrasts (e.g., 0.902 → 0.727 in Study 2 MDD, 0.725 → 0.508 in Study 4 UCSD PD, 0.842 → 0.725 in Study 5c Dementia All, and 0.685 → 0.550 in Study 7 Iowa PD), whereas in Study 5a AD (0.807 → 0.798) posterior alpha and χ retain strong complementary signal.*"
     )
     return "\n".join(lines)
 
@@ -483,7 +488,7 @@ def build_supp_table_s7_and_s7b() -> str:
         "| **GBDT** | Flattened 76-D (19 × 4) | Fixed: `max_iter=100`, `max_depth=4`, `random_state=42` | Fixed architecture (no grid search) | `HistGradientBoostingClassifier` |",
         "| **Single_Theta** | 1-D Frontal Periodic θ | Mean across `Fp1, Fp2, F3, F4, Fz`; default L2 (C = 1.0) | Fixed univariate baseline | `LogisticRegression(random_state=42)` |",
         "| **Single_Chi** | 1-D Global Exponent χ | Mean across all 19 channels; default L2 (C = 1.0) | Fixed univariate baseline | `LogisticRegression(random_state=42)` |",
-        "\n*Note: Together with the four graph neural network variants (`GCN_OMST`, `GCN_Identity`, `GCN_Random`, `GCN_Full`) in Table S7, these eight classical and univariate models form the exact 12-model benchmark reported in Main Text Table 2 and Supplementary Table S11. All hyperparameter tuning is nested strictly inside each outer training fold ($0.0\\%$ participant overlap between outer training and validation folds under `StratifiedGroupKFold(n_splits=5)`). In repeated-session cohorts (Studies 1, 4, and 6c), enforcing participant-grouped `StratifiedGroupKFold(n_splits=3)` in the inner hyperparameter selection loop prevents within-training-fold session mixing and improves out-of-fold ROC-AUC for `Tuned_LogisticRegression` relative to ungrouped inner `StratifiedKFold(n_splits=3)` ($0.609 \\to 0.612$ [$\\Delta = +0.003$] in Study 1; $0.627 \\to 0.656$ [$\\Delta = +0.029$] in Study 4; and $0.704 \\to 0.723$ [$\\Delta = +0.019$] in Study 6c) by selecting stronger L2 regularization against participant-specific baseline variance.*",
+        "\n*Note: Together with the four graph neural network variants (`GCN_OMST`, `GCN_Identity`, `GCN_Random`, `GCN_Full`) in Table S7, these eight classical and univariate models form the exact 12-model benchmark reported in Main Text Table 2 and Supplementary Table S11. All hyperparameter tuning is nested strictly inside each outer training fold (0.0% participant overlap between outer training and validation folds under `StratifiedGroupKFold(n_splits=5)`). In repeated-session cohorts (Studies 1, 4, and 6c), enforcing participant-grouped `StratifiedGroupKFold(n_splits=3)` in the inner hyperparameter selection loop prevents within-training-fold session mixing and improves out-of-fold ROC-AUC for `Tuned_LogisticRegression` relative to ungrouped inner `StratifiedKFold(n_splits=3)` (0.609 → 0.612 [Δ = +0.003] in Study 1; 0.627 → 0.656 [Δ = +0.029] in Study 4; and 0.704 → 0.723 [Δ = +0.019] in Study 6c) by selecting stronger L2 regularization against participant-specific baseline variance.*",
     ]
     return "\n".join(lines)
 
@@ -537,7 +542,7 @@ def build_supp_table_s7c() -> str:
     )
     lines.append(
         (
-            "\n*Note: Evaluates out-of-fold ROC-AUC for `NormativeGCN` across five representative cohorts under systematic perturbations of learning rate $\\eta \\in \\{0.001, 0.005, 0.010\\}$, training duration $E \\in \\{30, 50, 100\\}$ epochs, and hidden representation dimension $d_h \\in \\{16, 32, 64\\}$ ($914$ to $8,674$ parameters). Across all 35 cohort-by-hyperparameter evaluations, tuning the GCN modulates out-of-fold ROC-AUC within a modest range ($\\pm 0.03\\text{--}0.05$; 5-cohort means $0.693\\text{--}0.748$) without altering the central benchmark conclusions: (i) in university depression screening (Study 3), UCSD PD (Study 4), UNM PD-OFF (Study 6a), and Iowa PD (Study 7), univariate 5-channel frontal periodic theta alone (`Single θ`, AUC $0.683\\text{--}0.768$) matches or exceeds every single tuned or untuned GCN configuration on a per-cohort basis; and (ii) tabular `Random Forest` (5-cohort mean $0.740$) and `Tuned Ridge` baselines remain competitive with or superior to GCN models across clinical disorders (with the best-tuned GCN at $0.748$ showing only a $+0.008$ margin over Random Forest), demonstrating that the absence of a graph topological advantage is not an artifact of an under-tuned or fixed GCN architecture.*"
+            "\n*Note: Evaluates out-of-fold ROC-AUC for `NormativeGCN` across five representative cohorts under systematic perturbations of learning rate η in {0.001, 0.005, 0.010}, training duration E in {30, 50, 100} epochs, and hidden representation dimension d_h in {16, 32, 64} (914 to 8,674 parameters). Across all 35 cohort-by-hyperparameter evaluations, tuning the GCN modulates out-of-fold ROC-AUC within a modest range (± 0.03–0.05; 5-cohort means 0.693–0.748) without altering the central benchmark conclusions: (i) in university depression screening (Study 3), UCSD PD (Study 4), UNM PD-OFF (Study 6a), and Iowa PD (Study 7), univariate 5-channel frontal periodic theta alone (`Single θ`, AUC 0.683–0.768) matches or exceeds every single tuned or untuned GCN configuration on a per-cohort basis; and (ii) tabular `Random Forest` (5-cohort mean 0.740) and `Tuned Ridge` baselines remain competitive with or superior to GCN models across clinical disorders (with the best-tuned GCN at 0.748 showing only a +0.008 margin over Random Forest), demonstrating that the absence of a graph topological advantage is not an artifact of an under-tuned or fixed GCN architecture.*"
         )
     )
     return "\n".join(lines)
@@ -578,16 +583,14 @@ def build_supp_table_s11_and_s11b() -> str:
         "| Cohort Contrast | Model Identifier | Architecture / Input Specification | ROC-AUC [95% CI] | Balanced Accuracy | Raw Accuracy |",
         "| :--- | :--- | :--- | :---: | :---: | :---: |",
     ]
-    prev_c = None
     for _, r in df.iterrows():
-        c_lbl = cohort_disp.get(r["cohort"], r["cohort"]) if r["cohort"] != prev_c else ""
-        prev_c = r["cohort"]
+        c_lbl = cohort_disp.get(r["cohort"], r["cohort"])
         auc_s = f"{r['auc']:.3f} [{r['ci_lower']:.3f}, {r['ci_upper']:.3f}]"
         lines.append(
             f"| {c_lbl} | `{r['model']}` | {desc_map[r['model']]} | {auc_s} | {r['balanced_accuracy']*100:.1f}% | {r['accuracy']*100:.1f}% |"
         )
     lines.append(
-        "\n*Note: Comprises $11 \\text{ within-cohort contrasts} \\times 12 \\text{ models} = 132$ leak-free 5-fold cross-validation evaluations. `StratifiedGroupKFold` grouped on participant ID was enforced for repeated-session contrasts (Study 1, Study 4, Study 6c). Confidence intervals denote 1,000-sample bootstrap percentiles.*"
+        "\n*Note: Comprises 11 within-cohort contrasts × 12 models = 132 leak-free 5-fold cross-validation evaluations. `StratifiedGroupKFold` grouped on participant ID was enforced for repeated-session contrasts (Study 1, Study 4, Study 6c). Confidence intervals denote 1,000-sample bootstrap percentiles.*"
     )
 
     # Table S11b: Wilcoxon Signed-Rank Tests
@@ -605,7 +608,7 @@ def build_supp_table_s11_and_s11b() -> str:
             f"| {scope_lbl} | `{r['comparator_model']}` | {r['gcn_mean_auc']:.3f} | {r['comp_mean_auc']:.3f} | {r['mean_diff_auc']:+.3f} | {r['median_diff_auc']:+.3f} | {r['wins_ties_losses']} | {r['wilcoxon_W']:.1f} | {fmt_p(float(r['raw_p']))} | {q_fmt} |"
         )
     lines.append(
-        "\n*Note: Exact two-sided paired Wilcoxon signed-rank tests compare out-of-fold ROC-AUC values of `GCN_OMST` against each of the other 11 models across the 9 primary contrasts (Main Text Table 2) and across all 11 within-cohort contrasts (Table S11). Because contrasts derived from the same archive (Studies 5a–5c in AHEPA dementia and Studies 6a–6c in UNM PD) share control participants, these across-contrast Wilcoxon tests are treated as descriptive benchmark-level summary comparisons, complemented by within-cohort participant-cluster bootstrap confidence intervals (Table S19) and 5-seed repeated cross-validation distributions (Table S21). Across the 9 primary contrasts, no statistically significant differences were detected after BH-FDR correction across all 11 pairwise tests ($q \\ge 0.0645$); against `Tuned_Ridge`, `RandomForest`, `Tuned_LogisticRegression`, `GCN_Identity`, `GCN_Random`, `GCN_Full`, and `Single_Theta`, all uncorrected $p$-values exceeded $0.25$. Significance thresholds: \\*\\*\\* $q < 0.001$; \\*\\* $q < 0.01$; \\* $q < 0.05$; ns = not statistically significant.*"
+        "\n*Note: Exact two-sided paired Wilcoxon signed-rank tests compare out-of-fold ROC-AUC values of `GCN_OMST` against each of the other 11 models across the 9 primary contrasts (Main Text Table 2) and across all 11 within-cohort contrasts (Table S11). Because contrasts derived from the same archive (Studies 5a–5c in AHEPA dementia and Studies 6a–6c in UNM PD) share control participants, these across-contrast Wilcoxon tests are treated as descriptive benchmark-level summary comparisons, complemented by within-cohort participant-cluster bootstrap confidence intervals (Table S19) and 5-seed repeated cross-validation distributions (Table S21). Across the 9 primary contrasts, no statistically significant differences were detected after BH-FDR correction across all 11 pairwise tests (q ≥ 0.0645); against `Tuned_Ridge`, `RandomForest`, `Tuned_LogisticRegression`, `GCN_Identity`, `GCN_Random`, `GCN_Full`, and `Single_Theta`, all uncorrected p-values exceeded 0.25. Significance thresholds: *** q < 0.001; ** q < 0.01; * q < 0.05; ns = not statistically significant.*"
     )
     return "\n".join(lines)
 
@@ -617,10 +620,8 @@ def build_supp_table_s14() -> str:
         "| Parkinson's Cohort & Protocol | Electrophysiological Marker | Mean OFF | Mean ON | Paired Diff (ON - OFF) [95% CI] | Paired dz [95% CI] | Paired t | Two-Sided p (Sig) | Wilcoxon p |",
         "| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |",
     ]
-    prev_c = None
     for _, r in df.iterrows():
-        c_lbl = f"**{r['cohort']} ($N={int(r['n_pairs'])}$ pairs)**" if r["cohort"] != prev_c else ""
-        prev_c = r["cohort"]
+        c_lbl = f"**{r['cohort']} (N = {int(r['n_pairs'])} pairs)**"
         md_str = f"{r['mean_diff_on_minus_off']:+.4f} [{r['diff_ci_lower']:+.4f}, {r['diff_ci_upper']:+.4f}]"
         dz_str = f"{r['cohens_dz']:+.3f} [{r['dz_ci_lower']:+.3f}, {r['dz_ci_upper']:+.3f}]"
         p_str = fmt_p(float(r["paired_p"]), bold_sig=True, with_stars=True)
@@ -629,7 +630,7 @@ def build_supp_table_s14() -> str:
             f"| {c_lbl} | {r['marker']} | {r['mean_off']:+.4f} | {r['mean_on']:+.4f} | {md_str} | {dz_str} | {r['paired_t']:+.3f} | {p_str} | {w_str} |"
         )
     lines.append(
-        "\n*Note: Evaluates within-participant paired differences ($\\text{ON} - \\text{OFF}$) across the exact extracted spectral and topological features (`x[:, 0]` periodic theta, `x[:, 1]` periodic delta, `x[:, 2]` periodic alpha, `x[:, 3]` aperiodic exponent $\\chi$, and OMST Global Cost Efficiency). In Study 6 (UNM, $N = 25$ pairs recorded under counterbalanced $\\ge 15\\text{ h}$ overnight washout vs. ON medication), no statistically significant differences were detected across any marker (all paired $p \\ge 0.1579$; note that absence of statistical significance does not establish formal equivalence without pre-specified equivalence bounds). In Study 4 (UCSD, $N = 15$ pairs), ON-medication recordings exhibited higher periodic theta ($p = 0.0228$) and lower periodic delta ($p = 0.0113$) relative to OFF sessions. Significance thresholds: \\*\\*\\* $p < 0.001$; \\*\\* $p < 0.01$; \\* $p < 0.05$; ns = not statistically significant.*"
+        "\n*Note: Evaluates within-participant paired differences (ON - OFF) across the exact extracted spectral and topological features (`x[:, 0]` periodic theta, `x[:, 1]` periodic delta, `x[:, 2]` periodic alpha, `x[:, 3]` aperiodic exponent χ, and OMST Global Cost Efficiency). In Study 6 (UNM, N = 25 pairs recorded under counterbalanced ≥ 15 h overnight washout vs. ON medication), no statistically significant differences were detected across any marker (all paired p ≥ 0.1579; note that absence of statistical significance does not establish formal equivalence without pre-specified equivalence bounds). In Study 4 (UCSD, N = 15 pairs), ON-medication recordings exhibited higher periodic theta (p = 0.0228) and lower periodic delta (p = 0.0113) relative to OFF sessions. Significance thresholds: *** p < 0.001; ** p < 0.01; * p < 0.05; ns = not statistically significant.*"
     )
     return "\n".join(lines)
 
@@ -649,7 +650,7 @@ def build_supp_table_s15() -> str:
             f"| {r['cohort']} | {r['scale']} | {r['n']} | {m_str} | {r_str} | {p_str} | {r['r2']:+.4f} | {r['mae']:.4f} |"
         )
     lines.append(
-        "\n*Note: Exploratory out-of-fold cross-sectional predictions from 5-fold cross-validation (`KFold(n_splits=5, shuffle=True, random_state=42)`) on the 76 flattened channel-by-feature predictors standardized within each training fold. Negative $R^2$ indicates out-of-fold MSE exceeding test-fold variance around the mean. Significance thresholds: \\*\\*\\* $p < 0.001$; \\*\\* $p < 0.01$; \\* $p < 0.05$; ns = not statistically significant ($p \\ge 0.05$).*"
+        "\n*Note: Exploratory out-of-fold cross-sectional predictions from 5-fold cross-validation (`KFold(n_splits=5, shuffle=True, random_state=42)`) on the 76 flattened channel-by-feature predictors standardized within each training fold. Negative R² indicates out-of-fold MSE exceeding test-fold variance around the mean. Significance thresholds: *** p < 0.001; ** p < 0.01; * p < 0.05; ns = not statistically significant (p ≥ 0.05).*"
     )
     return "\n".join(lines)
 
@@ -679,7 +680,7 @@ def build_supp_table_s16_and_s17() -> str:
         rest = [f"**{v:.3f}**" if abs(v - rmax) < 1e-4 else f"{v:.3f}" for v in vals[1:]]
         lines.append(f"| {sl} | {tl} | {ns} | {nt} | {om_s} | {' | '.join(rest)} |")
     lines.append(
-        "\n*Note: Site-calibrated cross-center evaluations without model retraining; target-site healthy controls were used solely to compute normative mean and standard deviation scaling parameters. Transfer performance varies across directions, from near-chance when training on smaller cohorts (`UNM → UCSD`: GCN-OMST $0.590$) to moderate-to-good when training on the largest cohort (`Iowa → UNM`: $0.811$; `Iowa → UCSD`: Random Forest $0.804$, GCN-OMST $0.740$).*"
+        "\n*Note: Site-calibrated cross-center evaluations without model retraining; target-site healthy controls were used solely to compute normative mean and standard deviation scaling parameters. Transfer performance varies across directions, from near-chance when training on smaller cohorts (`UNM → UCSD`: GCN-OMST 0.590) to moderate-to-good when training on the largest cohort (`Iowa → UNM`: 0.811; `Iowa → UCSD`: Random Forest 0.804, GCN-OMST 0.740).*" 
     )
 
     cd_pairs = [
@@ -713,7 +714,7 @@ def build_supp_table_s16_and_s17() -> str:
         rest = [f"**{v:.3f}**" if abs(v - rmax) < 1e-4 else f"{v:.3f}" for v in vals[1:]]
         lines.append(f"| {sl} | {tl} | {om_s} | {' | '.join(rest)} |")
     lines.append(
-        "\n*Note: Site-calibrated transfer without retraining. Notice the directional asymmetry across disorder boundaries: models trained on Parkinson's disease, clinical dementia, or sleep deprivation and evaluated on outpatient MDD produce sub-chance ROC-AUCs ($0.274$–$0.336$ for `GCN-OMST`), as does outpatient MDD $\\to$ clinical dementia ($0.338$), reflecting opposing frontal periodic theta directions; conversely, reverse transfers from outpatient MDD to Iowa PD (`GCN-OMST` $0.539$; tabular models $0.325$–$0.330$) and to sleep deprivation ($0.490$) remain near chance because multi-feature depression weights also incorporate aperiodic slope differences.*"
+        "\n*Note: Site-calibrated transfer without retraining. Notice the directional asymmetry across disorder boundaries: models trained on Parkinson's disease, clinical dementia, or sleep deprivation and evaluated on outpatient MDD produce sub-chance ROC-AUCs (0.274–0.336 for `GCN-OMST`), as does outpatient MDD → clinical dementia (0.338), reflecting opposing frontal periodic theta directions; conversely, reverse transfers from outpatient MDD to Iowa PD (`GCN-OMST` 0.539; tabular models 0.325–0.330) and to sleep deprivation (0.490) remain near chance because multi-feature depression weights also incorporate aperiodic slope differences.*"
     )
     return "\n".join(lines)
 
@@ -725,10 +726,8 @@ def build_supp_table_s18() -> str:
         "| Cohort Contrast (N with Age) | Electrophysiological Marker | Group Coef ± SE | Group t | Group p-Value (Sig) | Age Coef ± SE (per yr) | Age t | Age p-Value (Sig) | Model R² | Unadjusted Status Retention |",
         "| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :--- |",
     ]
-    prev_c = None
     for _, r in df.iterrows():
-        c_lbl = f"**{r['cohort']} (N={int(r['n_valid_age'])})**" if r["cohort"] != prev_c else ""
-        prev_c = r["cohort"]
+        c_lbl = f"**{r['cohort']} (N = {int(r['n_valid_age'])})**"
         gp = float(r["group_p"])
         ap = float(r["age_p"])
         gp_str = fmt_p(gp, bold_sig=True, with_stars=True)
@@ -738,7 +737,7 @@ def build_supp_table_s18() -> str:
             f"| {c_lbl} | {r['marker']} | {r['group_coef']:+.4f} ± {r['group_se']:.4f} | {r['group_t']:+.3f} | {gp_str} | {r['age_coef']:+.4f} ± {r['age_se']:.4f} | {r['age_t']:+.3f} | {ap_str} | {r['r_squared']:.3f} | {status} |"
         )
     lines.append(
-        "\n*Note: Ordinary least squares (OLS) ANCOVA models (`Marker ~ Group + Age`, where `Group` is coded $1 = \\text{case}$, $0 = \\text{control/reference}$ and `Age` is continuous chronological age in years) were estimated using strictly independent single-session observations across all five between-subject datasets with participant-level age metadata: Study 3 (`ds003478`, $N = 118$ with recorded age; 1 participant had missing age in BIDS `participants.tsv`), Study 4a/4b (`ds002778`, $N = 31$ unique participants evaluated separately in OFF vs. HC and ON vs. HC to avoid pooling repeated sessions), Study 5 (`ds004504`, $N = 88$), Study 6a/6b (`ds003490`, $N = 50$ unique participants evaluated separately in OFF vs. HC and ON vs. HC), and Study 7 (`ds004584`, $N = 149$). Study 1 (`ds004902`, $N = 71$ pairs) is age-invariant within contrast by paired crossover design, and Study 2 (`Figshare 4244171`, $N = 58$) provides only group-level age summary statistics in its public release. Every group contrast that was statistically significant unadjusted remained statistically significant after covarying for age, whereas unadjusted non-significant markers remained non-significant; across all 28 models, the age covariate did not reach $p < 0.05$ (minimum age $p = 0.0609$). Significance thresholds: \\*\\*\\* $p < 0.001$; \\*\\* $p < 0.01$; \\* $p < 0.05$; ns = not statistically significant.*"
+        "\n*Note: Ordinary least squares (OLS) ANCOVA models (`Marker ~ Group + Age`, where `Group` is coded 1 = case, 0 = control/reference and `Age` is continuous chronological age in years) were estimated using strictly independent single-session observations across all five between-subject datasets with participant-level age metadata: Study 3 (`ds003478`, N = 118 with recorded age; 1 participant had missing age in BIDS `participants.tsv`), Study 4a/4b (`ds002778`, N = 31 unique participants evaluated separately in OFF vs. HC and ON vs. HC to avoid pooling repeated sessions), Study 5 (`ds004504`, N = 88), Study 6a/6b (`ds003490`, N = 50 unique participants evaluated separately in OFF vs. HC and ON vs. HC), and Study 7 (`ds004584`, N = 149). Study 1 (`ds004902`, N = 71 pairs) is age-invariant within contrast by paired crossover design, and Study 2 (`Figshare 4244171`, N = 58) provides only group-level age summary statistics in its public release. Every group contrast that was statistically significant unadjusted remained statistically significant after covarying for age, whereas unadjusted non-significant markers remained non-significant; across all 28 models, the age covariate did not reach p < 0.05 (minimum age p = 0.0609). Significance thresholds: *** p < 0.001; ** p < 0.01; * p < 0.05; ns = not statistically significant.*"
     )
     return "\n".join(lines)
 

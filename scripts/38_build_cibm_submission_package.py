@@ -208,8 +208,8 @@ def style_submission_doc(doc_path: Path, is_main: bool = False):
         s.left_margin = Inches(1.0)
         s.right_margin = Inches(1.0)
         
-    if is_main:
-        add_continuous_line_numbering(doc)
+    # Add continuous line numbering
+    add_continuous_line_numbering(doc)
 
     # Add page numbering to footer
     add_footer_page_numbering(doc)
@@ -305,9 +305,9 @@ def build_cover_letter() -> str:
 *{EXACT_TITLE}*
 
 **Author:**  
-{AUTHOR_NAME}$^{{1,*}}$  
-$^{{1}}$ {AUTHOR_AFFIL}  
-$^*$ Corresponding Author: {CORRESPONDENCE}
+{AUTHOR_NAME}¹*  
+¹ {AUTHOR_AFFIL}  
+* Corresponding Author: {CORRESPONDENCE}
 
 ---
 
@@ -316,16 +316,16 @@ Dear Dr. Ciaccio and Members of the Editorial Board,
 I am pleased to submit this original research article entitled **"{EXACT_TITLE}"** for publication consideration as a **Research Paper** in ***{JOURNAL_NAME}***.
 
 ### Rationale and Alignment with Journal Scope
-Resting-state electroencephalography (EEG) offers accessible, millisecond-resolution functional neuromonitoring across neurodegenerative and psychiatric disorders. However, translating machine learning models and quantitative EEG (qEEG) biomarkers into reproducible clinical tools has been hindered by montage heterogeneity, uncalibrated amplifier gain scaling across hardware, conflation of resonant periodic oscillations with broadband $1/f^\\chi$ aperiodic slope, and optimistic validation leakage. Concurrently, Graph Neural Networks (GNNs) have gained significant popularity in biomedical computing under the assumption that relational message passing across sensor functional connectomes improves diagnostic decoding. Whether GNNs confer demonstrable advantages over regularized tabular classifiers on standard 19-channel clinical montages has remained unbenchmarked under leak-free protocols.
+Resting-state electroencephalography (EEG) offers accessible, millisecond-resolution functional neuromonitoring across neurodegenerative and psychiatric disorders. However, translating machine learning models and quantitative EEG (qEEG) biomarkers into reproducible clinical tools has been hindered by montage heterogeneity, uncalibrated amplifier gain scaling across hardware, conflation of resonant periodic oscillations with broadband 1/f^χ aperiodic slope, and optimistic validation leakage. Concurrently, Graph Neural Networks (GNNs) have gained significant popularity in biomedical computing under the assumption that relational message passing across sensor functional connectomes improves diagnostic decoding. Whether GNNs confer demonstrable advantages over regularized tabular classifiers on standard 19-channel clinical montages has remained unbenchmarked under leak-free protocols.
 
 Drawing upon rigorous methodological standards from computational bioinformatics and statistical genomics—where batch-effect auditing, leak-free nested cross-validation, and empirical null controls are foundational prerequisites—this benchmark introduces bioinformatics-grade validation rigor to clinical 19-channel EEG analytics. This work provides a fully reproducible, open-source benchmark that directly addresses the methodological reproducibility gap in clinical EEG machine learning, aligning closely with *Computers in Biology and Medicine*'s dedication to translational computational biomedical engineering.
 
 ### Key Contributions and Methodological Rigor
-1. **Harmonized Multi-Cohort Benchmark ($N = 566$ participants, $677$ primary sessions):** Evaluated across seven public datasets spanning experimental acute sleep deprivation (OpenNeuro `ds004902`), outpatient major depressive disorder (Figshare `4244171`), university depression screening (`ds003478`), tri-center Parkinson's disease (`ds002778`, `ds003490`, `ds004584`), and clinical dementia (`ds004504`).
-2. **Resolution of Electrophysiological Theta Polarity:** Once broadband $1/f^\\chi$ background activity is disentangled via `specparam`, resting frontal periodic theta demonstrates disease-specific opposing polarity: significant reduction in outpatient MDD ($d = -0.826$) and university depression ($d = -0.676$), contrasted with significant elevation across Parkinson's disease ($d = +0.803$ to $+0.918$) and dementia ($d = +0.903$ to $+1.279$). Meta-analysis across mutually exclusive between-subject cohorts confirms strong between-domain polarity ($Q_{{\\text{{between}}}} = 62.38, p = 2.89 \\times 10^{{-15}}$).
-3. **Architectural Evaluation of Graph Neural Networks:** Across 132 within-cohort evaluations and 5 random seeds, `GCN-OMST` (reference mean AUC = $0.738$, 5-seed mean $0.731$) fails to outperform regularized classical baselines (`Random Forest` $0.752$, `Tuned Ridge` $0.749$, `Tuned Logistic` $0.743$). Furthermore, density-matched random graph ablations (`GCN-Random` mean AUC $0.754$) and isolated-node models (`GCN-Identity` $0.742$) match structured graphs, demonstrating that message passing on low-density sensor arrays does not confer topological advantages over regional node features.
-4. **Empirical Audit of PLI Non-Positive Definiteness:** An exhaustive empirical audit of all 677 primary resting sessions reveals that **12.56% (85/677) of sensor-level Phase Lag Index matrices violate positive semi-definiteness** (minimum eigenvalues down to $-7.370$), establishing that sensor-level functional connectivity requires adaptive regularization when projected onto Riemannian SPD manifolds (Adaptive SPD mean AUC = $0.743$), where it fails to outperform regional oscillatory power.
-5. **Multiplicative Gain Invariance and Leakage Control:** Analytical proofs and numerical perturbations verify that spectral parameterization and PLI are invariant across four orders of magnitude of voltage scaling ($|\\Delta \\mathbf{{X}}| = 0.0000$), whereas uncalibrated band power suffers probability calibration drift ($|\\Delta p| = 0.205\\text{{--}}0.339$) and classifier collapse. Leakage ablations demonstrate bidirectional bias ($\le +0.102$ inflation in label-concordant cohorts; $-0.069$ deflation in crossover designs).
+1. **Harmonized Multi-Cohort Benchmark (566 unique participants, 677 primary sessions; 737 total sessions including Study 2 eyes-open recordings):** Evaluated across seven public datasets spanning experimental acute sleep deprivation (OpenNeuro `ds004902`), outpatient major depressive disorder (Figshare `4244171`), university depression screening (`ds003478`), tri-center Parkinson's disease (`ds002778`, `ds003490`, `ds004584`), and clinical dementia (`ds004504`).
+2. **Resolution of Electrophysiological Theta Polarity:** Once broadband 1/f^χ background activity is disentangled via `specparam`, resting frontal periodic theta demonstrates disease-specific opposing polarity: significant reduction in outpatient MDD (d = -0.826) and university depression (d = -0.676), contrasted with significant elevation across Parkinson's disease (d = +0.803 to +0.918) and dementia (d = +0.903 to +1.279). Meta-analysis across mutually exclusive between-subject cohorts confirms strong between-domain polarity (Q_between = 62.38, p = 2.89 × 10⁻¹⁵).
+3. **Architectural Evaluation of Graph Neural Networks:** Across 132 within-cohort evaluations and 5 random seeds, `GCN-OMST` (reference mean AUC = 0.738, 5-seed mean 0.731) fails to outperform regularized classical baselines (`Random Forest` 0.752, `Tuned Ridge` 0.749, `Tuned Logistic` 0.743). Furthermore, density-matched random graph ablations (`GCN-Random` mean AUC 0.754) and isolated-node models (`GCN-Identity` 0.742) match structured graphs, demonstrating that message passing on low-density sensor arrays does not confer topological advantages over regional node features.
+4. **Empirical Audit of PLI Non-Positive Definiteness:** An exhaustive empirical audit of all 677 primary resting sessions reveals that **12.56% (85/677) of sensor-level Phase Lag Index matrices violate positive semi-definiteness** (minimum eigenvalues down to -7.370), establishing that sensor-level functional connectivity requires adaptive regularization when projected onto Riemannian SPD manifolds (Adaptive SPD mean AUC = 0.743), where it fails to outperform regional oscillatory power.
+5. **Multiplicative Gain Invariance and Leakage Control:** Analytical proofs and numerical perturbations verify that spectral parameterization and PLI are invariant across four orders of magnitude of voltage scaling (|ΔX| = 0.0000), whereas uncalibrated band power suffers probability calibration drift (|Δp| = 0.205–0.339) and classifier collapse. Leakage ablations demonstrate bidirectional bias (≤ +0.102 inflation in label-concordant cohorts; -0.069 deflation in crossover designs).
 6. **Open Science and Reproducibility:** All seven datasets are publicly accessible, and the entire end-to-end Python pipeline is openly released on GitHub (https://github.com/chushuta-cmyk/transdiagnostic-eeg-benchmark).
 
 ### Mandatory Declarations
@@ -407,10 +407,10 @@ def build_title_page() -> str:
 Multi-Cohort EEG Benchmark & Graph Models
 
 ## Author Information
-**Chushu Tan**$^{{1,*}}$
+**Chushu Tan**¹*
 
-$^{{1}}$ School of Sociology, China University of Political Science and Law, Beijing 102249, China  
-$^*$ **Corresponding Author:**  
+¹ School of Sociology, China University of Political Science and Law, Beijing 102249, China  
+* **Corresponding Author:**  
 Chushu Tan  
 School of Sociology, China University of Political Science and Law  
 Fuxue Road 27, Changping District, Beijing 102249, China  
@@ -539,7 +539,7 @@ The author suggests the following independent experts for peer review of this ma
 
 | Reviewer Name & Title | Institution & Country | Email Address | Relevant Expertise & Rationale |
 | :--- | :--- | :--- | :--- |
-| **Prof. Bradley Voytek, Ph.D.**<br>Professor of Cognitive Science and Data Science | University of California, San Diego (UCSD), La Jolla, CA, USA | `bvoytek@ucsd.edu` | Pioneer of parameterized spectral decomposition (`specparam` / FOOOF). Leading international authority on separating resonant periodic oscillations from $1/f^\\chi$ aperiodic neural dynamics and clinical electrophysiology. |
+| **Prof. Bradley Voytek, Ph.D.**<br>Professor of Cognitive Science and Data Science | University of California, San Diego (UCSD), La Jolla, CA, USA | `bvoytek@ucsd.edu` | Pioneer of parameterized spectral decomposition (`specparam` / FOOOF). Leading international authority on separating resonant periodic oscillations from 1/f^χ aperiodic neural dynamics and clinical electrophysiology. |
 | **Prof. Stavros I. Dimitriadis, Ph.D.**<br>Professor of Neuroimaging & Neuroinformatics | School of Medicine, Cardiff University Brain Research Imaging Centre (CUBRIC), Cardiff, UK | `DimitriadisS@cardiff.ac.uk` | Developer of Orthogonal Minimum Spanning Trees (OMST) in complex brain networks. Renowned expert in Phase Lag Index (PLI) functional connectomics, graph theory, and EEG biomarkers in cognitive disorders. |
 | **Prof. Alexandre Gramfort, Ph.D.**<br>Research Director / Senior Research Scientist | Meta AI & Inria, Université Paris-Saclay, Palaiseau, France | `alexandre.gramfort@inria.fr` | Lead architect of MNE-Python. Globally recognized authority in machine learning for electrophysiological signals, Riemannian geometry on covariance manifolds, and robust EEG decoding benchmarks. |
 | **Prof. Arnaud Delorme, Ph.D.**<br>Professor & Research Director | Swartz Center for Computational Neuroscience, UCSD, USA & CNRS, France | `adelorme@ucsd.edu` | Lead architect of EEGLAB; world-renowned expert in electrophysiological signal processing, EEG-BIDS standards, automated artifact rejection, and multi-cohort resting EEG benchmarks. Completely independent with zero conflict of interest. |
@@ -571,7 +571,7 @@ When submitting through the Editorial Manager portal, upload each file from the 
 | Local Submission File | Editorial Manager Item Type | Notes & Compliance Check |
 | :--- | :--- | :--- |
 | `01_Cover_Letter_CIBM.docx` | **Cover Letter** | Addressed to Dr. Edward J. Ciaccio; contains rationale, novelty, declarations, and suggested reviewers. |
-| `02_Highlights_CIBM.docx` | **Highlights** | 5 bullet points, strictly $\\le 85$ characters each (including spaces). |
+| `02_Highlights_CIBM.docx` | **Highlights** | 5 bullet points, strictly ≤ 85 characters each (including spaces). |
 | `03_Title_Page_CIBM.docx` | **Title Page** | Contains full author metadata, affiliations, corresponding author details, declarations, word counts. |
 | `04_Main_Manuscript_CIBM.docx` | **Manuscript File** | Formatted with 1.5 line spacing, 1.0-inch margins, continuous line numbers, embedded figures/tables. |
 | `05_Supplementary_Material_CIBM.docx` | **Supplementary Material** | Contains Extended Methods S1.1–S1.4, Tables S1–S23, Figures S1–S6. |
@@ -752,15 +752,12 @@ def build_all_submission_artifacts():
 
     # 11. Strict Audits on Generated Package
     print("\n🔍 Running package verification audits...")
-    # Check line numbering in main docx
-    d_main = docx.Document(main_dst_docx)
-    has_ln = False
-    for s in d_main.sections:
-        if s._sectPr.find(qn("w:lnNumType")) is not None:
-            has_ln = True
-            break
-    assert has_ln, "Main manuscript is missing line numbering!"
-    print("   ✓ Continuous line numbering verified on 04_Main_Manuscript_CIBM.docx")
+    # Check line numbering in main and supp docx
+    for chk_path, chk_name in [(main_dst_docx, "04_Main_Manuscript_CIBM.docx"), (supp_dst_docx, "05_Supplementary_Material_CIBM.docx")]:
+        d_chk = docx.Document(chk_path)
+        has_ln = any(s._sectPr.find(qn("w:lnNumType")) is not None for s in d_chk.sections)
+        assert has_ln, f"{chk_name} is missing line numbering!"
+    print("   ✓ Continuous line numbering verified on Main Manuscript and Supplementary Material")
 
     # Check highlights
     for b in [
