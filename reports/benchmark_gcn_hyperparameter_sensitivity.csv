@@ -1,36 +1,36 @@
 cohort,n_samples,config_label,learning_rate,epochs,hidden_dim,auc
-Study 2: Mumtaz Outpatient MDD (EC),58,"Baseline (lr=0.005, ep=50, h=32)",0.005,50,32,0.8750000000000001
-Study 2: Mumtaz Outpatient MDD (EC),58,"Lower LR (lr=0.001, ep=50, h=32)",0.001,50,32,0.8892857142857143
-Study 2: Mumtaz Outpatient MDD (EC),58,"Higher LR (lr=0.010, ep=50, h=32)",0.01,50,32,0.851190476190476
-Study 2: Mumtaz Outpatient MDD (EC),58,"Fewer Epochs (lr=0.005, ep=30, h=32)",0.005,30,32,0.925
-Study 2: Mumtaz Outpatient MDD (EC),58,"More Epochs (lr=0.005, ep=100, h=32)",0.005,100,32,0.8642857142857142
-Study 2: Mumtaz Outpatient MDD (EC),58,"Smaller Capacity (lr=0.005, ep=50, h=16)",0.005,50,16,0.9416666666666667
-Study 2: Mumtaz Outpatient MDD (EC),58,"Larger Capacity (lr=0.005, ep=50, h=64)",0.005,50,64,0.8642857142857143
-Study 3: Cavanagh Univ. Depression (EO),119,"Baseline (lr=0.005, ep=50, h=32)",0.005,50,32,0.657878787878788
-Study 3: Cavanagh Univ. Depression (EO),119,"Lower LR (lr=0.001, ep=50, h=32)",0.001,50,32,0.6542424242424243
-Study 3: Cavanagh Univ. Depression (EO),119,"Higher LR (lr=0.010, ep=50, h=32)",0.01,50,32,0.6748484848484848
-Study 3: Cavanagh Univ. Depression (EO),119,"Fewer Epochs (lr=0.005, ep=30, h=32)",0.005,30,32,0.6515151515151515
-Study 3: Cavanagh Univ. Depression (EO),119,"More Epochs (lr=0.005, ep=100, h=32)",0.005,100,32,0.6765151515151515
-Study 3: Cavanagh Univ. Depression (EO),119,"Smaller Capacity (lr=0.005, ep=50, h=16)",0.005,50,16,0.663030303030303
-Study 3: Cavanagh Univ. Depression (EO),119,"Larger Capacity (lr=0.005, ep=50, h=64)",0.005,50,64,0.6672727272727272
-Study 4: UCSD Parkinson All,46,"Baseline (lr=0.005, ep=50, h=32)",0.005,50,32,0.6937500000000001
-Study 4: UCSD Parkinson All,46,"Lower LR (lr=0.001, ep=50, h=32)",0.001,50,32,0.7250000000000001
-Study 4: UCSD Parkinson All,46,"Higher LR (lr=0.010, ep=50, h=32)",0.01,50,32,0.6635416666666667
-Study 4: UCSD Parkinson All,46,"Fewer Epochs (lr=0.005, ep=30, h=32)",0.005,30,32,0.7145833333333333
-Study 4: UCSD Parkinson All,46,"More Epochs (lr=0.005, ep=100, h=32)",0.005,100,32,0.6822916666666667
-Study 4: UCSD Parkinson All,46,"Smaller Capacity (lr=0.005, ep=50, h=16)",0.005,50,16,0.6645833333333333
-Study 4: UCSD Parkinson All,46,"Larger Capacity (lr=0.005, ep=50, h=64)",0.005,50,64,0.65625
-Study 6a: UNM PD-OFF vs CTL,50,"Baseline (lr=0.005, ep=50, h=32)",0.005,50,32,0.7024
-Study 6a: UNM PD-OFF vs CTL,50,"Lower LR (lr=0.001, ep=50, h=32)",0.001,50,32,0.7568
-Study 6a: UNM PD-OFF vs CTL,50,"Higher LR (lr=0.010, ep=50, h=32)",0.01,50,32,0.6624
-Study 6a: UNM PD-OFF vs CTL,50,"Fewer Epochs (lr=0.005, ep=30, h=32)",0.005,30,32,0.7312000000000001
-Study 6a: UNM PD-OFF vs CTL,50,"More Epochs (lr=0.005, ep=100, h=32)",0.005,100,32,0.6368
-Study 6a: UNM PD-OFF vs CTL,50,"Smaller Capacity (lr=0.005, ep=50, h=16)",0.005,50,16,0.7168
-Study 6a: UNM PD-OFF vs CTL,50,"Larger Capacity (lr=0.005, ep=50, h=64)",0.005,50,64,0.6239999999999999
-Study 7: Iowa Parkinson,149,"Baseline (lr=0.005, ep=50, h=32)",0.005,50,32,0.6569387755102041
-Study 7: Iowa Parkinson,149,"Lower LR (lr=0.001, ep=50, h=32)",0.001,50,32,0.7122448979591837
-Study 7: Iowa Parkinson,149,"Higher LR (lr=0.010, ep=50, h=32)",0.01,50,32,0.6630612244897959
-Study 7: Iowa Parkinson,149,"Fewer Epochs (lr=0.005, ep=30, h=32)",0.005,30,32,0.6714285714285715
-Study 7: Iowa Parkinson,149,"More Epochs (lr=0.005, ep=100, h=32)",0.005,100,32,0.6485714285714286
-Study 7: Iowa Parkinson,149,"Smaller Capacity (lr=0.005, ep=50, h=16)",0.005,50,16,0.6824489795918368
-Study 7: Iowa Parkinson,149,"Larger Capacity (lr=0.005, ep=50, h=64)",0.005,50,64,0.6538775510204082
+Study 2: Mumtaz Outpatient MDD (EC),58,"Baseline (lr=0.005, ep=50, h=32)",0.005,50,32,0.9023809523809524
+Study 2: Mumtaz Outpatient MDD (EC),58,"Lower LR (lr=0.001, ep=50, h=32)",0.001,50,32,0.9119047619047619
+Study 2: Mumtaz Outpatient MDD (EC),58,"Higher LR (lr=0.010, ep=50, h=32)",0.01,50,32,0.8892857142857142
+Study 2: Mumtaz Outpatient MDD (EC),58,"Fewer Epochs (lr=0.005, ep=30, h=32)",0.005,30,32,0.9428571428571428
+Study 2: Mumtaz Outpatient MDD (EC),58,"More Epochs (lr=0.005, ep=100, h=32)",0.005,100,32,0.888095238095238
+Study 2: Mumtaz Outpatient MDD (EC),58,"Smaller Capacity (lr=0.005, ep=50, h=16)",0.005,50,16,0.9476190476190476
+Study 2: Mumtaz Outpatient MDD (EC),58,"Larger Capacity (lr=0.005, ep=50, h=64)",0.005,50,64,0.8761904761904762
+Study 3: Cavanagh Univ. Depression (EO),119,"Baseline (lr=0.005, ep=50, h=32)",0.005,50,32,0.646969696969697
+Study 3: Cavanagh Univ. Depression (EO),119,"Lower LR (lr=0.001, ep=50, h=32)",0.001,50,32,0.6542424242424242
+Study 3: Cavanagh Univ. Depression (EO),119,"Higher LR (lr=0.010, ep=50, h=32)",0.01,50,32,0.643030303030303
+Study 3: Cavanagh Univ. Depression (EO),119,"Fewer Epochs (lr=0.005, ep=30, h=32)",0.005,30,32,0.6484848484848484
+Study 3: Cavanagh Univ. Depression (EO),119,"More Epochs (lr=0.005, ep=100, h=32)",0.005,100,32,0.7036363636363636
+Study 3: Cavanagh Univ. Depression (EO),119,"Smaller Capacity (lr=0.005, ep=50, h=16)",0.005,50,16,0.6481818181818182
+Study 3: Cavanagh Univ. Depression (EO),119,"Larger Capacity (lr=0.005, ep=50, h=64)",0.005,50,64,0.6599999999999999
+Study 4: UCSD Parkinson All,46,"Baseline (lr=0.005, ep=50, h=32)",0.005,50,32,0.725
+Study 4: UCSD Parkinson All,46,"Lower LR (lr=0.001, ep=50, h=32)",0.001,50,32,0.6666666666666667
+Study 4: UCSD Parkinson All,46,"Higher LR (lr=0.010, ep=50, h=32)",0.01,50,32,0.728125
+Study 4: UCSD Parkinson All,46,"Fewer Epochs (lr=0.005, ep=30, h=32)",0.005,30,32,0.6958333333333333
+Study 4: UCSD Parkinson All,46,"More Epochs (lr=0.005, ep=100, h=32)",0.005,100,32,0.703125
+Study 4: UCSD Parkinson All,46,"Smaller Capacity (lr=0.005, ep=50, h=16)",0.005,50,16,0.6770833333333334
+Study 4: UCSD Parkinson All,46,"Larger Capacity (lr=0.005, ep=50, h=64)",0.005,50,64,0.73125
+Study 6a: UNM PD-OFF vs CTL,50,"Baseline (lr=0.005, ep=50, h=32)",0.005,50,32,0.6991999999999999
+Study 6a: UNM PD-OFF vs CTL,50,"Lower LR (lr=0.001, ep=50, h=32)",0.001,50,32,0.7552
+Study 6a: UNM PD-OFF vs CTL,50,"Higher LR (lr=0.010, ep=50, h=32)",0.01,50,32,0.6960000000000001
+Study 6a: UNM PD-OFF vs CTL,50,"Fewer Epochs (lr=0.005, ep=30, h=32)",0.005,30,32,0.7343999999999999
+Study 6a: UNM PD-OFF vs CTL,50,"More Epochs (lr=0.005, ep=100, h=32)",0.005,100,32,0.6512
+Study 6a: UNM PD-OFF vs CTL,50,"Smaller Capacity (lr=0.005, ep=50, h=16)",0.005,50,16,0.7248
+Study 6a: UNM PD-OFF vs CTL,50,"Larger Capacity (lr=0.005, ep=50, h=64)",0.005,50,64,0.6208
+Study 7: Iowa Parkinson,149,"Baseline (lr=0.005, ep=50, h=32)",0.005,50,32,0.6853061224489796
+Study 7: Iowa Parkinson,149,"Lower LR (lr=0.001, ep=50, h=32)",0.001,50,32,0.7026530612244898
+Study 7: Iowa Parkinson,149,"Higher LR (lr=0.010, ep=50, h=32)",0.01,50,32,0.676734693877551
+Study 7: Iowa Parkinson,149,"Fewer Epochs (lr=0.005, ep=30, h=32)",0.005,30,32,0.6699999999999999
+Study 7: Iowa Parkinson,149,"More Epochs (lr=0.005, ep=100, h=32)",0.005,100,32,0.6651020408163265
+Study 7: Iowa Parkinson,149,"Smaller Capacity (lr=0.005, ep=50, h=16)",0.005,50,16,0.6810204081632653
+Study 7: Iowa Parkinson,149,"Larger Capacity (lr=0.005, ep=50, h=64)",0.005,50,64,0.656326530612245

@@ -6,6 +6,7 @@ is an artifact of fixed hyperparameters (lr=0.005, epochs=50, hidden_dim=32)
 or represents a robust property across learning rates, training epochs, and network capacities.
 """
 
+import random
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -59,24 +60,33 @@ def run_gcn_grid_sensitivity():
     records = []
     
     for c_name, graphs, is_grouped in cohort_list:
-        y = np.array([g["y"].item() for g in graphs])
-        subjs = np.array([g["subject_id"] for g in graphs])
-        
-        cv = StratifiedGroupKFold(n_splits=5) if is_grouped else StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+        graphs = [g for g in graphs if int(g["y"]) in (0, 1)]
+        y = np.array([int(g["y"]) for g in graphs])
+        subjs = np.array([g.get("bids_id", g.get("sub_name", g.get("subject_id", str(i)))) for i, g in enumerate(graphs)])
+
+        # Identical splitter to the primary benchmark (scripts/17): shuffled, random_state = 42
+        if is_grouped:
+            cv = StratifiedGroupKFold(n_splits=5, shuffle=True, random_state=42)
+        else:
+            cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+        splits = list(cv.split(graphs, y, groups=subjs if is_grouped else None))
         
         for lr, epochs, h_dim, config_label in grid:
             oof_probs = np.zeros(len(graphs))
             
-            for tr_idx, val_idx in cv.split(graphs, y, groups=subjs if is_grouped else None):
+            for fold, (tr_idx, val_idx) in enumerate(splits):
                 tx = torch.stack([graphs[i]["x"] for i in tr_idx])
                 vx = torch.stack([graphs[i]["x"] for i in val_idx])
-                ty = torch.tensor([graphs[i]["y"].item() for i in tr_idx])
+                ty = torch.tensor([int(graphs[i]["y"]) for i in tr_idx], dtype=torch.long)
                 tadj = torch.stack([graphs[i]["adj"] for i in tr_idx])
                 vadj = torch.stack([graphs[i]["adj"] for i in val_idx])
                 
                 tz, vz, _, _ = compute_fold_normative_z(tx, ty, vx)
                 
-                torch.manual_seed(42)
+                # Identical seeding to the primary benchmark: seed = 42 + fold
+                random.seed(42 + fold)
+                np.random.seed(42 + fold)
+                torch.manual_seed(42 + fold)
                 model = NormativeGCN(in_node_features=4, hidden_dim=h_dim, num_classes=2, dropout=0.25)
                 optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=1e-4)
                 criterion = nn.CrossEntropyLoss()

@@ -39,8 +39,8 @@ ARTIFACT_DIR = Path("/Users/tan/.gemini/antigravity/brain/874c84f2-3204-455c-a63
 ARTIFACT_SUBMISSION_DIR = ARTIFACT_DIR / "submission_CIBM"
 
 EXACT_TITLE = (
-    "A Gain-Invariant, Leak-Free EEG Framework Delineates Frontal Theta Polarity "
-    "and Evaluates Graph Neural Network Utility in Standard Clinical Montages"
+    "Participant-Level Benchmarking of Frontal Periodic Theta and Graph Neural Network Utility "
+    "Across Seven Public 19-Channel Clinical EEG Cohorts"
 )
 
 AUTHOR_NAME = "Chushu Tan"
@@ -177,25 +177,25 @@ def apply_three_line_table_styling(tbl):
 
 
 def add_footer_page_numbering(doc):
-    """Adds centered 'Page X of Y' page numbers in the footer of all sections."""
+    """Adds centered dynamic page numbers in the footer of all sections."""
     for s in doc.sections:
         footer = s.footer
         p = footer.paragraphs[0] if footer.paragraphs else footer.add_paragraph()
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         p.text = ""
-        r1 = p.add_run("Page ")
-        r1.font.name = "Times New Roman"
-        r1.font.size = Pt(9.5)
-        r1.font.color.rgb = RGBColor(0x64, 0x74, 0x8B)
-
-        p._p.append(parse_xml(r"""<w:fldSimple xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" w:instr="PAGE"/>"""))
-
-        r2 = p.add_run(" of ")
-        r2.font.name = "Times New Roman"
-        r2.font.size = Pt(9.5)
-        r2.font.color.rgb = RGBColor(0x64, 0x74, 0x8B)
-
-        p._p.append(parse_xml(r"""<w:fldSimple xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" w:instr="NUMPAGES"/>"""))
+        fld_xml = parse_xml(
+            r'''<w:fldSimple xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" w:instr="PAGE">
+                <w:r>
+                    <w:rPr>
+                        <w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman"/>
+                        <w:sz w:val="20"/>
+                        <w:color w:val="64748B"/>
+                    </w:rPr>
+                    <w:t>1</w:t>
+                </w:r>
+            </w:fldSimple>'''
+        )
+        p._p.append(fld_xml)
 
 
 def style_submission_doc(doc_path: Path, is_main: bool = False):
@@ -321,11 +321,11 @@ Resting-state electroencephalography (EEG) offers accessible, millisecond-resolu
 Drawing upon rigorous methodological standards from computational bioinformatics and statistical genomics—where batch-effect auditing, leak-free nested cross-validation, and empirical null controls are foundational prerequisites—this benchmark introduces bioinformatics-grade validation rigor to clinical 19-channel EEG analytics. This work provides a fully reproducible, open-source benchmark that directly addresses the methodological reproducibility gap in clinical EEG machine learning, aligning closely with *Computers in Biology and Medicine*'s dedication to translational computational biomedical engineering.
 
 ### Key Contributions and Methodological Rigor
-1. **Harmonized Multi-Cohort Benchmark (566 unique participants, 677 primary sessions; 737 total sessions including Study 2 eyes-open recordings):** Evaluated across seven public datasets spanning experimental acute sleep deprivation (OpenNeuro `ds004902`), outpatient major depressive disorder (Figshare `4244171`), university depression screening (`ds003478`), tri-center Parkinson's disease (`ds002778`, `ds003490`, `ds004584`), and clinical dementia (`ds004504`).
-2. **Resolution of Electrophysiological Theta Polarity:** Once broadband 1/f^χ background activity is disentangled via `specparam`, resting frontal periodic theta demonstrates disease-specific opposing polarity: significant reduction in outpatient MDD (d = -0.826) and university depression (d = -0.676), contrasted with significant elevation across Parkinson's disease (d = +0.803 to +0.918) and dementia (d = +0.903 to +1.279). Meta-analysis across mutually exclusive between-subject cohorts confirms strong between-domain polarity (Q_between = 62.38, p = 2.89 × 10⁻¹⁵).
-3. **Architectural Evaluation of Graph Neural Networks:** Across 132 within-cohort evaluations and 5 random seeds, `GCN-OMST` (reference mean AUC = 0.738, 5-seed mean 0.731) fails to outperform regularized classical baselines (`Random Forest` 0.752, `Tuned Ridge` 0.749, `Tuned Logistic` 0.743). Furthermore, density-matched random graph ablations (`GCN-Random` mean AUC 0.754) and isolated-node models (`GCN-Identity` 0.742) match structured graphs, demonstrating that message passing on low-density sensor arrays does not confer topological advantages over regional node features.
+1. **Harmonized Multi-Cohort Benchmark (566 analyzed participants in primary recording state, 677 primary sessions; 737 total sessions including Study 2 eyes-open recordings):** Evaluated across seven public datasets spanning experimental acute sleep deprivation (OpenNeuro `ds004902`), outpatient major depressive disorder (Figshare `4244171`), university depression screening (`ds003478`), tri-center Parkinson's disease (`ds002778`, `ds003490`, `ds004584`), and clinical dementia (`ds004504`).
+2. **Electrophysiological Frontal Theta Polarity Across Clinical Domains:** Once broadband 1/f^χ background activity is disentangled via `specparam`, resting frontal periodic theta demonstrates cohort-level opposing directions: significant reduction in outpatient MDD (d = -0.826) and university depression screening (d = -0.676), contrasted with elevation across Parkinson's disease (d = +0.803 to +0.918) and dementia (d = +0.903 to +1.279). Random-effects meta-analysis across between-subject cohorts confirms between-domain differences (Q_between = 62.38, p = 2.89 × 10⁻¹⁵), while small-study limitations (k = 2 in depression) are transparently acknowledged.
+3. **Architectural Evaluation of Graph Neural Networks:** Across 132 within-cohort evaluations and 5 random seeds, `GCN-OMST` (reference mean AUC = 0.738, 5-seed mean 0.731) does not show a detectable advantage over regularized classical baselines (`Random Forest` 0.752, `Tuned Ridge` 0.749, `Tuned Logistic` 0.743). Furthermore, density-matched random graph ablations (`GCN-Random` mean AUC 0.754) and isolated-node models (`GCN-Identity` 0.742) match structured graphs, demonstrating that message passing on low-density sensor arrays does not improve on regional node features in this benchmarking design.
 4. **Empirical Audit of PLI Non-Positive Definiteness:** An exhaustive empirical audit of all 677 primary resting sessions reveals that **12.56% (85/677) of sensor-level Phase Lag Index matrices violate positive semi-definiteness** (minimum eigenvalues down to -7.370), establishing that sensor-level functional connectivity requires adaptive regularization when projected onto Riemannian SPD manifolds (Adaptive SPD mean AUC = 0.743), where it fails to outperform regional oscillatory power.
-5. **Multiplicative Gain Invariance and Leakage Control:** Analytical proofs and numerical perturbations verify that spectral parameterization and PLI are invariant across four orders of magnitude of voltage scaling (|ΔX| = 0.0000), whereas uncalibrated band power suffers probability calibration drift (|Δp| = 0.205–0.339) and classifier collapse. Leakage ablations demonstrate bidirectional bias (≤ +0.102 inflation in label-concordant cohorts; -0.069 deflation in crossover designs).
+5. **Multiplicative Gain Invariance and Leakage Control:** Analytical proofs and numerical perturbations verify that spectral parameterization and PLI are invariant across four orders of magnitude of voltage scaling (|ΔX| = 0.0000), whereas uncalibrated band power suffers probability calibration drift (|Δp| = 0.205–0.339). Leakage ablations demonstrate that subject session mixing drives substantial optimistic bias (≤ +0.102 AUC inflation).
 6. **Open Science and Reproducibility:** All seven datasets are publicly accessible, and the entire end-to-end Python pipeline is openly released on GitHub (https://github.com/chushuta-cmyk/transdiagnostic-eeg-benchmark).
 
 ### Mandatory Declarations
@@ -377,10 +377,10 @@ ORCID: 0009-0007-3093-0160
 def build_highlights() -> str:
     bullets = [
         "Multi-cohort 19-channel EEG benchmark across 7 public datasets (N=566).",
-        "Frontal periodic theta shows opposing polarity in depression vs dementia.",
-        "Graph neural networks do not beat regularized classical tabular models.",
-        "Empirical audit finds 12.56% of sensor PLI matrices violate PSD structure.",
-        "Fold-nested calibration and gain invariance prevent optimistic bias.",
+        "Frontal periodic theta direction differs between depression and neurodegeneration.",
+        "GCN architectures do not outperform regularized classical linear baselines.",
+        "Empirical audit shows 12.56% of sensor PLI matrices violate PSD structure.",
+        "Subject session mixing causes substantial cross-validation leakage bias.",
     ]
     
     # Assert strict Elsevier CIBM limits (3-5 bullets, <=85 characters each including spaces)
@@ -423,7 +423,7 @@ ORCID: [0009-0007-3093-0160](https://orcid.org/0009-0007-3093-0160)
 ## Article Metadata
 - **Article Type:** Original Research Paper
 - **Target Journal:** *{JOURNAL_NAME}*
-- **Word Count (Abstract):** 285 words
+- **Word Count (Abstract):** 246 words
 - **Word Count (Main Text, Introduction through Conclusions):** ~6,800 words
 - **Total Number of References:** 43
 - **Total Number of Main Tables:** 4
@@ -599,7 +599,7 @@ When submitting through the Editorial Manager portal, upload each file from the 
   `{EXACT_TITLE}`
 - **Short Running Title:**  
   `Multi-Cohort EEG Benchmark & Graph Models`
-- **Abstract:** Copy from Section Abstract of Title Page or Main Manuscript (285 words).
+- **Abstract:** Copy from Section Abstract of Title Page or Main Manuscript (246 words).
 - **Keywords:** Enter the 6 keywords individually:
   1. `Quantitative EEG`
   2. `Spectral Parameterization`
@@ -762,10 +762,10 @@ def build_all_submission_artifacts():
     # Check highlights
     for b in [
         "Multi-cohort 19-channel EEG benchmark across 7 public datasets (N=566).",
-        "Frontal periodic theta shows opposing polarity in depression vs dementia.",
-        "Graph neural networks do not beat regularized classical tabular models.",
-        "Empirical audit finds 12.56% of sensor PLI matrices violate PSD structure.",
-        "Fold-nested calibration and gain invariance prevent optimistic bias.",
+        "Frontal periodic theta direction differs between depression and neurodegeneration.",
+        "GCN architectures do not outperform regularized classical linear baselines.",
+        "Empirical audit shows 12.56% of sensor PLI matrices violate PSD structure.",
+        "Subject session mixing causes substantial cross-validation leakage bias.",
     ]:
         assert len(b) <= 85, f"Highlight bullet too long: {b}"
     print("   ✓ Highlights: 5 bullets, all strictly <= 85 characters")
