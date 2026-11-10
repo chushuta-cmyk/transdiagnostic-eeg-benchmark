@@ -333,6 +333,7 @@ Drawing upon rigorous methodological standards from computational bioinformatics
 - **Author Approval:** The author has read and approved the final manuscript for submission.
 - **Ethical Compliance:** Secondary computational analysis of de-identified open-access public repositories; exempt under 45 CFR 46.104(d)(4) and institutional review guidelines.
 - **Conflict of Interest:** The author declares no competing financial or non-financial interests.
+- **Generative AI Declaration:** In accordance with Elsevier policy, the use of generative AI technologies (Google Gemini for drafting assistance and script automation; OpenAI ChatGPT, DeepSeek, and Anthropic Claude for independent cross-validation and review) is formally declared in the manuscript and Title Page.
 - **Data and Code Availability:** Complete repository accession numbers and GitHub source code repository links are transparently documented in the manuscript.
 
 ### Suggested Independent Reviewers
@@ -447,6 +448,9 @@ This study constitutes secondary computational analysis of fully de-identified, 
 
 ### Competing Interests
 The author declares that there are no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
+### Declaration of Generative AI in the Writing Process
+During the preparation of this work, the author used Google Gemini for assistance in computational script automation, manuscript drafting, and formatting, and utilized OpenAI ChatGPT, DeepSeek (V3/R1), and Anthropic Claude for independent methodological cross-validation, code auditing, and linguistic refinement. After using these tools, the author reviewed and edited the content as needed and takes full responsibility for the content of the publication.
 
 ### CRediT Author Statement
 **Chushu Tan:** Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Data curation, Writing - original draft, Writing - review & editing, Visualization, Project administration.
@@ -613,6 +617,8 @@ When submitting through the Editorial Manager portal, upload each file from the 
 ### Step 5: Funding and Declarations
 - **Funding Information:** Select "This research did not receive any specific grant from funding agencies in the public, commercial, or not-for-profit sectors."
 - **Conflict of Interest:** Select "No competing interests."
+- **Generative AI and AI-Assisted Technologies:** When prompted ("Did you use generative AI or AI-assisted technologies in the writing of this manuscript?"), select **"Yes"** and paste the formal declaration:  
+  *"During the preparation of this work, the author used Google Gemini for assistance in computational script automation, manuscript drafting, and formatting, and utilized OpenAI ChatGPT, DeepSeek (V3/R1), and Anthropic Claude for independent methodological cross-validation, code auditing, and linguistic refinement. After using these tools, the author reviewed and edited the content as needed and takes full responsibility for the content of the publication."*
 
 ### Step 6: Suggested Reviewers
 Copy and paste the 4 recommended reviewers from `08_Suggested_Reviewers_CIBM.docx`:

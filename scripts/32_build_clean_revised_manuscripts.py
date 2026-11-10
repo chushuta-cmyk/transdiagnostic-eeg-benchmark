@@ -277,6 +277,9 @@ I thank the investigators and study participants who collected and shared the se
 
 ### Competing Interests
 The author declares no competing financial or non-financial interests.
+
+### Declaration of Generative AI in the Writing Process
+During the preparation of this work, the author used Google Gemini for assistance in computational script automation, manuscript drafting, and formatting, and utilized OpenAI ChatGPT, DeepSeek (V3/R1), and Anthropic Claude for independent methodological cross-validation, code auditing, and linguistic refinement. After using these tools, the author reviewed and edited the content as needed and takes full responsibility for the content of the publication.
 """
     return tbl.compile_sequential_citations(body)
 
