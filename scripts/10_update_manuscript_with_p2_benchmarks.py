@@ -103,7 +103,7 @@ def update_supplementary():
             print(f"Table S11 already exists in {target_path.name}")
             continue
 
-        tables_to_add = """
+        tables_to_add = r"""
 
 ---
 

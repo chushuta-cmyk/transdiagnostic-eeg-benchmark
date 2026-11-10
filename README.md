@@ -1,107 +1,119 @@
-# Transdiagnostic EEG Benchmark: 19-Channel OMST & Normative Graph Modeling Across 4 Clinical Cohorts
+# A Gain-Invariant, Leak-Free EEG Benchmark: 19-Channel OMST Connectomics & Graph Neural Network Utility Across 7 Clinical Cohorts
 
-A leak-free, reproducible computational pipeline for evaluating **Universal 19-Channel Spatial Harmonization**, **Spectral Parameterization (specparam/FOOOF)**, **True Orthogonal Minimal Spanning Trees (OMST + GCE)**, and **Fold-Nested Normative Graph Convolutional Networks (`NormativeGCN`)** across four real public resting-state EEG cohorts ($N = 282$ distinct individuals, $365$ recording sessions).
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-green.svg)](https://www.python.org/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-orange.svg)](https://pytorch.org/)
 
-- **Academic Manuscript Draft (Markdown)**: [manuscript/PAPER_2_MULTI_COHORT_TRANSDIAGNOSTIC_EEG_BENCHMARK.md](file:///Users/tan/Documents/qwen-agent/aCAgqOVe0x/default/transdiagnostic_eeg_benchmark/manuscript/PAPER_2_MULTI_COHORT_TRANSDIAGNOSTIC_EEG_BENCHMARK.md)
-- **Publication-Ready Word Manuscript (.docx with embedded figures)**: [manuscript/PAPER_2_MULTI_COHORT_TRANSDIAGNOSTIC_EEG_BENCHMARK.docx](file:///Users/tan/Documents/qwen-agent/aCAgqOVe0x/default/transdiagnostic_eeg_benchmark/manuscript/PAPER_2_MULTI_COHORT_TRANSDIAGNOSTIC_EEG_BENCHMARK.docx)
-- **Full Research Proposal**: [Research_Proposal_and_Experimental_Design_EN.md](file:///Users/tan/Documents/qwen-agent/aCAgqOVe0x/default/transdiagnostic_eeg_benchmark/Research_Proposal_and_Experimental_Design_EN.md)
-
----
-
-## 🔬 Multi-Cohort Dataset Manifest ($N = 282$ subjects, $365$ sessions)
-
-1. **Study 1: Acute Total Sleep Deprivation (OpenNeuro `ds004902`)**:
-   - $N = 71$ paired subjects ($142$ sessions, Normal Sleep vs. 36h Total Sleep Deprivation).
-   - 64-channel Brain Products actiCHamp array harmonized to 19 channels.
-2. **Study 2: Severe Inpatient Major Depressive Disorder (Figshare `4244171`, Mumtaz et al., 2016)**:
-   - $N = 58$ subjects ($30$ MDD Inpatients vs. $28$ Healthy Controls).
-   - 19-channel standard 10–20 Grass Telefactor array, eyes-closed resting.
-3. **Study 3: Subclinical University Depression Screening (OpenNeuro `ds003478`, Cavanagh et al., 2019)**:
-   - $N = 119$ evaluable subjects ($44$ elevated BDI-II Depressed vs. $75$ Controls).
-   - 64-channel Brain Products BrainAmp harmonized to 19 channels, eyes-open resting.
-4. **Study 4: Basal Ganglia Degeneration in Parkinson's Disease (OpenNeuro `ds002778`, George et al., 2013)**:
-   - $N = 31$ subjects ($46$ sessions: $16$ Controls, $15$ PD-OFF medication, $15$ PD-ON dopaminergic medication).
-   - 32-channel BioSemi ActiveTwo harmonized to 19 channels, eyes-open resting.
+An open-source, leak-free computational benchmark for evaluating **Universal 19-Channel Spatial Harmonization**, **Spectral Parameterization (`specparam`)**, **Orthogonal Minimum Spanning Trees (OMST)**, and **Graph Neural Networks vs. Classical Tabular Baselines** across seven public resting-state EEG cohorts ($N = 566$ unique participants, $677$ primary recording sessions).
 
 ---
 
-## 📊 Key Empirical Findings
+## 🔬 Multi-Cohort Dataset Manifest ($N = 566$ participants, $677$ sessions)
 
-### 1. Biophysical Effect Sizes Across Pathologies (`reports/multicohort_biophysical_effect_sizes.csv`)
+The benchmark harmonizes seven publicly available resting EEG repositories into standardized 19-channel montages (standard 10–20 array):
 
-| Cohort & Comparison | N (Case/Ctrl) | Frontal Theta ($4\text{–}8\text{ Hz}$)<br>Cohen's $d$ [$95\%$ CI] | Posterior Alpha ($8\text{–}13\text{ Hz}$)<br>Cohen's $d$ [$95\%$ CI] | Global Exponent ($\chi$)<br>Cohen's $d$ [$95\%$ CI] | OMST GCE<br>Cohen's $d$ [$95\%$ CI] |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Study 1: Sleep Deprivation** | 71 / 71 | $+0.267$ [$-0.064, +0.597$] | $+0.059$ [$-0.270, +0.388$] | $+0.152$ [$-0.177, +0.482$] | $-0.200$ [$-0.530, +0.130$] |
-| **Study 2: Mumtaz Inpatient MDD** | 30 / 28 | **$-0.826$** [$-1.362, -0.289$]$^{**}$ | $-0.031$ [$-0.546, +0.484$] | **$-0.744$** [$-1.276, -0.211$]$^{**}$ | $+0.494$ [$-0.029, +1.017$]$^{\dagger}$ |
-| **Study 3: Cavanagh Depression** | 44 / 75 | **$-0.676$** [$-1.058, -0.294$]$^{***}$ | $-0.280$ [$-0.654, +0.093$] | $-0.327$ [$-0.702, +0.047$] | $+0.034$ [$-0.338, +0.406$] |
-| **Study 4a: Parkinson OFF** | 15 / 16 | $+0.559$ [$-0.159, +1.277$] | $+0.020$ [$-0.684, +0.725$] | $+0.372$ [$-0.339, +1.082$] | $-0.287$ [$-0.996, +0.421$] |
-| **Study 4b: Parkinson ON** | 15 / 16 | **$+1.150$** [$+0.389, +1.910$]$^{**}$ | $+0.152$ [$-0.554, +0.857$] | $+0.367$ [$-0.343, +1.077$] | $-0.095$ [$-0.800, +0.610$] |
-
-$^{\dagger}p < 0.10, ^{*}p < 0.05, ^{**}p < 0.01, ^{***}p < 0.001$.
-
-- **Frontal Theta Polarity Inversion**: Frontal periodic theta is **strongly suppressed** in depression ($d = -0.83$ and $-0.68$), but **elevated** under acute sleep debt ($d = +0.27$) and Parkinson's disease ($d = +1.15$ under medication).
-- **Aperiodic Slope Flattening**: Aperiodic exponent $\chi$ is significantly reduced in clinical depression ($d = -0.74, p = 0.0062$), indexing an increased excitation/inhibition (E/I) ratio.
-- **Topological Integrity**: OMST guarantees $0.0\%$ disconnected nodes across all 365 sessions, with a stable edge density ($13.2\%\text{--}16.0\%$).
-
-### 2. NormativeGCN Classification & Zero-Shot Transfer (`reports/multicohort_classification_benchmark.csv`)
-
-| Paradigm / Evaluation | N (Case/Ctrl) | Balanced Accuracy (%) | ROC-AUC [$95\%$ Bootstrap CI] | Scientific Interpretation |
-| :--- | :--- | :--- | :--- | :--- |
-| **Mumtaz MDD (Within 5-Fold CV)** | 58 (30 / 28) | $79.6\%$ | **$0.914$** [$0.835, 0.975$] | Robust leak-free discrimination of clinical MDD |
-| **UCSD Parkinson (Within 5-Fold CV)** | 46 (30 / 16) | $77.7\%$ | **$0.817$** [$0.637, 0.958$] | Accurate classification of basal ganglia pathology |
-| **Cavanagh MDD (Within 5-Fold CV)** | 119 (44 / 75) | $60.7\%$ | **$0.675$** [$0.562, 0.772$] | Moderate sensitivity in subclinical university screening |
-| **Sleep Debt (Within 5-Fold CV, Single-Sess)** | 142 (71 / 71) | $44.4\%$ | **$0.470$** [$0.376, 0.570$] | Confirms single-session sleep debt is masked cross-sectionally |
-| **Transfer: Cavanagh $\to$ Mumtaz MDD** | 58 (30 / 28) | $77.5\%$ | **$0.832$** [$0.711, 0.930$] | **High zero-shot transfer**: Generalizable depression biomarker |
-| **Transfer: Sleep Debt $\to$ Parkinson** | 46 (30 / 16) | $68.8\%$ | **$0.804$** [$0.656, 0.927$] | **Shared slowing**: Convergent thalamocortical pacing shifts |
-| **Transfer: Sleep Debt $\to$ Mumtaz MDD** | 58 (30 / 28) | $38.7\%$ | **$0.270$** [$0.130, 0.418$] | **Inverted AUC**: Biophysical proof of theta dissociation |
+| Cohort | Study & Accession | N (Sessions / Subj) | Clinical / Experimental Focus | Hardware Array & Sample Rate |
+| :--- | :--- | :---: | :--- | :--- |
+| **Study 1** | Acute Sleep Deprivation ([OpenNeuro `ds004902`](https://openneuro.org/datasets/ds004902)) | 142 / 71 | Paired crossover acute sleep debt (36h TSD vs. Normal Sleep) | 64-ch BrainAmp / actiCHamp (250 Hz) |
+| **Study 2** | Outpatient Major Depression ([Figshare `4244171`](https://doi.org/10.6084/m9.figshare.4244171)) | 58 / 58 | Clinical MDD (unmedicated outpatients) vs. Healthy Controls | 19-ch Grass Telefactor (250 Hz) |
+| **Study 3** | University Depression Screening ([OpenNeuro `ds003478`](https://openneuro.org/datasets/ds003478)) | 119 / 119 | Undergraduates screened with BDI-II (Depressed vs. Controls) | 64-ch BrainAmp (250 Hz) |
+| **Study 4** | UCSD Parkinson's Disease ([OpenNeuro `ds002778`](https://openneuro.org/datasets/ds002778)) | 46 / 31 | Idiopathic PD under Levodopa on/off state vs. Controls | 32-ch BioSemi ActiveTwo (250 Hz) |
+| **Study 5** | Clinical Dementia ([OpenNeuro `ds004504`](https://openneuro.org/datasets/ds004504)) | 88 / 88 | Probable AD (N=36), FTD (N=23), and Controls (N=29) | 19-ch Nihon Kohden (250 Hz) |
+| **Study 6** | UNM Parkinson's Disease ([OpenNeuro `ds003490`](https://openneuro.org/datasets/ds003490)) | 75 / 50 | Tri-center PD: Levodopa washout (OFF/ON) vs. Controls | 64-ch BrainAmp (250 Hz) |
+| **Study 7** | Iowa Parkinson's Disease ([OpenNeuro `ds004584`](https://openneuro.org/datasets/ds004584)) | 149 / 149 | Tri-center PD: Large single-site resting cohort | 64-ch BrainAmp (250 Hz) |
 
 ---
 
-## 🛠️ Step-by-Step Reproduction Pipeline
+## 🛠️ Methodological Framework
 
-All multi-cohort scripts run deterministically on local hardware (Apple Silicon MPS or CPU):
+1. **Multiplicative Voltage Gain Invariance**:
+   - Analytically and numerically proves that periodic residual power and aperiodic slope $\chi$ derived from `specparam` are invariant under arbitrary sensor amplifier voltage scaling ($|\Delta \mathbf{X}| = 0.0000$).
+   - Phase Lag Index (PLI) signed phase differences are scale-free by construction.
+2. **Topological Connectome Regularization**:
+   - Full 19×19 functional connectivity matrices are filtered via Orthogonal Minimum Spanning Trees (OMST), maximizing Global Cost Efficiency (GCE = $E_{\text{global}} - \text{Cost}$) without arbitrary proportional thresholding heuristics.
+3. **Strict Leak-Free Validation**:
+   - Stratified participant-grouped cross-validation (`StratifiedGroupKFold`) for repeated-measurement cohorts.
+   - Fold-nested normative calibration ($z$-scoring against training healthy controls only, computed within inner loops).
+4. **Architectural Evaluation of Graph Neural Networks**:
+   - Systematic comparison of `NormativeGCN` against 12 regularized classical and deep tabular baselines (`Random Forest`, `Tuned Ridge`, `Tuned Logistic Regression`, `Linear/RBF SVM`, `GBDT`, `MLP`).
+   - Graph ablations: `GCN-OMST` vs. `GCN-Random` (density-matched random topologies) vs. `GCN-Identity` (isolated nodes).
+5. **Riemannian Geometry Audit**:
+   - Empirical eigenvalue spectrum audit across all 677 primary sessions demonstrates that 12.56% of sensor PLI matrices violate positive semi-definiteness, requiring eigenvalue-adaptive regularization before projection to Riemannian SPD manifolds.
+
+---
+
+## 📦 Installation & Setup
 
 ```bash
-cd /Users/tan/Documents/qwen-agent/aCAgqOVe0x/default/transdiagnostic_eeg_benchmark
+git clone https://github.com/chushuta-cmyk/transdiagnostic-eeg-benchmark.git
+cd transdiagnostic-eeg-benchmark
 
-# 1. Build universal 19-ch OMST graphs for all cohorts (.pt)
-python3 scripts/01_build_multicohort_graphs.py --cohort all
+# Create and activate virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
 
-# 2. Compute Cohen's d effect sizes, CIs, and Welch tests across cohorts
-python3 scripts/02_multicohort_biophysical_profiling.py
-
-# 3. Train fold-nested NormativeGCN (5-fold CV & zero-shot cross-cohort transfer)
-python3 scripts/03_train_multicohort_benchmarks.py
-
-# 4. Generate 300-DPI publication figures (PNG and TIFF)
-python3 scripts/04_plot_multicohort_figures.py
-
-# 5. Build publication-ready Word manuscript (.docx)
-python3 scripts/05_generate_clean_paper2_docx.py
+# Install required dependencies
+pip install numpy scipy pandas scikit-learn torch mne specparam statsmodels matplotlib seaborn pyyaml
 ```
 
 ---
 
-## 📁 Repository Structure
+## 🚀 Execution & Reproduction Pipeline
+
+All scripts execute deterministically:
+
+```bash
+# 1. Extract 19-channel features and construct OMST brain graphs
+python3 scripts/01_build_multicohort_graphs.py
+python3 scripts/11_build_dementia_ds004504_graphs.py
+python3 scripts/13_build_unm_pd_ds003490_graphs.py
+python3 scripts/15_build_iowa_pd_ds004584_graphs.py
+
+# 2. Biophysical effect size profiling & clinical scale regression
+python3 scripts/02_multicohort_biophysical_profiling.py
+python3 scripts/12_analyze_dementia_biophysics.py
+python3 scripts/14_analyze_unm_pd_biophysics.py
+python3 scripts/16_analyze_iowa_pd_biophysics.py
+
+# 3. Model benchmarking & cross-site transfer
+python3 scripts/17_run_comprehensive_7cohort_benchmark.py
+python3 scripts/18_cross_site_pd_and_transdiagnostic_transfer.py
+
+# 4. Methodological ablations (leakage, gain perturbation, Riemannian geometry, multi-seed)
+python3 scripts/33_run_leakage_and_gain_ablation_benchmarks.py
+python3 scripts/34_run_multiseed_and_riemannian_benchmarks.py
+python3 scripts/37_run_gcn_hyperparameter_sensitivity.py
+
+# 5. Generate high-resolution publication figures (Figures 1–4, S1–S6)
+python3 scripts/22_update_all_figures_and_flowchart.py
+```
+
+---
+
+## 📁 Repository Organization
 
 ```
 transdiagnostic_eeg_benchmark/
-├── manuscript/
-│   ├── PAPER_2_MULTI_COHORT_TRANSDIAGNOSTIC_EEG_BENCHMARK.md    # Full academic text
-│   └── PAPER_2_MULTI_COHORT_TRANSDIAGNOSTIC_EEG_BENCHMARK.docx  # Formatted Word doc with figures
+├── config/
+│   └── pipeline_config.yaml                  # Pipeline parameters and frequency band definitions
 ├── reports/
-│   ├── Figure_1_Multicohort_Biophysical_Effect_Sizes.png & .tiff # 300-DPI Forest Plot
-│   ├── Figure_2_Within_vs_Cross_Cohort_Performance.png & .tiff   # 300-DPI Transfer Benchmarks
-│   ├── multicohort_biophysical_effect_sizes.csv                 # All 30 statistical comparisons
-│   └── multicohort_classification_benchmark.csv                 # 5-fold CV & transfer metrics
-├── scripts/
-│   ├── 01_build_multicohort_graphs.py                           # Universal graph extraction
-│   ├── 02_multicohort_biophysical_profiling.py                  # Cohen's d effect size profiling
-│   ├── 03_train_multicohort_benchmarks.py                       # Leak-free NormativeGCN
-│   ├── 04_plot_multicohort_figures.py                           # Matplotlib + Pillow figure engine
-│   └── 05_generate_clean_paper2_docx.py                         # Word document generator
+│   ├── master_results.json                   # Consolidated benchmark performance metrics
+│   ├── Figure_1_Multicohort_Biophysical_Effect_Sizes.png/.pdf
+│   ├── Figure_2_Tri_Center_Parkinsons_Generalization.png/.pdf
+│   ├── Figure_3_Transdiagnostic_Transfer_and_Ablations.png/.pdf
+│   ├── Figure_4_Clinical_Scale_Continuous_Prediction.png/.pdf
+│   └── *.csv                                 # Master benchmark results, effect sizes, and ablations
+├── scripts/                                  # Modular, numbered execution pipeline scripts
 ├── src/
-│   ├── harmonizer_and_graph.py                                  # OMST, GCE, FOOOF, NormativeGCN
-│   └── multi_cohort_loader.py                                   # Universal19ChannelAdapter
+│   ├── harmonizer_and_graph.py               # 19-ch adapter, OMST, GCE, NormativeGCN PyTorch module
+│   └── multi_cohort_loader.py                # BIDS data loader and epoch standardizer
+├── .gitignore
+├── LICENSE
 └── README.md
 ```
+
+---
+
+## 📄 License
+
+This repository is distributed under the open-source **MIT License**. See `LICENSE` for details.

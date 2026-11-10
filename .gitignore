@@ -30,8 +30,11 @@ Thumbs.db
 *.swp
 *.tmp
 
-# Manuscript drafts (local only - keep out of public GitHub repository)
+# Manuscript drafts & journal submission packages (local only - keep out of public GitHub repository)
 manuscript/
+submission_CIBM/
+submission_*/
 *.docx
 *.bak
 Research_Proposal_and_Experimental_Design_EN.md
+reports/supplementary_extended_tables_s19_s23.md

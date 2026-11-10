@@ -24,9 +24,10 @@ from statsmodels.stats.multitest import multipletests
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression, RidgeClassifier
+from sklearn.svm import SVC
 from sklearn.metrics import roc_auc_score, accuracy_score, balanced_accuracy_score
-from sklearn.model_selection import StratifiedKFold, StratifiedGroupKFold
+from sklearn.model_selection import StratifiedKFold, StratifiedGroupKFold, GridSearchCV
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import seaborn as sns
@@ -168,6 +169,14 @@ def update_single_theta_and_compute_ablations(sleep, mumtaz, cav, ucsd, dem, unm
             "GCN_Ablate_Chi": np.zeros(n),
         }
         oof_preds_theta = np.zeros(n)
+        tuned_cls_specs = {
+            "Tuned_LogisticRegression": (LogisticRegression(max_iter=1000, random_state=42), {"C": [0.001, 0.01, 0.05, 0.1, 0.5, 1.0, 10.0]}, False),
+            "Tuned_Ridge": (RidgeClassifier(random_state=42), {"alpha": [0.01, 0.1, 1.0, 10.0, 50.0, 100.0]}, True),
+            "Linear_SVM": (SVC(kernel="linear", probability=True, random_state=42), {"C": [0.01, 0.1, 1.0, 10.0]}, False),
+            "RBF_SVM": (SVC(kernel="rbf", probability=True, random_state=42), {"C": [0.1, 1.0, 10.0], "gamma": ["scale", "auto"]}, False),
+        }
+        oof_tuned_probs = {m: np.zeros(n) for m in tuned_cls_specs}
+        oof_tuned_preds = {m: np.zeros(n) for m in tuned_cls_specs}
 
         for fold, (tr, va) in enumerate(splits):
             tx = torch.stack([vg[i]["x"] for i in tr])
@@ -177,6 +186,20 @@ def update_single_theta_and_compute_ablations(sleep, mumtaz, cav, ucsd, dem, unm
             vadj = torch.stack([vg[i]["adj"] for i in va])
             tz, vz, _, _ = compute_fold_normative_z(tx, ty, vx)
             y_tr = ty.numpy()
+
+            if use_grp:
+                X_tr_76 = tz.view(len(tr), -1).numpy()
+                X_va_76 = vz.view(len(va), -1).numpy()
+                tr_groups = [groups[i] for i in tr]
+                inner_cv = list(StratifiedGroupKFold(n_splits=3, shuffle=True, random_state=42).split(X_tr_76, y_tr, groups=tr_groups))
+                for m_cls, (est_cls, grid_cls, is_ridge_cls) in tuned_cls_specs.items():
+                    gs_cls = GridSearchCV(est_cls, grid_cls, cv=inner_cv, scoring="roc_auc").fit(X_tr_76, y_tr)
+                    if is_ridge_cls:
+                        dec_cls = gs_cls.decision_function(X_va_76)
+                        oof_tuned_probs[m_cls][va] = 1.0 / (1.0 + np.exp(-dec_cls))
+                    else:
+                        oof_tuned_probs[m_cls][va] = gs_cls.predict_proba(X_va_76)[:, 1]
+                    oof_tuned_preds[m_cls][va] = gs_cls.predict(X_va_76)
 
             # Canonical 5-channel Frontal Theta (Fp1, Fp2, F3, F4, Fz)
             th_tr = tz[:, FOCAL_5, 0].mean(dim=-1, keepdim=True).numpy()
@@ -216,6 +239,14 @@ def update_single_theta_and_compute_ablations(sleep, mumtaz, cav, ucsd, dem, unm
         bal_th = float(balanced_accuracy_score(y_all, oof_preds_theta))
         mask = (df_ext["cohort"] == cname) & (df_ext["model"] == "Single_Theta")
         df_ext.loc[mask, ["auc", "ci_lower", "ci_upper", "accuracy", "balanced_accuracy"]] = [auc_th, lo_th, hi_th, acc_th, bal_th]
+
+        if use_grp:
+            for m_cls in tuned_cls_specs:
+                auc_c, lo_c, hi_c = bootstrap_auc_ci(y_all, oof_tuned_probs[m_cls])
+                acc_c = float(accuracy_score(y_all, oof_tuned_preds[m_cls]))
+                bal_c = float(balanced_accuracy_score(y_all, oof_tuned_preds[m_cls]))
+                m_mask = (df_ext["cohort"] == cname) & (df_ext["model"] == m_cls)
+                df_ext.loc[m_mask, ["auc", "ci_lower", "ci_upper", "accuracy", "balanced_accuracy"]] = [auc_c, lo_c, hi_c, acc_c, bal_c]
 
         row_ab = {"cohort": cname, "n_samples": n}
         for k, probs in oof_probs.items():
@@ -284,6 +315,20 @@ def export_biophysics_ancova_and_medication(sleep, mumtaz, cav, ucsd, dem, unm, 
     sd_sleep = sorted([g for g in sleep if g.get("condition") == "SD"], key=lambda g: g["subject_id"])
     ns_sleep = sorted([g for g in sleep if g.get("condition") == "NS"], key=lambda g: g["subject_id"])
 
+    # Build participant-averaged UCSD PD graphs (N=15 unique PD patients vs N=16 HCs) for strictly independent primary testing
+    ucsd_pd_by_bids = {}
+    for g in ucsd:
+        if "PD" in g.get("group", ""):
+            bid = g.get("bids_id", g["subject_id"])
+            ucsd_pd_by_bids.setdefault(bid, []).append(g)
+    ucsd_pd_subj_mean = []
+    for bid in sorted(ucsd_pd_by_bids.keys()):
+        g_pair = ucsd_pd_by_bids[bid]
+        x_mean = torch.stack([g["x"] for g in g_pair]).mean(dim=0)
+        gce_mean = float(np.mean([float(g.get("gce", 0.0)) for g in g_pair]))
+        ucsd_pd_subj_mean.append({"bids_id": bid, "group": "PD_SubjMean", "x": x_mean, "gce": gce_mean})
+    ucsd_hc_graphs = [g for g in ucsd if g.get("group") == "HC"]
+
     comparisons_10 = [
         ("Study 1: Acute Sleep Deprivation", "ds004902", sd_sleep, ns_sleep, "SD", "NS", True),
         ("Study 2: Outpatient MDD", "4244171",
@@ -293,8 +338,8 @@ def export_biophysics_ancova_and_medication(sleep, mumtaz, cav, ucsd, dem, unm, 
          [g for g in cav if g.get("group") == "Depressed"],
          [g for g in cav if g.get("group") == "Control"], "Depressive-Symptom", "Control", False),
         ("Study 4: UCSD Parkinson All", "ds002778",
-         [g for g in ucsd if "PD" in g.get("group", "")],
-         [g for g in ucsd if g.get("group") == "HC"], "PD", "Control", False),
+         ucsd_pd_subj_mean,
+         ucsd_hc_graphs, "PD (Participant Mean)", "Control", False),
         ("Study 5a: Alzheimer's Disease (AD)", "ds004504",
          [g for g in dem if g.get("diagnosis") == "Alzheimer"],
          [g for g in dem if g.get("diagnosis") == "Control"], "AD", "Control", False),
@@ -363,6 +408,38 @@ def export_biophysics_ancova_and_medication(sleep, mumtaz, cav, ucsd, dem, unm, 
     df_50 = pd.DataFrame(rec_50)
     _, df_50["fdr_q_50"], _, _ = multipletests(df_50["p_value"].values, method="fdr_bh")
     df_50.to_csv(REPORTS_DIR / "multicohort_biophysical_effect_sizes_expanded.csv", index=False)
+
+    # Also update master_results.json with UCSD_PD_SubjMean_vs_HC (N=15 PD vs N=16 HC)
+    mr_path = REPORTS_DIR / "master_results.json"
+    if mr_path.exists():
+        with open(mr_path, "r", encoding="utf-8") as f:
+            mr_data = json.load(f)
+        sub_u4 = df_50[df_50["cohort"] == "Study 4: UCSD Parkinson All"].set_index("marker_key")
+        mr_key_map = {
+            "frontal_theta_5ch": "frontal_theta",
+            "global_delta": "global_delta",
+            "posterior_alpha": "posterior_alpha",
+            "global_chi": "global_chi",
+            "omst_gce": "omst_gce",
+        }
+        u4_entry = {}
+        for mr_k, df_k in mr_key_map.items():
+            r_m = sub_u4.loc[df_k]
+            u4_entry[mr_k] = {
+                "cohens_d": float(r_m["cohens_d"]),
+                "ci_lower": float(r_m["ci_lower"]),
+                "ci_upper": float(r_m["ci_upper"]),
+                "welch_t": float(r_m["t_statistic"]),
+                "welch_p": float(r_m["p_value"]),
+                "df_satterthwaite": float(r_m["df_satterthwaite"]),
+                "mean_case": float(r_m["mean_case"]),
+                "mean_ctrl": float(r_m["mean_control"]),
+                "n_case": int(r_m["n_case"]),
+                "n_ctrl": int(r_m["n_control"]),
+            }
+        mr_data["biophysics"]["UCSD_PD_SubjMean_vs_HC"] = u4_entry
+        with open(mr_path, "w", encoding="utf-8") as f:
+            json.dump(mr_data, f, indent=2)
 
     # Complete 5-cohort independent-sample Age ANCOVA
     ancova_contrasts = [
@@ -475,13 +552,13 @@ def regenerate_clean_figures(df_50, df_med, sleep, mumtaz, cav, ucsd):
         ("Study 1: Acute Sleep Deprivation", "1. Sleep Deprivation (ds004902, N=71 pairs)", "#1976D2"),
         ("Study 2: Outpatient MDD", "2. Outpatient MDD (Mumtaz, N=58)", "#5E35B1"),
         ("Study 3: Univ. Depression Screening", "3. Univ. Depression Screening (ds003478, N=119)", "#7E57C2"),
-        ("Study 4: UCSD Parkinson All", "4. UCSD Parkinson (ds002778, N=46 sess.)", "#C2185B"),
-        ("Study 6a: UNM Parkinson OFF", "5a. UNM PD-OFF (ds003490, N=50)", "#D81B60"),
-        ("Study 6b: UNM Parkinson ON", "5b. UNM PD-ON (ds003490, N=50)", "#EC407A"),
-        ("Study 7: Iowa Parkinson Cohort", "6. Iowa Parkinson (ds004584, N=149)", "#B71C1C"),
-        ("Study 5a: Alzheimer's Disease (AD)", "7a. Dementia AD (ds004504, N=65)", "#EF6C00"),
-        ("Study 5b: Frontotemporal Dementia (FTD)", "7b. Dementia FTD (ds004504, N=52)", "#F57C00"),
-        ("Study 5c: Clinical Dementia (All)", "7c. Dementia All (ds004504, N=88)", "#BF360C"),
+        ("Study 4: UCSD Parkinson All", "4. UCSD Parkinson (ds002778, N=31 subj.)", "#C2185B"),
+        ("Study 5a: Alzheimer's Disease (AD)", "5a. Dementia AD (ds004504, N=65)", "#EF6C00"),
+        ("Study 5b: Frontotemporal Dementia (FTD)", "5b. Dementia FTD (ds004504, N=52)", "#F57C00"),
+        ("Study 5c: Clinical Dementia (All)", "5c. Dementia All (ds004504, N=88)", "#BF360C"),
+        ("Study 6a: UNM Parkinson OFF", "6a. UNM PD-OFF (ds003490, N=50)", "#D81B60"),
+        ("Study 6b: UNM Parkinson ON", "6b. UNM PD-ON (ds003490, N=50)", "#EC407A"),
+        ("Study 7: Iowa Parkinson Cohort", "7. Iowa Parkinson (ds004584, N=149)", "#B71C1C"),
     ]
     panel_specs = [
         ("frontal_theta", "A. Frontal Periodic Theta (4–8 Hz)\n[Frontal Polarity Axis]"),
