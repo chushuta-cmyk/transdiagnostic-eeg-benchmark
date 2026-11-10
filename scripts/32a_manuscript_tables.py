@@ -36,12 +36,7 @@ def fmt_p(p: float, bold_sig: bool = False, with_stars: bool = False) -> str:
     if p < 0.001:
         mant, exp = f"{p:.2e}".split("e")
         exp_i = int(exp)
-        super_digits = {
-            "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴",
-            "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹", "-": "⁻"
-        }
-        exp_str = "".join(super_digits.get(c, c) for c in str(exp_i))
-        s = f"{mant} × 10{exp_str}"
+        s = f"{mant} × 10^{exp_i}"
     else:
         s = f"{p:.4f}"
     if bold_sig and p < 0.05:
@@ -92,7 +87,7 @@ def build_main_table_1() -> str:
 
     lines = [
         "### Table 1. Electrophysiological Effect Sizes Across Seven Public EEG Datasets and Ten Primary Group Contrasts",
-        "| Study / Dataset | Group Contrast | Sample Size N (Case / Ref) | Frontal Periodic θ d [95% CI] | Posterior Periodic α d [95% CI] | Global Exponent χ d [95% CI] | OMST Efficiency (GCE) d [95% CI] | Frontal θ Raw p | Frontal θ q₁₀ (Sig) |",
+        "| Study / Dataset | Group Contrast | Sample Size N (Case / Ref) | Frontal Periodic θ d [95% CI] | Posterior Periodic α d [95% CI] | Global Exponent χ d [95% CI] | OMST Efficiency (GCE) d [95% CI] | Frontal θ Raw p | Frontal θ q_10 (Sig) |",
         "| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |",
     ]
 
@@ -116,7 +111,7 @@ def build_main_table_1() -> str:
         )
 
     lines.append(
-        "\n*Note: Standardized effect sizes report paired Cohen's dz for the repeated-measures crossover design in Study 1 and independent-groups Cohen's d (with two-sample Welch's unequal-variance t-tests) for Studies 2–7, accompanied by analytical 95% confidence intervals. Electrophysiological markers are canonically defined across standard scalp montages: (i) **Frontal Periodic θ (4–8 Hz)** is the mean residual across five frontocentral electrodes (`Fp1, Fp2, F3, F4, Fz`); (ii) **Posterior Periodic α (8–13 Hz)** is the mean residual across five parietal-occipital electrodes (`P3, P4, Pz, O1, O2`); (iii) **Global Periodic δ (1–4 Hz)** is the mean residual across all 19 canonical 10–20 electrodes; (iv) **Global Aperiodic Exponent χ** is the mean spectral slope across all 19 electrodes; and (v) **OMST Efficiency (GCE)** is the global cost efficiency computed on the 19 × 19 Orthogonal Minimum Spanning Tree thresholded PLI network. In Study 1, paired dz = +0.284 converts to an independent-groups equivalent effect size of d_IG = dz · sqrt(2(1 - r)) = +0.267 (95% CI [+0.007, +0.528], accounting for within-subject test-retest correlation r = 0.5709 across N = 71 pairs via Morris & DeShon, 2002). In Study 4 (UCSD Parkinson's), both this table and Figure 1 report the strictly participant-independent comparison averaging ON and OFF sessions within each PD patient (N = 15 unique PD patients vs. N = 16 HCs: frontal periodic θ d = +0.918 [+0.177, +1.658], Welch t = +2.560, df = 29.0, p = 0.0159, q₁₀ = 0.0199); single-session-per-participant medication contrasts yield d = +0.559 (p = 0.1303, ns) in Study 4a PD-OFF (15/16) and d = +1.150 (p = 0.0035) in Study 4b PD-ON (15/16), while pooling all 30 PD sessions against 16 HCs without participant averaging yields d = +0.837 (p = 0.0090). Bold effect-size cells indicate uncorrected p < 0.05. In the rightmost column, q₁₀ denotes Benjamini–Hochberg false discovery rate (FDR) adjusted q-values across the 10 primary frontal periodic theta contrasts shown in this table; other marker columns report uncorrected two-sided Welch t-test p-values, whereas Supplementary Table S4 reports conservative pooled FDR adjustment (q₅₀) across all 50 marker-by-contrast tests (under q₅₀, Study 1 frontal periodic theta is q₅₀ = 0.0540, ns, and Study 4 is q₅₀ = 0.0468, *). Significance thresholds: *** q₁₀ < 0.001; ** q₁₀ < 0.01; * q₁₀ < 0.05; ns = not statistically significant.*"
+        "\n*Note: Standardized effect sizes report paired Cohen's dz for the repeated-measures crossover design in Study 1 and independent-groups Cohen's d (with two-sample Welch's unequal-variance t-tests) for Studies 2–7, accompanied by analytical 95% confidence intervals. Electrophysiological markers are canonically defined across standard scalp montages: (i) **Frontal Periodic θ (4–8 Hz)** is the mean residual across five frontocentral electrodes (`Fp1, Fp2, F3, F4, Fz`); (ii) **Posterior Periodic α (8–13 Hz)** is the mean residual across five parietal-occipital electrodes (`P3, P4, Pz, O1, O2`); (iii) **Global Periodic δ (1–4 Hz)** is the mean residual across all 19 canonical 10–20 electrodes; (iv) **Global Aperiodic Exponent χ** is the mean spectral slope across all 19 electrodes; and (v) **OMST Efficiency (GCE)** is the global cost efficiency computed on the 19 × 19 Orthogonal Minimum Spanning Tree thresholded PLI network. In Study 1, paired dz = +0.284 converts to an independent-groups equivalent effect size of d_IG = dz · sqrt(2(1 - r)) = +0.267 (95% CI [+0.007, +0.528], accounting for within-subject test-retest correlation r = 0.5709 across N = 71 pairs via Morris & DeShon, 2002). In Study 4 (UCSD Parkinson's), both this table and Figure 1 report the strictly participant-independent comparison averaging ON and OFF sessions within each PD patient (N = 15 unique PD patients vs. N = 16 HCs: frontal periodic θ d = +0.918 [+0.177, +1.658], Welch t = +2.560, df = 29.0, p = 0.0159, q_10 = 0.0199); single-session-per-participant medication contrasts yield d = +0.559 (p = 0.1303, ns) in Study 4a PD-OFF (15/16) and d = +1.150 (p = 0.0035) in Study 4b PD-ON (15/16), while pooling all 30 PD sessions against 16 HCs without participant averaging yields d = +0.837 (p = 0.0090). Bold effect-size cells indicate uncorrected p < 0.05. In the rightmost column, q_10 denotes Benjamini–Hochberg false discovery rate (FDR) adjusted q-values across the 10 primary frontal periodic theta contrasts shown in this table; other marker columns report uncorrected two-sided Welch t-test p-values, whereas Supplementary Table S4 reports conservative pooled FDR adjustment (q_50) across all 50 marker-by-contrast tests (under q_50, Study 1 frontal periodic theta is q_50 = 0.0540, ns, and Study 4 is q_50 = 0.0468, *). Significance thresholds: *** q_10 < 0.001; ** q_10 < 0.01; * q_10 < 0.05; ns = not statistically significant.*"
     )
     return "\n".join(lines)
 
@@ -404,7 +399,7 @@ def build_supp_table_s4() -> str:
     df = pd.read_csv(REPORTS_DIR / "multicohort_biophysical_effect_sizes_expanded.csv")
     lines = [
         "### Table S4. Complete Statistical Summary of Electrophysiological Markers Across All Multi-Cohort Comparisons (50 Pooled Hypotheses with Benjamini–Hochberg FDR Control)",
-        "| Study | Group Contrast | Electrophysiological Marker | N (Case / Ref) | Test Design | t-Statistic | Exact df | Raw p-Value | Pooled FDR q₅₀ | Effect Size d [95% CI] | Sig (q₅₀) |",
+        "| Study | Group Contrast | Electrophysiological Marker | N (Case / Ref) | Test Design | t-Statistic | Exact df | Raw p-Value | Pooled FDR q_50 | Effect Size d [95% CI] | Sig (q_50) |",
         "| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |",
     ]
     for _, r in df.iterrows():
@@ -422,7 +417,7 @@ def build_supp_table_s4() -> str:
             f"| **{c_short}** | {r['case_group']} vs. {r['ref_group']} | {r['marker_label']} | {n_str} | {test_type} | {t_str} | {df_str} | {p_str} | {q_str} | {d_str} | {st_str} |"
         )
     lines.append(
-        "\n*Note: Independent two-group contrasts use two-sample Welch's unequal-variance t-tests with exact Welch–Satterthwaite degrees of freedom (df); Study 1 uses within-subject paired t-tests (df = 70) and paired Cohen's dz. Unlike Main Text Table 1—which applies Benjamini–Hochberg FDR across the 10 primary frontal periodic theta contrasts (q₁₀)—this supplementary table pools all 50 tests (10 cohort contrasts × 5 markers, using participant-averaged PD sessions 15/16 in Study 4 and separate OFF/ON contrasts in Study 6) into a single conservative benchmark-wide family (q₅₀). In Study 4, pooling all 30 PD sessions against 16 HCs without participant averaging yields d = +0.837 (p = 0.0090) for frontal periodic θ, d = -0.453 (p = 0.1303) for global δ, d = +0.081 (p = 0.7885) for posterior α, d = +0.349 (p = 0.2562) for global χ, and d = -0.173 (p = 0.5975) for OMST GCE. Significance thresholds: *** q₅₀ < 0.001; ** q₅₀ < 0.01; * q₅₀ < 0.05; ns = not statistically significant (q₅₀ ≥ 0.05).*"
+        "\n*Note: Independent two-group contrasts use two-sample Welch's unequal-variance t-tests with exact Welch–Satterthwaite degrees of freedom (df); Study 1 uses within-subject paired t-tests (df = 70) and paired Cohen's dz. Unlike Main Text Table 1—which applies Benjamini–Hochberg FDR across the 10 primary frontal periodic theta contrasts (q_10)—this supplementary table pools all 50 tests (10 cohort contrasts × 5 markers, using participant-averaged PD sessions 15/16 in Study 4 and separate OFF/ON contrasts in Study 6) into a single conservative benchmark-wide family (q_50). In Study 4, pooling all 30 PD sessions against 16 HCs without participant averaging yields d = +0.837 (p = 0.0090) for frontal periodic θ, d = -0.453 (p = 0.1303) for global δ, d = +0.081 (p = 0.7885) for posterior α, d = +0.349 (p = 0.2562) for global χ, and d = -0.173 (p = 0.5975) for OMST GCE. Significance thresholds: *** q_50 < 0.001; ** q_50 < 0.01; * q_50 < 0.05; ns = not statistically significant (q_50 ≥ 0.05).*"
     )
     return "\n".join(lines)
 
@@ -455,7 +450,7 @@ def build_supp_table_s6() -> str:
             f"| {lbl} | {s_th} | {r['Single_Delta_auc']:.3f} | {r['Single_Alpha_auc']:.3f} | {r['Single_Chi_auc']:.3f} | {r['Single_GCE_auc']:.3f} | {g_f4} | {r['GCN_Ablate_Theta_auc']:.3f} | {r['GCN_Ablate_Delta_auc']:.3f} | {r['GCN_Ablate_Alpha_auc']:.3f} | {r['GCN_Ablate_Chi_auc']:.3f} |"
         )
     lines.append(
-        "\n*Note: All entries report 5-fold cross-validated ROC-AUC under identical fold splits and fold-nested healthy-control normative standardization (`Adam`, η = 0.005, weight decay 10⁻⁴, 50 epochs for all `NormativeGCN` models; L2 `LogisticRegression` for univariate baselines). Single θ uses the canonical 5-channel frontal periodic theta mean (`Fp1, Fp2, F3, F4, Fz`); Single α uses the 5-channel posterior periodic alpha mean (`P3, P4, Pz, O1, O2`); Single δ and Single χ use 19-channel global means; Single GCE uses scalar OMST Global Cost Efficiency. Leave-one-feature-out columns train 3-feature `NormativeGCN` (`in_node_features = 3`) on binary OMST graphs by omitting one feature channel at a time relative to the 4-feature `GCN Full` (`GCN_OMST` in Table 2 and Table S11). Removing periodic theta (`Ablate θ`) substantially lowers `NormativeGCN` AUC across depression, Parkinson's, and frontotemporal/combined dementia contrasts (e.g., 0.902 → 0.727 in Study 2 MDD, 0.725 → 0.508 in Study 4 UCSD PD, 0.842 → 0.725 in Study 5c Dementia All, and 0.685 → 0.550 in Study 7 Iowa PD), whereas in Study 5a AD (0.807 → 0.798) posterior alpha and χ retain strong complementary signal.*"
+        "\n*Note: All entries report 5-fold cross-validated ROC-AUC under identical fold splits and fold-nested healthy-control normative standardization (`Adam`, η = 0.005, weight decay 10^-4, 50 epochs for all `NormativeGCN` models; L2 `LogisticRegression` for univariate baselines). Single θ uses the canonical 5-channel frontal periodic theta mean (`Fp1, Fp2, F3, F4, Fz`); Single α uses the 5-channel posterior periodic alpha mean (`P3, P4, Pz, O1, O2`); Single δ and Single χ use 19-channel global means; Single GCE uses scalar OMST Global Cost Efficiency. Leave-one-feature-out columns train 3-feature `NormativeGCN` (`in_node_features = 3`) on binary OMST graphs by omitting one feature channel at a time relative to the 4-feature `GCN Full` (`GCN_OMST` in Table 2 and Table S11). Removing periodic theta (`Ablate θ`) substantially lowers `NormativeGCN` AUC across depression, Parkinson's, and frontotemporal/combined dementia contrasts (e.g., 0.902 → 0.727 in Study 2 MDD, 0.725 → 0.508 in Study 4 UCSD PD, 0.842 → 0.725 in Study 5c Dementia All, and 0.685 → 0.550 in Study 7 Iowa PD), whereas in Study 5a AD (0.807 → 0.798) posterior alpha and χ retain strong complementary signal.*"
     )
     return "\n".join(lines)
 
@@ -469,12 +464,12 @@ def build_supp_table_s7_and_s7b() -> str:
         "| Input Graph Nodes (N) | 19 scalp channels | Canonical international 10–20 EEG montage (`CHANNELS_19`) |",
         "| Node Feature Vector (D) | 4 features per node | [z_θ, z_δ, z_α, z_χ] standardized strictly against training-fold healthy controls |",
         "| Adjacency Variants | 19 × 19 binary matrix | `GCN-OMST` (PLI 4–13 Hz OMST), `GCN-Identity` (A = I), `GCN-Random` (18 random edges), `GCN-Full` (A = 1) |",
-        "| Graph Convolution Layer 1 | `PurePyTorchGCNLayer(4, 32)` | Symmetric normalized D̃⁻¹/²(A + I)D̃⁻¹/², ReLU, Dropout (p = 0.25); 160 parameters |",
+        "| Graph Convolution Layer 1 | `PurePyTorchGCNLayer(4, 32)` | Symmetric normalized D_norm^(-1/2)(A + I)D_norm^(-1/2), ReLU, Dropout (p = 0.25); 160 parameters |",
         "| Graph Convolution Layer 2 | `PurePyTorchGCNLayer(32, 32)` | Symmetric normalized message passing, ReLU, Dropout (p = 0.25); 1,056 parameters |",
         "| Graph Readout | Concatenated Mean + Max Pool | Global mean (32-D) || global max (32-D) across 19 nodes → 64-D embedding |",
         "| Classification Head | 2-layer MLP | `Linear(64, 32)` → ReLU → `Dropout(0.25)` → `Linear(32, 2)`; 2,080 + 66 = 2,146 parameters |",
         "| Total Trainable Parameters | 3,362 parameters | 160 + 1,056 + 2,080 + 66 = 3,362 (for 4-feature input) |",
-        "| Optimizer & Weight Decay | `torch.optim.Adam` | Learning rate η = 0.005, L2 weight decay λ = 1.0 × 10⁻⁴, cross-entropy loss |",
+        "| Optimizer & Weight Decay | `torch.optim.Adam` | Learning rate η = 0.005, L2 weight decay λ = 1.0 × 10^-4, cross-entropy loss |",
         "| Training Schedule | Fixed 50 epochs | Full-batch training; zero validation/test-fold early stopping to prevent leakage |",
         "",
         "### Table S7b. Classical Machine Learning and Univariate Baseline Configurations (Exact Settings in `scripts/17`)",

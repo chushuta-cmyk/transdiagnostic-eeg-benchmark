@@ -45,7 +45,8 @@ EXACT_TITLE = (
 
 AUTHOR_NAME = "Chushu Tan"
 AUTHOR_AFFIL = "School of Sociology, China University of Political Science and Law, Beijing 102249, China"
-CORRESPONDENCE = "Guangzhou, Guangdong 510006, China; Email: chushuta@gmail.com; ORCID: 0009-0007-3093-0160"
+AUTHOR_AFFIL_2 = "Department of Psychology, University at Buffalo (UB), The State University of New York, New York, NY 12246, USA"
+CORRESPONDENCE = "Guangzhou, Guangdong 510006, China; Email: chushuta@gmail.com; Tel: +86 18008428969; ORCID: 0009-0007-3093-0160"
 JOURNAL_NAME = "Computers in Biology and Medicine"
 EDITOR_NAME = "Dr. Edward J. Ciaccio"
 EDITOR_AFFIL = "Editor-in-Chief, Computers in Biology and Medicine\nDepartment of Medicine, Columbia University Irving Medical Center, New York, NY 10032, USA"
@@ -268,6 +269,32 @@ def style_submission_doc(doc_path: Path, is_main: bool = False):
     doc.save(doc_path)
 
 
+
+def patch_settings(docx_path: Path):
+    """Declare xmlns:m on <w:settings> before injecting <m:mathPr> so strict XML parsers succeed."""
+    import zipfile
+    math_ns = 'xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"'
+    math_pr = (
+        '<m:mathPr><m:mathFont m:val="Cambria Math"/><m:brkBin m:val="before"/>'
+        '<m:brkBinSub m:val="--"/><m:smallFrac m:val="0"/><m:dispDef/>'
+        '<m:lMargin m:val="0"/><m:rMargin m:val="0"/><m:defJc m:val="centerGroup"/>'
+        '<m:wrapIndent m:val="1440"/><m:intLim m:val="subSup"/><m:naryLim m:val="undOvr"/></m:mathPr>'
+    )
+    with zipfile.ZipFile(docx_path, "r") as z_in:
+        contents = {item.filename: z_in.read(item.filename) for item in z_in.infolist()}
+
+    settings_xml = contents["word/settings.xml"].decode("utf-8")
+    if "xmlns:m=" not in settings_xml:
+        settings_xml = re.sub(r"(<w:settings[^>]*)(>)", r"\1 " + math_ns + r"\2", settings_xml, count=1)
+    if "<m:mathPr>" not in settings_xml:
+        open_end = settings_xml.find(">", settings_xml.find("<w:settings")) + 1
+        settings_xml = settings_xml[:open_end] + math_pr + settings_xml[open_end:]
+    contents["word/settings.xml"] = settings_xml.encode("utf-8")
+    with zipfile.ZipFile(docx_path, "w", zipfile.ZIP_DEFLATED) as z_out:
+        for fname, data in contents.items():
+            z_out.writestr(fname, data)
+
+
 def md_to_docx(md_path: Path, docx_path: Path, is_main: bool = False):
     """Converts markdown to styled docx using pandoc and python-docx."""
     cmd = [
@@ -285,6 +312,7 @@ def md_to_docx(md_path: Path, docx_path: Path, is_main: bool = False):
     if res.returncode != 0:
         raise RuntimeError(f"Pandoc conversion failed for {md_path.name}:\n{res.stderr}")
     style_submission_doc(docx_path, is_main=is_main)
+    patch_settings(docx_path)
 
 
 # ==============================================================================
@@ -305,8 +333,9 @@ def build_cover_letter() -> str:
 *{EXACT_TITLE}*
 
 **Author:**  
-{AUTHOR_NAME}¹*  
-¹ {AUTHOR_AFFIL}  
+{AUTHOR_NAME}^1,2*^  
+^1^ {AUTHOR_AFFIL}  
+^2^ {AUTHOR_AFFIL_2}  
 * Corresponding Author: {CORRESPONDENCE}
 
 ---
@@ -322,7 +351,7 @@ Drawing upon rigorous methodological standards from computational bioinformatics
 
 ### Key Contributions and Methodological Rigor
 1. **Harmonized Multi-Cohort Benchmark (566 analyzed participants in primary recording state, 677 primary sessions; 737 total sessions including Study 2 eyes-open recordings):** Evaluated across seven public datasets spanning experimental acute sleep deprivation (OpenNeuro `ds004902`), outpatient major depressive disorder (Figshare `4244171`), university depression screening (`ds003478`), tri-center Parkinson's disease (`ds002778`, `ds003490`, `ds004584`), and clinical dementia (`ds004504`).
-2. **Electrophysiological Frontal Theta Polarity Across Clinical Domains:** Once broadband 1/f^χ background activity is disentangled via `specparam`, resting frontal periodic theta demonstrates cohort-level opposing directions: significant reduction in outpatient MDD (d = -0.826) and university depression screening (d = -0.676), contrasted with elevation across Parkinson's disease (d = +0.803 to +0.918) and dementia (d = +0.903 to +1.279). Random-effects meta-analysis across between-subject cohorts confirms between-domain differences (Q_between = 62.38, p = 2.89 × 10⁻¹⁵), while small-study limitations (k = 2 in depression) are transparently acknowledged.
+2. **Electrophysiological Frontal Theta Polarity Across Clinical Domains:** Once broadband 1/f^χ background activity is disentangled via `specparam`, resting frontal periodic theta demonstrates cohort-level opposing directions: significant reduction in outpatient MDD (d = -0.826) and university depression screening (d = -0.676), contrasted with elevation across Parkinson's disease (d = +0.803 to +0.918) and dementia (d = +0.903 to +1.279). Random-effects meta-analysis across between-subject cohorts confirms between-domain differences (Q_between = 62.38, p = 2.89 × 10^-15), while small-study limitations (k = 2 in depression) are transparently acknowledged.
 3. **Architectural Evaluation of Graph Neural Networks:** Across 132 within-cohort evaluations and 5 random seeds, `GCN-OMST` (reference mean AUC = 0.738, 5-seed mean 0.731) does not show a detectable advantage over regularized classical baselines (`Random Forest` 0.752, `Tuned Ridge` 0.749, `Tuned Logistic` 0.743). Furthermore, density-matched random graph ablations (`GCN-Random` mean AUC 0.754) and isolated-node models (`GCN-Identity` 0.742) match structured graphs, demonstrating that message passing on low-density sensor arrays does not improve on regional node features in this benchmarking design.
 4. **Empirical Audit of PLI Non-Positive Definiteness:** An exhaustive empirical audit of all 677 primary resting sessions reveals that **12.56% (85/677) of sensor-level Phase Lag Index matrices violate positive semi-definiteness** (minimum eigenvalues down to -7.370), establishing that sensor-level functional connectivity requires adaptive regularization when projected onto Riemannian SPD manifolds (Adaptive SPD mean AUC = 0.743), where it fails to outperform regional oscillatory power.
 5. **Multiplicative Gain Invariance and Leakage Control:** Analytical proofs and numerical perturbations verify that spectral parameterization and PLI are invariant across four orders of magnitude of voltage scaling (|ΔX| = 0.0000), whereas uncalibrated band power suffers probability calibration drift (|Δp| = 0.205–0.339). Leakage ablations demonstrate that subject session mixing drives substantial optimistic bias (≤ +0.102 AUC inflation).
@@ -400,23 +429,22 @@ def build_highlights() -> str:
 def build_title_page() -> str:
     return f"""# Title Page
 
-## Article Title
-**{EXACT_TITLE}**
+## {EXACT_TITLE}
 
-## Running Head / Short Title
-Multi-Cohort EEG Benchmark & Graph Models
+**Running title:** Multi-Cohort Clinical EEG Benchmark & Graph Models
 
-## Author Information
-**Chushu Tan**¹*
+**Chushu Tan**^1,2*^
 
-¹ School of Sociology, China University of Political Science and Law, Beijing 102249, China  
-* **Corresponding Author:**  
-Chushu Tan  
-School of Sociology, China University of Political Science and Law  
-Fuxue Road 27, Changping District, Beijing 102249, China  
-Current Contact: Guangzhou, Guangdong 510006, China  
-Email: `chushuta@gmail.com`  
-ORCID: [0009-0007-3093-0160](https://orcid.org/0009-0007-3093-0160)
+### Affiliations
+1. {AUTHOR_AFFIL}  
+2. {AUTHOR_AFFIL_2}  
+
+### *Corresponding Author
+**Name:** Chushu Tan  
+**Address:** Guangzhou, Guangdong 510006, China  
+**Email:** chushuta@gmail.com  
+**Tel:** +86 18008428969  
+**ORCID:** [0009-0007-3093-0160](https://orcid.org/0009-0007-3093-0160)
 
 ---
 
@@ -428,13 +456,13 @@ ORCID: [0009-0007-3093-0160](https://orcid.org/0009-0007-3093-0160)
 - **Total Number of References:** 43
 - **Total Number of Main Tables:** 4
 - **Total Number of Main Figures:** 4
-- **Total Number of Supplementary Tables:** 27 (Tables S1–S23, including S7b, S7c, S8b, S11b)
-- **Total Number of Supplementary Figures:** 6 (Figures S1–S6)
+- **Total Number of Supplementary Tables:** 31
+- **Total Number of Supplementary Figures:** 6
 
 ---
 
 ## Keywords (6)
-Quantitative EEG; Spectral Parameterization; Gain Invariance; Graph Neural Networks; Frontal Theta; Multi-Cohort Benchmark
+Quantitative EEG; Spectral Parameterization; Graph Neural Networks; Frontal Theta; Cross-Validation; Multi-Cohort Benchmark
 
 ---
 
@@ -444,7 +472,14 @@ Quantitative EEG; Spectral Parameterization; Gain Invariance; Graph Neural Netwo
 This research received no specific grant from any funding agency in the public, commercial, or not-for-profit sectors.
 
 ### Ethical Approval and Consent to Participate
-This study constitutes secondary computational analysis of fully de-identified, publicly available EEG datasets retrieved from OpenNeuro and Figshare. Under 45 CFR 46.104(d)(4) and institutional guidelines, secondary computational analysis of public de-identified data is exempt from additional institutional review board (IRB) approval. Primary data collection protocols were approved by the respective institutional review boards of the original contributing institutions, and all participants provided written informed consent.
+This study constitutes secondary computational analysis of fully de-identified, publicly available EEG datasets retrieved from OpenNeuro and Figshare. Under 45 CFR 46.104(d)(4) and institutional guidelines, secondary computational analysis of public de-identified data is exempt from additional institutional review board (IRB) approval. Primary data collection protocols were approved by the respective institutional review boards of the original contributing institutions in accordance with the Declaration of Helsinki, and all participants provided written informed consent:
+1. **Study 1 (Acute Sleep Deprivation, OpenNeuro ds004902):** Approved by the Ethics Committee of Southwest University (approval number H20039). Written informed consent was obtained from adult participants, with written parental/guardian consent and participant assent for the minor.
+2. **Study 2 (Outpatient Major Depressive Disorder, Figshare 4244171):** Approved by the Human Research Ethics Committee of Universiti Sains Malaysia (JEPeM Code: USM/JEPeM/1401015); written informed consent obtained from all participants.
+3. **Study 3 (University Depression Screening, OpenNeuro ds003478):** Approved by the University of New Mexico Institutional Review Board (HRRC protocol); written informed consent obtained.
+4. **Study 4 (UCSD Parkinson's Disease, OpenNeuro ds002778):** Approved by the UC San Diego Human Research Protections Program / Institutional Review Board; written informed consent obtained.
+5. **Study 5 (AHEPA Clinical Dementia, OpenNeuro ds004504):** Approved by the Scientific and Ethics Committee of AHEPA University Hospital, Aristotle University of Thessaloniki, Greece (protocol 142/12-04-2023); written informed consent obtained.
+6. **Study 6 (UNM Parkinson's Disease Washout, OpenNeuro ds003490):** Approved by the University of New Mexico Institutional Review Board; written informed consent obtained.
+7. **Study 7 (Iowa Parkinson's Multi-Scale, OpenNeuro ds004584):** Approved by the University of Iowa Institutional Review Board (IRB protocol 201707828); written informed consent obtained.
 
 ### Competing Interests
 The author declares that there are no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
@@ -456,17 +491,10 @@ During the preparation of this work, the author used Google Gemini for assistanc
 **Chushu Tan:** Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Data curation, Writing - original draft, Writing - review & editing, Visualization, Project administration.
 
 ### Data Availability Statement
-All seven resting EEG cohorts analyzed in this benchmark are openly accessible without restriction from public repositories:
-1. Study 1 (Acute Sleep Deprivation): OpenNeuro `ds004902` (https://openneuro.org/datasets/ds004902)
-2. Study 2 (Outpatient MDD): Figshare `4244171` (https://doi.org/10.6084/m9.figshare.4244171)
-3. Study 3 (University Depression Screening): OpenNeuro `ds003478` (https://openneuro.org/datasets/ds003478)
-4. Study 4 (UCSD Parkinson's Disease): OpenNeuro `ds002778` (https://openneuro.org/datasets/ds002778)
-5. Study 5 (AHEPA Clinical Dementia): OpenNeuro `ds004504` (https://openneuro.org/datasets/ds004504)
-6. Study 6 (UNM Parkinson's Disease): OpenNeuro `ds003490` (https://openneuro.org/datasets/ds003490)
-7. Study 7 (Iowa Parkinson's Disease): OpenNeuro `ds004584` (https://openneuro.org/datasets/ds004584)
+All seven resting EEG cohorts analyzed in this benchmark are openly accessible without restriction from public repositories (OpenNeuro ds004902, Figshare 4244171, OpenNeuro ds003478, ds002778, ds004504, ds003490, ds004584).
 
 ### Code Availability Statement
-The complete software repository—encompassing BIDS preprocessing, `specparam` decomposition, OMST graph construction, `NormativeGCN` and classical baseline implementations, statistical validation tests, and figure generation routines—is available under the open-source MIT license at:  
+The complete software repository is openly available under the MIT license at:  
 https://github.com/chushuta-cmyk/transdiagnostic-eeg-benchmark
 
 ### Acknowledgments
@@ -638,6 +666,58 @@ Copy and paste the 4 recommended reviewers from `08_Suggested_Reviewers_CIBM.doc
 """
 
 
+
+# ==============================================================================
+# Document 10: Ethical Approval and Informed Consent Statement
+# ==============================================================================
+def build_ethics_statement() -> str:
+    return f"""# Ethical Approval and Informed Consent Statement
+
+**Manuscript Title:** *{EXACT_TITLE}*  
+**Target Journal:** *{JOURNAL_NAME}*  
+**Author:** Chushu Tan^1,2*^  
+^1^ {AUTHOR_AFFIL}  
+^2^ {AUTHOR_AFFIL_2}  
+* Corresponding Author: Guangzhou, Guangdong 510006, China; Email: `chushuta@gmail.com`; Tel: +86 18008428969; ORCID: [0009-0007-3093-0160](https://orcid.org/0009-0007-3093-0160)
+
+---
+
+## 1. Regulatory Status and Exemption Criteria
+This study constitutes secondary computational analysis of fully de-identified, publicly available resting-state electroencephalographic (EEG) datasets retrieved from open-access repositories (OpenNeuro and Figshare). Under United States Federal Regulations 45 CFR 46.104(d)(4) and institutional guidelines governing human subjects research, secondary computational research involving existing, publicly accessible, fully de-identified data is formally exempt from additional institutional review board (IRB) review. No experimental human subject recruitment, interventional procedures, or identifiable private health information was accessed or handled in this study.
+
+---
+
+## 2. Declaration of Helsinki and Primary Ethics Approvals
+All primary data collection protocols for the seven contributing cohorts were conducted in strict accordance with the Declaration of Helsinki and were approved by the respective institutional review boards and human research ethics committees of the contributing medical and academic centers:
+
+1. **Study 1 — Experimental Acute Sleep Deprivation (`OpenNeuro ds004902`):**  
+   Approved by the **Ethics Committee of Southwest University** (approval protocol number: **H20039**). Written informed consent was obtained from all adult participants prior to protocol initiation. For the single 17-year-old participant, written parental/guardian consent and participant assent were obtained.
+2. **Study 2 — Outpatient Major Depressive Disorder (`Figshare 4244171`):**  
+   Approved by the **Human Research Ethics Committee of Universiti Sains Malaysia (JEPeM)** (approval protocol code: **USM/JEPeM/1401015**). All participants provided written informed consent.
+3. **Study 3 — University Depression-Screening Cohort (`OpenNeuro ds003478`):**  
+   Approved by the **University of New Mexico Institutional Review Board** (Human Research Review Committee / HRRC protocol). All participants provided written informed consent.
+4. **Study 4 — UCSD Parkinson's Disease ON/OFF Cohort (`OpenNeuro ds002778`):**  
+   Approved by the **UC San Diego Human Research Protections Program / Institutional Review Board**. All participants provided written informed consent.
+5. **Study 5 — AHEPA Clinical Dementia Cohort (`OpenNeuro ds004504`):**  
+   Approved by the **Scientific and Ethics Committee of AHEPA University Hospital, Aristotle University of Thessaloniki, Greece** (protocol reference: **142/12-04-2023**). All participants or their legally authorized representatives provided written informed consent.
+6. **Study 6 — UNM Parkinson's Disease Washout Cohort (`OpenNeuro ds003490`):**  
+   Approved by the **University of New Mexico Institutional Review Board**. All participants provided written informed consent.
+7. **Study 7 — Iowa Parkinson's Multi-Scale Cohort (`OpenNeuro ds004584`):**  
+   Approved by the **University of Iowa Institutional Review Board** (IRB protocol number: **201707828**). All participants provided written informed consent.
+
+---
+
+## 3. Data Protection and Participant De-identification
+All primary archives were accessed in fully de-identified formats stripped of direct personal identifiers (HIPAA Safe Harbor standard and European GDPR compliance). No participant re-identification was attempted or is technically possible from the released time series.
+
+---
+
+**Author Signature:**  
+Chushu Tan  
+Date: November 10, 2026  
+"""
+
+
 def build_all_submission_artifacts():
     print("=" * 80)
     print("🚀 Step 38: Generating Complete CIBM / Elsevier Submission Package")
@@ -712,6 +792,14 @@ def build_all_submission_artifacts():
     sg_md_path = SUBMISSION_DIR / "09_Submission_Checklist_and_Guide_CIBM.md"
     sg_md_path.write_text(sg_md, encoding="utf-8")
     print("✓ Generated 09_Submission_Checklist_and_Guide_CIBM.md")
+
+    # 10. Ethics Statement
+    es_md = build_ethics_statement()
+    es_md_path = SUBMISSION_DIR / "10_Ethics_Statement_CIBM.md"
+    es_docx_path = SUBMISSION_DIR / "10_Ethics_Statement_CIBM.docx"
+    es_md_path.write_text(es_md, encoding="utf-8")
+    md_to_docx(es_md_path, es_docx_path, is_main=False)
+    print("✓ Generated 10_Ethics_Statement_CIBM (.docx, .md)")
 
     # 10. Copy Figures
     fig_map = [
