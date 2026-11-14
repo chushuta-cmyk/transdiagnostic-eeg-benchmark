@@ -27,7 +27,12 @@ from sklearn.model_selection import StratifiedKFold, StratifiedGroupKFold, GridS
 BENCHMARK_ROOT = Path(__file__).resolve().parent.parent
 SRC_DIR = BENCHMARK_ROOT / "src"
 sys.path.append(str(SRC_DIR))
-from harmonizer_and_graph import NormativeGCN, compute_fold_normative_z
+from harmonizer_and_graph import (
+    NormativeGCN,
+    compute_fold_normative_z,
+    compute_masked_ols_19ch_features,
+    compute_specparam_19ch_features,
+)
 import multi_cohort_loader as mcl
 
 DATA_DIR = BENCHMARK_ROOT / "data" / "derivatives"
@@ -263,26 +268,26 @@ def run_leakage_ablation():
 # 2. REAL WELCH PSD EXTRACTION & THREE SPECTRAL FEATURE REPRESENTATIONS
 # ==============================================================================
 
-def compute_three_representations_from_psd(freqs: np.ndarray, mean_psd: np.ndarray):
+def compute_spectral_representations_from_psd(freqs: np.ndarray, mean_psd: np.ndarray):
     """
     Given freqs [n_freqs] and mean_psd [19, n_freqs] (in linear power units),
-    computes three distinct [19, 4] float32 feature matrices:
-      1. x_specparam: [Periodic Theta, Periodic Delta, Periodic Alpha, Aperiodic Chi]
-      2. x_relpower:  [Relative Theta, Relative Delta, Relative Alpha, log10(Theta/Alpha)]
-      3. x_rawlog:    [log10(Theta), log10(Delta), log10(Alpha), log10(Total 1-40Hz Power)]
+    computes four distinct [19, 4] float32 feature matrices:
+      1. x_specparam:  Genuine specparam (v2.0.0rc7) periodic residuals + exponent chi
+      2. x_masked_ols: [7, 14] Hz-masked log-linear OLS residuals + chi_ols
+      3. x_relpower:   [Relative Theta, Relative Delta, Relative Alpha, log10(Theta/Alpha)]
+      4. x_rawlog:     [log10(Theta), log10(Delta), log10(Alpha), log10(Total 1-40Hz Power)]
     """
     valid_mask = (freqs >= 1.0) & (freqs <= 40.0)
     f_valid = freqs[valid_mask]
-    log_f = np.log10(f_valid)
-
-    aperiodic_fit_mask = (f_valid < 7.0) | (f_valid > 14.0)
-    log_f_fit = log_f[aperiodic_fit_mask]
 
     theta_mask = (f_valid >= 4.0) & (f_valid < 8.0)
     delta_mask = (f_valid >= 1.0) & (f_valid < 4.0)
     alpha_mask = (f_valid >= 8.0) & (f_valid <= 13.0)
 
-    x_specparam = np.zeros((19, 4), dtype=np.float32)
+    x_specparam, _, _ = compute_specparam_19ch_features(freqs, mean_psd)
+    x_specparam = np.nan_to_num(x_specparam, nan=0.0).astype(np.float32)
+    x_masked_ols = compute_masked_ols_19ch_features(freqs, mean_psd)
+
     x_relpower = np.zeros((19, 4), dtype=np.float32)
     x_rawlog = np.zeros((19, 4), dtype=np.float32)
 
@@ -290,21 +295,9 @@ def compute_three_representations_from_psd(freqs: np.ndarray, mean_psd: np.ndarr
         psd_c = np.maximum(mean_psd[c, valid_mask], 1e-20)
         log_p = np.log10(psd_c)
 
-        # 1. specparam periodic residual + aperiodic exponent chi
-        slope, intercept = np.polyfit(log_f_fit, log_p[aperiodic_fit_mask], 1)
-        chi = -slope
-        aperiodic_line = intercept + slope * log_f
-        flattened_spec = log_p - aperiodic_line
-
-        x_specparam[c, 0] = float(np.mean(flattened_spec[theta_mask]))
-        x_specparam[c, 1] = float(np.mean(flattened_spec[delta_mask]))
-        x_specparam[c, 2] = float(np.mean(flattened_spec[alpha_mask]))
-        x_specparam[c, 3] = float(chi)
-
-        # 2. Relative linear band power (normalized by total 1-40 Hz linear power)
+        # Relative linear band power (normalized by total 1-40 Hz linear power)
         total_lin = float(np.sum(psd_c)) + 1e-25
         lin_theta = float(np.mean(psd_c[theta_mask]))
-        lin_delta = float(np.mean(psd_c[delta_mask]))
         lin_alpha = float(np.mean(psd_c[alpha_mask]))
 
         x_relpower[c, 0] = float(np.sum(psd_c[theta_mask]) / total_lin)
@@ -312,13 +305,13 @@ def compute_three_representations_from_psd(freqs: np.ndarray, mean_psd: np.ndarr
         x_relpower[c, 2] = float(np.sum(psd_c[alpha_mask]) / total_lin)
         x_relpower[c, 3] = float(np.log10((lin_theta + 1e-25) / (lin_alpha + 1e-25)))
 
-        # 3. Unparameterized raw log10 band power
+        # Unparameterized raw log10 band power
         x_rawlog[c, 0] = float(np.mean(log_p[theta_mask]))
         x_rawlog[c, 1] = float(np.mean(log_p[delta_mask]))
         x_rawlog[c, 2] = float(np.mean(log_p[alpha_mask]))
         x_rawlog[c, 3] = float(np.mean(log_p))
 
-    return x_specparam, x_relpower, x_rawlog
+    return x_specparam, x_masked_ols, x_relpower, x_rawlog
 
 
 def load_or_extract_pd_tricenter_psds():
@@ -424,19 +417,21 @@ def run_gain_and_calibration_ablation():
 
     psd_cache = load_or_extract_pd_tricenter_psds()
 
-    # Build baseline (k=1.0) feature tensors for all 3 representations across UCSD, UNM_OFF, Iowa
+    # Build baseline (k=1.0) feature tensors for all 4 representations across UCSD, UNM_OFF, Iowa
     site_tensors = {}
     for site_name, rec_list in psd_cache.items():
-        spec_list, rel_list, raw_list, adj_list, y_list = [], [], [], [], []
+        spec_list, ols_list, rel_list, raw_list, adj_list, y_list = [], [], [], [], [], []
         for r in rec_list:
-            x_sp, x_rl, x_rw = compute_three_representations_from_psd(r["freqs"], r["mean_psd"])
+            x_sp, x_ols, x_rl, x_rw = compute_spectral_representations_from_psd(r["freqs"], r["mean_psd"])
             spec_list.append(torch.tensor(x_sp, dtype=torch.float32))
+            ols_list.append(torch.tensor(x_ols, dtype=torch.float32))
             rel_list.append(torch.tensor(x_rl, dtype=torch.float32))
             raw_list.append(torch.tensor(x_rw, dtype=torch.float32))
             adj_list.append(r["adj"])
             y_list.append(r["y"])
         site_tensors[site_name] = {
             "specparam_periodic_residual": torch.stack(spec_list),
+            "masked_ols_residual": torch.stack(ols_list),
             "relative_band_power": torch.stack(rel_list),
             "raw_log_band_power": torch.stack(raw_list),
             "adj": torch.stack(adj_list),
@@ -455,7 +450,7 @@ def run_gain_and_calibration_ablation():
     ]
 
     calibration_regimes = ["Uncalibrated_Raw", "Global_Cohort_ZScore", "Target_HC_Normative"]
-    feature_types = ["specparam_periodic_residual", "relative_band_power", "raw_log_band_power"]
+    feature_types = ["specparam_periodic_residual", "masked_ols_residual", "relative_band_power", "raw_log_band_power"]
 
     records = []
 
@@ -550,19 +545,21 @@ def run_gain_and_calibration_ablation():
     scaled_site_tensors = {k: {} for k in gain_settings}
     for k in gain_settings:
         for site_name, rec_list in psd_cache.items():
-            spec_list, rel_list, raw_list = [], [], []
+            spec_list, ols_list, rel_list, raw_list = [], [], [], []
             for idx, r in enumerate(rec_list):
                 if k == "Heterogeneous_0.5x_5.0x":
                     k_val = 0.5 if (idx % 2 == 0) else 5.0
                 else:
                     k_val = float(k)
                 scaled_psd = (k_val ** 2) * r["mean_psd"]
-                x_sp, x_rl, x_rw = compute_three_representations_from_psd(r["freqs"], scaled_psd)
+                x_sp, x_ols, x_rl, x_rw = compute_spectral_representations_from_psd(r["freqs"], scaled_psd)
                 spec_list.append(torch.tensor(x_sp, dtype=torch.float32))
+                ols_list.append(torch.tensor(x_ols, dtype=torch.float32))
                 rel_list.append(torch.tensor(x_rl, dtype=torch.float32))
                 raw_list.append(torch.tensor(x_rw, dtype=torch.float32))
             scaled_site_tensors[k][site_name] = {
                 "specparam_periodic_residual": torch.stack(spec_list),
+                "masked_ols_residual": torch.stack(ols_list),
                 "relative_band_power": torch.stack(rel_list),
                 "raw_log_band_power": torch.stack(raw_list),
             }

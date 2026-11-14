@@ -17,6 +17,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+try:
+    from specparam import SpectralGroupModel as _SpectralGroupModel
+except ImportError:
+    _SpectralGroupModel = None
+
 CHANNELS_19 = [
     'Fp1', 'Fp2', 'F3', 'F4', 'C3', 'C4', 'P3', 'P4',
     'O1', 'O2', 'F7', 'F8', 'T7', 'T8', 'P7', 'P8',
@@ -160,31 +165,15 @@ class TopologicalGraphBuilder:
         return self.build_mst_proportional_graph(fc_matrix)
 
 
-def extract_real_19ch_features_and_pli(epochs_data: np.ndarray, sfreq: float):
+def compute_masked_ols_19ch_features(freqs: np.ndarray, mean_psd: np.ndarray) -> np.ndarray:
     """
-    Computes 100% REAL electrophysiological node features and Phase Lag Index (PLI)
-    from a 3D EEG array of shape [n_epochs, 19, n_times].
-    Returns:
-      - x_mat: [19, 4] float32 array per channel:
-          col 0: Periodic (flattened) Theta power (4-8 Hz)
-          col 1: Periodic (flattened) Delta power (1-4 Hz)
-          col 2: Periodic (flattened) Alpha power (8-13 Hz)
-          col 3: Aperiodic 1/f exponent chi (fit across 1-40 Hz excluding 7-14 Hz alpha bump)
-      - pli_matrix: [19, 19] float32 Phase Lag Index connectivity matrix in 4-13 Hz
+    Compute the [7.0, 14.0] Hz-masked log-linear OLS spectral residual baseline (NOT specparam).
+    Fits log10(P) = intercept - chi * log10(f) by OLS across [1, 7) U (14, 40] Hz and returns
+    [19, 4] features: (theta_4_8_resid, delta_1_4_resid, alpha_8_13_resid, chi_ols).
     """
-    n_epochs, n_ch, n_times = epochs_data.shape
-    assert n_ch == 19, f"Expected 19 channels, got {n_ch}"
-
-    # 1. Compute Welch PSD averaged across epochs for each of the 19 channels
-    nperseg = min(int(sfreq * 2.0), n_times)
-    freqs, psd = signal.welch(epochs_data, fs=sfreq, nperseg=nperseg, axis=-1)
-    mean_psd = np.mean(psd, axis=0)  # [19, n_freqs]
-
     valid_mask = (freqs >= 1.0) & (freqs <= 40.0)
     f_valid = freqs[valid_mask]
     log_f = np.log10(f_valid)
-
-    # Fit aperiodic 1/f background excluding canonical alpha peak [7.0, 14.0] Hz
     aperiodic_fit_mask = (f_valid < 7.0) | (f_valid > 14.0)
     log_f_fit = log_f[aperiodic_fit_mask]
 
@@ -195,9 +184,8 @@ def extract_real_19ch_features_and_pli(epochs_data: np.ndarray, sfreq: float):
     x_mat = np.zeros((19, 4), dtype=np.float32)
     for c in range(19):
         log_p = np.log10(np.maximum(mean_psd[c, valid_mask], 1e-15))
-        # Linear regression in log-log space: log10(P) = offset - chi * log10(f)
         slope, intercept = np.polyfit(log_f_fit, log_p[aperiodic_fit_mask], 1)
-        chi = -slope  # Positive aperiodic exponent
+        chi = -slope
         aperiodic_line = intercept + slope * log_f
         flattened_spec = log_p - aperiodic_line
 
@@ -205,6 +193,119 @@ def extract_real_19ch_features_and_pli(epochs_data: np.ndarray, sfreq: float):
         x_mat[c, 1] = float(np.mean(flattened_spec[delta_mask]))
         x_mat[c, 2] = float(np.mean(flattened_spec[alpha_mask]))
         x_mat[c, 3] = float(chi)
+    return x_mat
+
+
+def compute_specparam_19ch_features(
+    freqs: np.ndarray,
+    mean_psd: np.ndarray,
+    freq_range=(1.0, 40.0),
+    peak_width_limits=(1.0, 12.0),
+    max_n_peaks: int = 6,
+    min_peak_height: float = 0.05,
+    peak_threshold: float = 2.0,
+    aperiodic_mode: str = "fixed",
+):
+    """
+    Decompose 19-channel Welch PSDs using genuine `specparam` (SpectralGroupModel)
+    into empirical aperiodic-subtracted periodic residuals, multi-Gaussian peak fits,
+    and fit diagnostics (R^2, MAE, offset, chi, peak counts).
+    """
+    if _SpectralGroupModel is None:
+        raise ImportError("specparam package is required for compute_specparam_19ch_features().")
+
+    sgm = _SpectralGroupModel(
+        aperiodic_mode=aperiodic_mode,
+        periodic_mode="gaussian",
+        peak_width_limits=list(peak_width_limits),
+        max_n_peaks=max_n_peaks,
+        min_peak_height=min_peak_height,
+        peak_threshold=peak_threshold,
+        metrics=["error_mae", "gof_rsquared"],
+        verbose=False,
+    )
+    sgm.fit(freqs, np.maximum(mean_psd, 1e-25), list(freq_range), n_jobs=1)
+
+    f_fit = sgm.data.freqs
+    theta_mask = (f_fit >= 4.0) & (f_fit < 8.0)
+    delta_mask = (f_fit >= 1.0) & (f_fit < 4.0)
+    alpha_mask = (f_fit >= 8.0) & (f_fit <= 13.0)
+
+    ap_params = sgm.get_params("aperiodic")
+    r2_all = sgm.get_metrics("gof", "rsquared")
+    mae_all = sgm.get_metrics("error", "mae")
+    null_set = set(sgm.results.null_inds or [])
+
+    x_resid = np.zeros((19, 4), dtype=np.float32)
+    x_peaks = np.zeros((19, 4), dtype=np.float32)
+    diagnostics = {
+        "r_squared": np.full(19, np.nan, dtype=np.float32),
+        "mae": np.full(19, np.nan, dtype=np.float32),
+        "ap_offset": np.full(19, np.nan, dtype=np.float32),
+        "n_peaks": np.zeros(19, dtype=np.int32),
+        "fit_ok": np.ones(19, dtype=bool),
+    }
+
+    for c in range(19):
+        if c in null_set:
+            x_resid[c, :] = np.nan
+            x_peaks[c, :] = np.nan
+            diagnostics["fit_ok"][c] = False
+            continue
+        m_c = sgm.get_model(c)
+        resid = m_c.data.power_spectrum - m_c.results.model._ap_fit
+        pk_fit = m_c.results.model._peak_fit
+        chi = float(ap_params[c, 1])
+
+        x_resid[c] = [np.mean(resid[theta_mask]), np.mean(resid[delta_mask]), np.mean(resid[alpha_mask]), chi]
+        x_peaks[c] = [np.mean(pk_fit[theta_mask]), np.mean(pk_fit[delta_mask]), np.mean(pk_fit[alpha_mask]), chi]
+        diagnostics["r_squared"][c] = float(r2_all[c])
+        diagnostics["mae"][c] = float(mae_all[c])
+        diagnostics["ap_offset"][c] = float(ap_params[c, 0])
+        diagnostics["n_peaks"][c] = int(m_c.results.n_peaks)
+
+    return x_resid, x_peaks, diagnostics
+
+
+def extract_real_19ch_features_and_pli(
+    epochs_data: np.ndarray,
+    sfreq: float,
+    spectral_method: str = "specparam_resid",
+):
+    """
+    Computes 100% REAL electrophysiological node features and Phase Lag Index (PLI)
+    from a 3D EEG array of shape [n_epochs, 19, n_times].
+
+    Args:
+      spectral_method:
+        - 'specparam_resid' (default): Genuine specparam aperiodic subtraction
+          (log10 PSD minus specparam fixed 1/f fit) + specparam exponent chi.
+        - 'specparam_peaks': Genuine specparam multi-Gaussian periodic fit + chi.
+        - 'masked_ols': [7.0, 14.0] Hz-masked log-linear OLS baseline (deprecated proxy).
+    Returns:
+      - x_mat: [19, 4] float32 array per channel:
+          col 0: Periodic Theta power (4-8 Hz)
+          col 1: Periodic Delta power (1-4 Hz)
+          col 2: Periodic Alpha power (8-13 Hz)
+          col 3: Aperiodic 1/f exponent chi
+      - pli_matrix: [19, 19] float32 Phase Lag Index connectivity matrix in 4-13 Hz
+    """
+    n_epochs, n_ch, n_times = epochs_data.shape
+    assert n_ch == 19, f"Expected 19 channels, got {n_ch}"
+
+    # 1. Compute Welch PSD averaged across epochs for each of the 19 channels
+    nperseg = min(int(sfreq * 2.0), n_times)
+    freqs, psd = signal.welch(epochs_data, fs=sfreq, nperseg=nperseg, axis=-1)
+    mean_psd = np.mean(psd, axis=0)  # [19, n_freqs]
+
+    if spectral_method == "specparam_resid":
+        x_mat, _, _ = compute_specparam_19ch_features(freqs, mean_psd)
+    elif spectral_method == "specparam_peaks":
+        _, x_mat, _ = compute_specparam_19ch_features(freqs, mean_psd)
+    elif spectral_method == "masked_ols":
+        x_mat = compute_masked_ols_19ch_features(freqs, mean_psd)
+    else:
+        raise ValueError(f"Unknown spectral_method: {spectral_method!r}")
 
     # 2. Compute Real Phase Lag Index (PLI) in 4-13 Hz across epochs (use up to 30 clean epochs for speed)
     max_ep = min(n_epochs, 30)

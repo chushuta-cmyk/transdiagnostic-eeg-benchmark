@@ -48,67 +48,8 @@ REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 # FIGURE S1: SPECPARAM SPECTRAL DECOMPOSITION EXAMPLE
 # ==============================================================================
 def plot_figure_s1(output_dir: Path = REPORTS_DIR):
-    np.random.seed(42)
-    freqs = np.linspace(1.0, 40.0, 391)
-
-    b_val = 0.650
-    chi_val = 1.152
-    aperiodic_bg = b_val - chi_val * np.log10(freqs)
-
-    alpha_peak = 0.72 * np.exp(-((freqs - 10.2) ** 2) / (2 * (1.10 ** 2)))
-    theta_peak = 0.28 * np.exp(-((freqs - 5.8) ** 2) / (2 * (0.85 ** 2)))
-    beta_peak = 0.16 * np.exp(-((freqs - 21.0) ** 2) / (2 * (2.20 ** 2)))
-    periodic_peaks = alpha_peak + theta_peak + beta_peak
-
-    model_fit = aperiodic_bg + periodic_peaks
-    noise = np.random.normal(0, 0.020, size=len(freqs))
-    noise = np.convolve(noise, [0.2, 0.6, 0.2], mode='same')
-    raw_spectrum = model_fit + noise
-    periodic_residual = raw_spectrum - aperiodic_bg
-
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(7.0, 6.2), sharex=True, dpi=300,
-                                   gridspec_kw={'height_ratios': [1.2, 1.0], 'hspace': 0.15})
-
-    # Upper panel: Full Spectrum and Model Fit
-    ax1.plot(freqs, raw_spectrum, color='#1e293b', lw=1.2, alpha=0.85, label='Raw log_{10} PSD')
-    ax1.plot(freqs, aperiodic_bg, color='#dc2626', lw=1.8, ls='--', label='Aperiodic background (L(f) = b − χ log_{10} f)')
-    ax1.plot(freqs, model_fit, color='#2563eb', lw=1.8, label='Full model fit (Aperiodic + Peaks)')
-    ax1.legend(loc='upper right', framealpha=0.95, fontsize=8.5)
-    ax1.set_ylabel(r'Power $\log_{10}\ (\mu\mathrm{V}^2/\mathrm{Hz})$ [B]', labelpad=6)
-    ax1.set_ylim(-1.25, 1.15)
-    ax1.grid(True, linestyle=':', alpha=0.45, color='#94a3b8')
-    ax1.set_title('A. Raw EEG Power Spectrum and Aperiodic Parameterization', fontweight='bold', fontsize=10.5)
-
-    param_text = (
-        r"$\mathbf{specparam\ Model\ Parameters}$" + "\n" +
-        f"Aperiodic Offset (b): {b_val:.3f} B\n" +
-        r"Aperiodic Exponent ($\chi$): " + f"{chi_val:.3f}\n" +
-        r"Goodness-of-Fit ($R^2$): 0.993" + "\n" +
-        r"Focal $\alpha$ Peak: 10.2 Hz (0.72 B)" + "\n" +
-        r"Frontal $\theta$ Peak: 5.8 Hz (0.28 B)"
-    )
-    ax1.text(0.55, 0.15, param_text, transform=ax1.transAxes, fontsize=8.5,
-             bbox=dict(boxstyle='round,pad=0.5', facecolor='#f8fafc', edgecolor='#cbd5e1', lw=0.8))
-
-    # Lower panel: Pure Extracted Periodic Residual (returning to 0 B baseline)
-    ax2.plot(freqs, periodic_residual, color='#64748b', lw=1.0, alpha=0.7, label='Empirical residual (Raw − Aperiodic)')
-    ax2.plot(freqs, periodic_peaks, color='#2563eb', lw=1.8, label='Fitted periodic Gaussian peaks')
-    ax2.axhline(0.0, color='#dc2626', ls='--', lw=1.2, label='Aperiodic baseline (0.0 B)')
-    ax2.fill_between(freqs, 0.0, periodic_peaks, color='#3b82f6', alpha=0.20)
-    ax2.legend(loc='upper right', framealpha=0.95, fontsize=8.5)
-    ax2.set_xlabel('Frequency (Hz)', labelpad=6)
-    ax2.set_ylabel(r'Periodic Residual [B]', labelpad=6)
-    ax2.set_xlim(1.0, 40.0)
-    ax2.set_ylim(-0.15, 0.90)
-    ax2.grid(True, linestyle=':', alpha=0.45, color='#94a3b8')
-    ax2.set_title('B. Isolated Periodic Residual Oscillations (Baseline-Subtracted)', fontweight='bold', fontsize=10.5)
-
-    out_pdf = output_dir / "fig_S1_specparam_example.pdf"
-    out_png = output_dir / "fig_S1_specparam_example.png"
-    plt.savefig(out_pdf, format="pdf", bbox_inches="tight", dpi=300)
-    plt.savefig(out_png, format="png", bbox_inches="tight", dpi=300)
-    plt.close(fig)
-    print(f"✓ Generated: {out_pdf.name}")
+    from fig_s1_real_specparam import plot_real_figure_s1
+    return plot_real_figure_s1(output_dir=output_dir)
 
 
 # ==============================================================================

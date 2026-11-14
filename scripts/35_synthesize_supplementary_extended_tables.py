@@ -264,10 +264,14 @@ def build_table_s21_multiseed() -> str:
 def build_table_s22_riemannian() -> str:
     """Synthesize Markdown Table S22 (PLI eigenvalue audit and Riemannian vs Euclidean connectivity)."""
     eig_path = REPORTS_DIR / "pli_spd_eigenvalue_audit.csv"
+    eig_sum_path = REPORTS_DIR / "pli_spd_eigenvalue_summary.csv"
     bench_path = REPORTS_DIR / "benchmark_riemannian_tangent_space.csv"
     if not eig_path.exists() or not bench_path.exists():
         raise FileNotFoundError(f"Missing required input: {eig_path} or {bench_path}")
     df_eig = pd.read_csv(eig_path)
+    if eig_sum_path.exists():
+        df_eig = pd.concat([df_eig, pd.read_csv(eig_sum_path)], ignore_index=True)
+    df_b = pd.read_csv(bench_path)
     df_b = pd.read_csv(bench_path)
 
     lines = [

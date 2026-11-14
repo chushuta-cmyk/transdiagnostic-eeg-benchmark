@@ -362,7 +362,11 @@ def audit_pli_eigenvalue_spectrum():
         )
 
     all_min_evals = np.array(all_min_evals)
-    audit_rows.append({
+    df_audit = pd.DataFrame(audit_rows)
+    out_csv = REPORTS_DIR / "pli_spd_eigenvalue_audit.csv"
+    df_audit.to_csv(out_csv, index=False)
+
+    summary_rows = [{
         "cohort": "Total Across All 7 Datasets (Primary Sessions)",
         "n_sessions": total_sessions,
         "min_eigenvalue": float(all_min_evals.min()),
@@ -371,12 +375,14 @@ def audit_pli_eigenvalue_spectrum():
         "n_indefinite_raw": total_non_spd,
         "pct_indefinite_raw": 100.0 * total_non_spd / total_sessions,
         "n_indefinite_after_1e4_shift": total_non_spd_after_1e4,
-    })
+    }]
+    out_summary_csv = REPORTS_DIR / "pli_spd_eigenvalue_summary.csv"
+    pd.DataFrame(summary_rows).to_csv(out_summary_csv, index=False)
 
-    df_audit = pd.DataFrame(audit_rows)
-    out_csv = REPORTS_DIR / "pli_spd_eigenvalue_audit.csv"
-    df_audit.to_csv(out_csv, index=False)
-    print(f"\n✅ Saved PLI eigenvalue audit to: {out_csv} (Total indefinite: {total_non_spd}/{total_sessions} = {100.0*total_non_spd/total_sessions:.2f}%)")
+    print(
+        f"\n✅ Saved cohort PLI audit to: {out_csv} & summary to: {out_summary_csv} "
+        f"(Total indefinite: {total_non_spd}/{total_sessions} = {100.0*total_non_spd/total_sessions:.2f}%)"
+    )
     return df_audit
 
 

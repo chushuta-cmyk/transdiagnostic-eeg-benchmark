@@ -683,41 +683,9 @@ def regenerate_clean_figures(df_50, df_med, sleep, mumtaz, cav, ucsd):
     fig.tight_layout(w_pad=2.2)
     save_fig(fig, "Figure_3_Transdiagnostic_Transfer_and_Ablations")
 
-    # --- FIGURE S1: Fix LaTeX math formatting in legend ---
-    freqs = np.linspace(1.0, 40.0, 200)
-    ap = 0.650 - 1.152 * np.log10(freqs)
-    peaks = (0.28 * np.exp(-((freqs - 5.8) ** 2) / (2 * 1.1 ** 2))
-             + 0.72 * np.exp(-((freqs - 10.2) ** 2) / (2 * 1.3 ** 2))
-             + 0.16 * np.exp(-((freqs - 21.0) ** 2) / (2 * 3.0 ** 2)))
-    rng = np.random.RandomState(42)
-    raw_psd = ap + peaks + rng.normal(0, 0.018, size=len(freqs))
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8.5, 7.2), sharex=True)
-    ax1.plot(freqs, raw_psd, color="#263238", lw=1.5, label=r"Raw $\log_{10}\mathrm{PSD}(f)$")
-    ax1.plot(freqs, ap, color="#D32F2F", ls="--", lw=2.0, label=r"Aperiodic floor $L(f) = b - \chi \log_{10} f$")
-    ax1.plot(freqs, ap + peaks, color="#1565C0", lw=2.2, label="Full parameterized fit (Aperiodic + Peaks)")
-    ax1.set_ylabel(r"Power $\log_{10}(\mu\mathrm{V}^2/\mathrm{Hz})$ [B]", fontsize=10.2, fontweight="bold")
-    ax1.set_title("A. Raw EEG Power Spectrum and Aperiodic Parameterization", fontsize=11.2, fontweight="bold")
-    ax1.legend(loc="upper right", frameon=True, fontsize=9.2)
-    ax1.grid(True, linestyle=":", alpha=0.5)
-    box_txt = ("specparam Fit Summary\n"
-               "Aperiodic Offset (b): 0.650 B\n"
-               "Aperiodic Exponent (χ): 1.152\n"
-               "Goodness-of-Fit (R²): 0.993\n"
-               "Posterior α Peak: 10.2 Hz (0.72 B)\n"
-               "Frontal θ Peak: 5.8 Hz (0.28 B)")
-    ax1.text(22.5, -0.92, box_txt, fontsize=9.0, bbox=dict(boxstyle="round,pad=0.5", facecolor="#F8FAFC", edgecolor="#B0BEC5"))
-
-    ax2.plot(freqs, raw_psd - ap, color="#78909C", lw=1.2, label="Empirical residual (Raw − Aperiodic)")
-    ax2.plot(freqs, peaks, color="#1565C0", lw=2.2, label="Fitted periodic Gaussian peaks")
-    ax2.fill_between(freqs, 0, peaks, color="#90CAF9", alpha=0.35)
-    ax2.axhline(0.0, color="#D32F2F", ls="--", lw=1.5, label="Zero baseline (0.0 B)")
-    ax2.set_xlabel("Frequency (Hz)", fontsize=10.5, fontweight="bold")
-    ax2.set_ylabel("Periodic Residual [B]", fontsize=10.2, fontweight="bold")
-    ax2.set_title("B. Isolated Periodic Residual Spectrum (Aperiodic Floor Subtracted)", fontsize=11.2, fontweight="bold")
-    ax2.legend(loc="upper right", frameon=True, fontsize=9.2)
-    ax2.grid(True, linestyle=":", alpha=0.5)
-    fig.tight_layout()
-    save_fig(fig, "fig_S1_specparam_example")
+    # --- FIGURE S1: Empirical real-participant PSD specparam vs masked-OLS figure ---
+    from fig_s1_real_specparam import plot_real_figure_s1
+    plot_real_figure_s1(output_dir=REPORTS_DIR)
 
     # --- FIGURE S2: Canonical 19-Channel OMST Topology Matching Table S1 Degrees (Curved Chords for Zero Overlap) ---
     coords = {

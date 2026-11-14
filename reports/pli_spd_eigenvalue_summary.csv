@@ -1,0 +1,2 @@
+cohort,n_sessions,min_eigenvalue,median_min_eigenvalue,max_min_eigenvalue,n_indefinite_raw,pct_indefinite_raw,n_indefinite_after_1e4_shift
+Total Across All 7 Datasets (Primary Sessions),677,-7.3697052001953125,0.5171321630477905,0.8447222709655762,85,12.555391432791728,85
