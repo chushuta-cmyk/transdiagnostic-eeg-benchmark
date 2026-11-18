@@ -57,7 +57,7 @@ def plot_real_figure_s1(
         metrics=["error_mae", "gof_rsquared"],
         verbose=False,
     )
-    sm.fit(freqs_all, np.maximum(psd_uv2[ch_idx], 1e-12), [1.0, 40.0])
+    sm.fit(freqs_all, np.maximum(psd_uv2[ch_idx], 1e-12), [2.0, 30.0])
 
     f_fit = sm.data.freqs
     raw_log = sm.data.power_spectrum
@@ -69,10 +69,10 @@ def plot_real_figure_s1(
     mae_val = float(sm.get_metrics("error", "mae"))
     peaks = sm.get_params("peak")  # [n_peaks, 3] -> CF, PW, BW
 
-    # Deprecated [7, 14] Hz-masked OLS baseline on identical uV^2/Hz PSD
-    valid_mask = (freqs_all >= 1.0) & (freqs_all <= 40.0)
-    f_valid = freqs_all[valid_mask]
-    assert np.allclose(f_valid, f_fit)
+    # Legacy [7, 14] Hz-masked OLS baseline across full [1, 40] Hz & interior [2, 30] Hz context
+    valid_40 = (freqs_all >= 1.0) & (freqs_all <= 40.0)
+    f_40 = freqs_all[valid_40]
+    raw_log_40 = np.log10(np.maximum(psd_uv2[ch_idx, valid_40], 1e-12))
     log_f = np.log10(f_fit)
     ols_mask = (f_fit < 7.0) | (f_fit > 14.0)
     slope_ols, intercept_ols = np.polyfit(log_f[ols_mask], raw_log[ols_mask], 1)
@@ -93,26 +93,28 @@ def plot_real_figure_s1(
         gridspec_kw={"height_ratios": [1.18, 1.0], "hspace": 0.16}
     )
 
-    # Panel A: Empirical log10 PSD, specparam fit, and OLS contamination
+    # Panel A: Empirical log10 PSD, interior [2, 30] Hz specparam fit, and OLS contamination
+    ax1.axvspan(1.0, 2.0, color="#FEE2E2", alpha=0.40, zorder=0, label="Excluded passband skirt (<2 / >30 Hz)")
+    ax1.axvspan(30.0, 40.0, color="#FEE2E2", alpha=0.40, zorder=0)
     ax1.axvspan(4.0, 7.0, color="#FEF3C7", alpha=0.55, zorder=0, label="Unmasked 4–7 Hz theta (biases OLS fit)")
     ax1.axvspan(7.0, 14.0, color="#E2E8F0", alpha=0.45, zorder=0, label="Masked [7, 14] Hz window (OLS excluded)")
-    ax1.plot(f_fit, raw_log, color="#1E293B", lw=1.7, zorder=3,
+    ax1.plot(f_40, raw_log_40, color="#1E293B", lw=1.6, zorder=3,
              label=rf"Real Welch $\log_{{10}}\mathrm{{PSD}}(f)$ ({subject_id}, AD, Ch {channel_name})")
     ax1.plot(f_fit, full_sp, color="#2563EB", lw=2.0, zorder=4,
-             label=r"specparam full fit (Aperiodic + 4 Gaussian peaks)")
+             label=rf"specparam [2, 30] Hz fit (Aperiodic + {len(peaks)} Gaussian peaks)")
     ax1.plot(f_fit, ap_sp, color="#DC2626", ls="--", lw=2.0, zorder=5,
              label=rf"specparam aperiodic fit ($b={ap_offset:.3f}$, $\chi={ap_chi:.3f}$)")
     ax1.plot(f_fit, ap_ols, color="#0D9488", ls="-.", lw=1.8, zorder=5,
-             label=rf"Deprecated [7, 14] Hz OLS line ($\chi_{{OLS}}={chi_ols:.3f}$)")
+             label=rf"Legacy [7, 14] Hz-masked OLS ($\chi_{{OLS}}={chi_ols:.3f}$)")
 
     ax1.set_ylim(-1.60, 1.82)
     ax1.set_ylabel(r"Power $\log_{10}(\mu\mathrm{V}^2/\mathrm{Hz})$ [B]", fontsize=10.2, fontweight="bold")
     ax1.set_title(
         f"A. Real Participant Power Spectrum ({cohort_key}, {subject_id}, Channel {channel_name}): "
-        "specparam vs. Masked OLS",
-        fontsize=10.6, fontweight="bold", pad=8
+        "Interior [2, 30] Hz specparam vs. Masked OLS",
+        fontsize=10.4, fontweight="bold", pad=8
     )
-    ax1.legend(loc="upper right", fontsize=8.0, frameon=True, framealpha=0.96)
+    ax1.legend(loc="upper right", fontsize=7.6, frameon=True, framealpha=0.96)
     ax1.grid(True, linestyle=":", alpha=0.45)
 
     pk_lines = "\n".join(
@@ -135,6 +137,8 @@ def plot_real_figure_s1(
     # Panel B: Flattened Periodic Residuals
     resid_sp = raw_log - ap_sp
     resid_ols = raw_log - ap_ols
+    ax2.axvspan(1.0, 2.0, color="#FEE2E2", alpha=0.35, zorder=0)
+    ax2.axvspan(30.0, 40.0, color="#FEE2E2", alpha=0.35, zorder=0)
     ax2.axvspan(4.0, 8.0, color="#FEF3C7", alpha=0.45, zorder=0)
     ax2.axhline(0.0, color="#DC2626", ls="--", lw=1.3, zorder=2, label="specparam aperiodic baseline (0.0 B)")
     ax2.plot(f_fit, resid_sp, color="#475569", lw=1.3, alpha=0.85, zorder=3,

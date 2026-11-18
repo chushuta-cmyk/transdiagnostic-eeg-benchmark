@@ -1,0 +1,5 @@
+marker,n_shared,pearson_r,p_value
+Frontal Periodic Theta (4–8 Hz Residual),53,0.9407815497853751,1.295802120316845e-25
+Frontal Aperiodic Exponent (χ),53,0.27781609945976027,0.04399432129536455
+Global Aperiodic Exponent (χ),53,0.3999047891633071,0.0030090654793063637
+"Global Cost Efficiency (GCE, OMST)",53,0.7518614550668759,8.664414217835255e-11
