@@ -125,8 +125,8 @@ def plot_figure_1():
         ax.set_yticks(y_pos)
         ax.set_yticklabels([lbl for _, lbl, _ in cohort_order], fontsize=8.4)
     axes[1, 1].text(
-        0.99, 0.015, "* q_50<0.05  ** q_50<0.01  *** q_50<0.001  † q_10<0.05",
-        transform=axes[1, 1].transAxes, ha="right", va="bottom", fontsize=7.5,
+        0.99, 0.015, r"$*\,q_{50}<0.05 \quad **\,q_{50}<0.01 \quad ***\,q_{50}<0.001 \quad \dagger\,q_{10}<0.05$",
+        transform=axes[1, 1].transAxes, ha="right", va="bottom", fontsize=7.2,
         bbox=dict(boxstyle="round,pad=0.24", fc="#ffffff", ec="#cbd5e1", alpha=0.96),
     )
     fig.tight_layout(h_pad=1.3, w_pad=0.9)
@@ -439,13 +439,13 @@ def plot_figure_4(sp):
     ax2.scatter(y_dem[~is_ctrl], oof_full[~is_ctrl], c="#dc2626", s=32, alpha=0.82, edgecolors="#ffffff", lw=0.6, label="AD+FTD (N=59)")
     m_f, b_f = np.polyfit(y_dem, oof_full, 1)
     xs_f = np.linspace(y_dem.min(), y_dem.max(), 100)
-    ax2.plot(xs_f, m_f * xs_f + b_f, color="#0f172a", lw=1.7, label=f"All (N=88): r={r_full:.3f}")
+    ax2.plot(xs_f, m_f * xs_f + b_f, color="#0f172a", lw=1.7, label=f"All (N=88): r={r_full:.3f} (RF)")
     m_p, b_p = np.polyfit(y_pts, oof_pts, 1)
     xs_p = np.linspace(y_pts.min(), y_pts.max(), 100)
-    ax2.plot(xs_p, m_p * xs_p + b_p, color="#b91c1c", ls="--", lw=1.7, label=f"Pts (N=59): r={r_pts:.3f}")
+    ax2.plot(xs_p, m_p * xs_p + b_p, color="#b91c1c", ls="--", lw=1.7, label=f"Pts (N=59): r={r_pts:.3f} (RF)")
     ax2.set_xlabel("Observed MMSE Score", fontsize=9.0)
     ax2.set_ylabel("Split-0 OOF Predicted MMSE", fontsize=9.0)
-    ax2.set_title("(b) Dementia MMSE Confounding", fontweight="bold", loc="left", fontsize=9.6)
+    ax2.set_title("(b) Dementia MMSE Confounding (RF OOF)", fontweight="bold", loc="left", fontsize=9.6)
     ax2.set_ylim(13.5, 36.2)
     ax2.legend(loc="upper left", fontsize=7.0, framealpha=0.96)
     ax2.grid(True, ls=":", alpha=0.5)
@@ -477,7 +477,7 @@ def plot_figure_4(sp):
     pcol = "maxstat4_perm_p_2s" if "maxstat4_perm_p_2s" in rg.columns else "perm_p"
     for i_t, (ckey, _) in enumerate(tasks_cfg):
         sub_t = rg[rg["cohort_key"] == ckey]
-        best_row = sub_t.loc[sub_t[pcol].idxmin()] if "maxstat4_perm_p_2s" in rg.columns else sub_t.loc[sub_t["pearson_r_mean"].idxmax()]
+        best_row = sub_t.loc[sub_t["pearson_r_mean"].idxmax()]
         y_top = float(sub_t["pearson_r_mean"].max() + sub_t["pearson_r_sd"].max())
         p_p = float(best_row[pcol])
         p_lbl = "p_max<0.01" if p_p < 0.01 else f"p_max={p_p:.2f}"
