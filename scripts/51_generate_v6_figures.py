@@ -12,6 +12,7 @@ Springer Neuroinformatics v6 Figure Suite (Figures 1-4 & Supplementary Figures S
 """
 
 import json
+import shutil
 import sys
 from pathlib import Path
 
@@ -33,9 +34,7 @@ from harmonizer_and_graph import CHANNELS_19
 REPORTS_DIR = BENCHMARK_ROOT / "reports"
 DATA_DIR = BENCHMARK_ROOT / "data" / "derivatives"
 MANUSCRIPT_FIGS_DIR = BENCHMARK_ROOT / "manuscript" / "figures"
-SUB_MAIN_FIGS = BENCHMARK_ROOT / "submission_Neuroinformatics" / "Figures" / "Main_Figures"
-SUB_SUPP_FIGS = BENCHMARK_ROOT / "submission_Neuroinformatics" / "Figures" / "Supplementary_Figures"
-for d in (REPORTS_DIR, MANUSCRIPT_FIGS_DIR, SUB_MAIN_FIGS, SUB_SUPP_FIGS):
+for d in (REPORTS_DIR, MANUSCRIPT_FIGS_DIR):
     d.mkdir(parents=True, exist_ok=True)
 
 plt.rcParams["font.sans-serif"] = ["Arial", "Helvetica", "DejaVu Sans"]
@@ -56,9 +55,8 @@ plt.rcParams["legend.edgecolor"] = "#cbd5e1"
 
 
 def save_fig(fig, stem: str, is_main: bool = True):
-    """Export 600-DPI PNG, vector PDF, and vector EPS across reports/, manuscript/figures/, and submission/."""
-    sub_dir = SUB_MAIN_FIGS if is_main else SUB_SUPP_FIGS
-    for folder in (REPORTS_DIR, MANUSCRIPT_FIGS_DIR, sub_dir):
+    """Export 600-DPI PNG, vector PDF, and vector EPS across reports/ and manuscript/figures/."""
+    for folder in (REPORTS_DIR, MANUSCRIPT_FIGS_DIR):
         fig.savefig(folder / f"{stem}.png", dpi=600, bbox_inches="tight")
         fig.savefig(folder / f"{stem}.pdf", bbox_inches="tight")
         fig.savefig(folder / f"{stem}.eps", bbox_inches="tight")
@@ -263,6 +261,8 @@ def plot_figure_3():
     lk = pd.read_csv(REPORTS_DIR / "benchmark_leakage_ablation.csv")
     pli_audit = pd.read_csv(REPORTS_DIR / "pli_spd_eigenvalue_audit.csv")
     pli_sum = pd.read_csv(REPORTS_DIR / "pli_spd_eigenvalue_summary.csv").iloc[0]
+    dg = pd.read_csv(REPORTS_DIR / "v7_deep_baseline_and_tuned_gcn_10x5.csv")
+    sc_fm = pd.read_csv(REPORTS_DIR / "spatial_cov_foldwise_frechet_check.csv")
 
     fig = plt.figure(figsize=(11.8, 4.9), dpi=300)
     gs = fig.add_gridspec(1, 3, width_ratios=[1.28, 1.05, 1.02], wspace=0.38)
@@ -271,18 +271,24 @@ def plot_figure_3():
     ax1 = fig.add_subplot(gs[0, 0])
     nn8 = ms[~ms["cohort"].str.contains("2b|5c|6b|6c")].copy()
     agg = nn8.groupby("model")[["mean_auc", "std_auc"]].agg(mean_auc=("mean_auc", "mean"), within_sd=("std_auc", "mean"))
+    dg_agg = dg.groupby("model")[["mean_auc", "sd_auc"]].mean()
+    airm_rf_row = sc_fm[sc_fm["classifier"] == "RF"]
+    agg.loc["SpatialCov_AIRM_RF"] = [float(airm_rf_row["auc_fold_frechet_ref"].mean()), float(airm_rf_row["sd_fold_frechet"].mean())]
+    for m_new in ("ShallowSpecCNN", "GCN_OMST_Tuned"):
+        agg.loc[m_new] = [float(dg_agg.loc[m_new, "mean_auc"]), float(dg_agg.loc[m_new, "sd_auc"])]
+
     model_order = [
+        ("SpatialCov_AIRM_RF", "SpatialCov RF (AIRM)", "#0f766e"),
         ("Linear_SVM", "Linear SVM", "#1d4ed8"),
-        ("Tuned_LogisticRegression", "Tuned LR", "#0369a1"),
         ("RandomForest", "Random Forest", "#0284c7"),
-        ("Tuned_Ridge", "Tuned Ridge", "#1e3a8a"),
+        ("Tuned_LogisticRegression", "Tuned LR", "#0369a1"),
+        ("ShallowSpecCNN", "ShallowSpecCNN", "#7c3aed"),
+        ("GCN_OMST_Tuned", "GCN-OMST-Tuned", "#e11d48"),
         ("GCN_Random_EdgeMatched", "GCN-Random*", "#f97316"),
         ("GCN_Full", "GCN-Full", "#ea580c"),
         ("GCN_OMST", "GCN-OMST", "#dc2626"),
         ("GCN_Weighted_PLI", "GCN-WPLI", "#b91c1c"),
         ("GCN_Identity", "GCN-Identity", "#94a3b8"),
-        ("RBF_SVM", "RBF SVM", "#64748b"),
-        ("Single_Theta", "Single Theta", "#ca8a04"),
     ]
     x = np.arange(len(model_order))
     vals = [float(agg.loc[m, "mean_auc"]) for m, _, _ in model_order]
@@ -291,9 +297,9 @@ def plot_figure_3():
     ax1.axhline(0.50, color="#475569", ls=":", lw=1.0)
     ax1.axhline(float(agg.loc["GCN_OMST", "mean_auc"]), color="#dc2626", ls="--", lw=1.0, alpha=0.75)
     for b, v, sd in zip(bars, vals, sds):
-        ax1.text(b.get_x() + b.get_width() / 2, v + sd + 0.006, f"{v:.3f}", ha="center", va="bottom", fontsize=6.8, fontweight="bold", rotation=35)
+        ax1.text(b.get_x() + b.get_width() / 2, v + sd + 0.006, f"{v:.3f}", ha="center", va="bottom", fontsize=6.5, fontweight="bold", rotation=35)
     ax1.set_xticks(x)
-    ax1.set_xticklabels([lbl for _, lbl, _ in model_order], rotation=35, ha="right", fontsize=7.8)
+    ax1.set_xticklabels([lbl for _, lbl, _ in model_order], rotation=35, ha="right", fontsize=7.4)
     ax1.set_ylim(0.48, 0.85)
     ax1.set_ylabel("10×5 Mean ROC-AUC (k=8)", fontsize=9.0)
     ax1.set_title("(a) 10×5 Model & Graph Parity", fontweight="bold", loc="left", fontsize=9.6)
@@ -703,6 +709,7 @@ def plot_figure_s6():
 
 
 def main():
+    shutil.rmtree(BENCHMARK_ROOT / "submission_Neuroinformatics" / "Figures", ignore_errors=True)
     sp = torch.load(DATA_DIR / "specparam_vs_masked_ols_7cohorts.pt", weights_only=False)
     with open(REPORTS_DIR / "master_results.json", "r", encoding="utf-8") as f:
         master = json.load(f)
