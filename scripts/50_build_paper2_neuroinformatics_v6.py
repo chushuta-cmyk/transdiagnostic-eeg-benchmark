@@ -88,8 +88,8 @@ REFS_ALPHA = [
     ("Bullmore & Sporns, 2009", "Bullmore, E., & Sporns, O. (2009). Complex brain networks: Graph theoretical analysis of structural and functional systems. *Nature Reviews Neuroscience*, 10(3), 186–198. https://doi.org/10.1038/nrn2575"),
     ("Buzsáki, 2006", "Buzsáki, G. (2006). *Rhythms of the Brain*. Oxford University Press. https://doi.org/10.1093/acprof:oso/9780195301069.001.0001"),
     ("Buzsáki & Draguhn, 2004", "Buzsáki, G., & Draguhn, A. (2004). Neuronal oscillations in cortical networks. *Science*, 304(5679), 1926–1929. https://doi.org/10.1126/science.1099745"),
-    ("Cavanagh & Frank, 2014", "Cavanagh, J. F., & Frank, M. J. (2014). Frontal theta as a mechanism for cognitive control. *Trends in Cognitive Sciences*, 18(8), 414–421. https://doi.org/10.1016/j.tics.2014.04.012"),
     ("Cavanagh et al., 2019", "Cavanagh, J. F., Bismark, A. W., Frank, M. J., & Allen, J. J. B. (2019). Multiple dissociations between comorbid depression and anxiety on reward and punishment processing: Evidence from computationally informed EEG. *Computational Psychiatry*, 3, 1–17. https://doi.org/10.1162/cpsy_a_00024 (Dataset: OpenNeuro ds003478, https://doi.org/10.18112/openneuro.ds003478.v1.1.0)"),
+    ("Cavanagh & Frank, 2014", "Cavanagh, J. F., & Frank, M. J. (2014). Frontal theta as a mechanism for cognitive control. *Trends in Cognitive Sciences*, 18(8), 414–421. https://doi.org/10.1016/j.tics.2014.04.012"),
     ("Cavanagh et al., 2018", "Cavanagh, J. F., Kumar, P., Mueller, A. A., Richardson, S. P., & Mueen, A. (2018). Diminished EEG habituation to novel events effectively classifies Parkinson's patients. *Clinical Neurophysiology*, 129(2), 409–418. https://doi.org/10.1016/j.clinph.2017.11.023 (Dataset: OpenNeuro ds003490, https://doi.org/10.18112/openneuro.ds003490.v1.1.0)"),
     ("Cohen, 2014", "Cohen, M. X. (2014). *Analyzing Neural Time Series Data: Theory and Practice*. MIT Press."),
     ("Cole & Voytek, 2017", "Cole, S. R., & Voytek, B. (2017). Brain oscillations and the importance of waveform shape. *Trends in Cognitive Sciences*, 21(2), 137–149. https://doi.org/10.1016/j.tics.2016.12.008"),
@@ -1908,11 +1908,16 @@ def main():
     shutil.copy2(SUPP_PDF, SUBMISSION_DIR / "05_Online_Resource_1_Neuroinformatics.pdf")
     build_excel_online_resource_2(d, SUBMISSION_DIR / "05b_Online_Resource_2_Benchmark_Tables.xlsx")
 
-    # Remove stale v5 ESM files in submission_Neuroinformatics if present
+    # Remove stale v5 ESM files and Word lock files in submission_Neuroinformatics if present
     for stale_fn in ["05_Supplementary_Material_Neuroinformatics.docx", "05_Supplementary_Material_Neuroinformatics.md"]:
         sp_old = SUBMISSION_DIR / stale_fn
         if sp_old.exists():
             sp_old.unlink()
+    for lock_f in list(SUBMISSION_DIR.glob("~$*")):
+        try:
+            lock_f.unlink()
+        except Exception:
+            pass
 
     chk_p = SUBMISSION_DIR / "08_Submission_Checklist_Neuroinformatics.md"
     chk_p.write_text(build_submission_checklist(main_md), encoding="utf-8")
