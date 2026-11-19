@@ -38,3 +38,6 @@ submission_*/
 *.bak
 Research_Proposal_and_Experimental_Design_EN.md
 reports/supplementary_extended_tables_s19_s23.md
+reports/*.eps
+reports/remediation_run.log
+reports/archive_cibm_masked_ols/

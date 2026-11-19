@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this benchmark suite or derived artifacts, please cite both the software release and the accompanying Neuroinformatics manuscript."
+title: "An Open Multi-Cohort EEG Benchmark for Spectral Parameterization, Sensor Graphs, and Reproducibility Audits"
+version: "v6.0.0"
+date-released: "2026-11-19"
+license: "MIT"
+repository-code: "https://github.com/chushuta-cmyk/transdiagnostic-eeg-benchmark"
+authors:
+  - family-names: "Tan"
+    given-names: "Chushu"
+    orcid: "https://orcid.org/0009-0007-3093-0160"
+    affiliation: "School of Sociology, China University of Political Science and Law, Beijing, China; Department of Psychology, University at Buffalo, The State University of New York, Buffalo, NY, USA"
+    email: "chushuta@gmail.com"
+keywords:
+  - neuroinformatics
+  - quantitative EEG
+  - spectral parameterization
+  - graph neural networks
+  - reproducibility auditing
+  - dataset forensics
